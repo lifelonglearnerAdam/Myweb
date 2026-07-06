@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>联系我 — 曾子墨</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .contact-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 24px;
+      border-radius: var(--radius);
+      background: var(--bg);
+      transition: all var(--transition);
+    }
+
+    .contact-item:hover {
+      background: var(--primary-light);
+    }
+
+    .contact-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .contact-icon.email { background: #dbeafe; }
+    .contact-icon.phone { background: #dcfce7; }
+    .contact-icon.wechat { background: #f0fdf4; }
+
+    .contact-label {
+      font-size: 13px;
+      color: var(--text-light);
+    }
+
+    .contact-value {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .contact-note {
+      text-align: center;
+      margin-top: 32px;
+    }
+
+    .contact-note p {
+      color: var(--text-light);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">Zimo</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">首页</a></li>
+        <li><a href="about.html">关于我</a></li>
+        <li><a href="hobby.html">我的爱好</a></li>
+        <li><a href="photo.html">我的相册</a></li>
+        <li><a href="myessay.html">我的随笔</a></li>
+        <li><a href="contact.html" class="active">联系我</a></li>
+      </ul>
+      <button class="nav-toggle" aria-label="菜单">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <main class="main">
+    <h1 class="page-title animate-in">联系我</h1>
+    <p class="page-subtitle animate-in" style="animation-delay: 0.1s">欢迎通过以下方式与我取得联系</p>
+
+    <div class="card animate-in" style="animation-delay: 0.15s">
+      <ul class="contact-list">
+        <li class="contact-item">
+          <div class="contact-icon email">📧</div>
+          <div>
+            <div class="contact-label">电子邮件</div>
+            <div class="contact-value">2319597720@qq.com</div>
+          </div>
+        </li>
+        <li class="contact-item">
+          <div class="contact-icon phone">📞</div>
+          <div>
+            <div class="contact-label">电话</div>
+            <div class="contact-value">188-722-38425</div>
+          </div>
+        </li>
+        <li class="contact-item">
+          <div class="contact-icon wechat">💬</div>
+          <div>
+            <div class="contact-label">微信</div>
+            <div class="contact-value">ThinkDifferent______</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="contact-note animate-in" style="animation-delay: 0.25s">
+      <p>期待与您交流！无论是技术讨论还是闲聊，都很欢迎 🎉</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2025 曾子墨 <span class="heart">❤</span> 好好学习，天天向上</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

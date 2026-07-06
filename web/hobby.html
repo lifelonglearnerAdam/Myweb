@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的爱好 — 曾子墨</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .hobby-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .hobby-card {
+      text-align: center;
+      padding: 32px 24px;
+      cursor: default;
+    }
+
+    .hobby-icon {
+      font-size: 40px;
+      margin-bottom: 14px;
+    }
+
+    .hobby-card h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .hobby-card p {
+      color: var(--text-light);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .hobby-note {
+      margin-top: 32px;
+    }
+
+    .hobby-note p {
+      font-size: 16px;
+      color: var(--text);
+      line-height: 1.9;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">Zimo</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">首页</a></li>
+        <li><a href="about.html">关于我</a></li>
+        <li><a href="hobby.html" class="active">我的爱好</a></li>
+        <li><a href="photo.html">我的相册</a></li>
+        <li><a href="myessay.html">我的随笔</a></li>
+        <li><a href="contact.html">联系我</a></li>
+      </ul>
+      <button class="nav-toggle" aria-label="菜单">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <main class="main">
+    <h1 class="page-title animate-in">我的爱好</h1>
+    <p class="page-subtitle animate-in" style="animation-delay: 0.1s">代码之外，还有更广阔的世界</p>
+
+    <div class="hobby-grid">
+      <div class="card hobby-card animate-in" style="animation-delay: 0.1s">
+        <div class="hobby-icon">💻</div>
+        <h3>编程</h3>
+        <p>网页设计 · C 语言 · Python，享受用代码创造事物的乐趣</p>
+      </div>
+      <div class="card hobby-card animate-in" style="animation-delay: 0.15s">
+        <div class="hobby-icon">📖</div>
+        <h3>阅读</h3>
+        <p>喜欢阅读各种类型的书籍，在文字中探索不同的世界</p>
+      </div>
+      <div class="card hobby-card animate-in" style="animation-delay: 0.2s">
+        <div class="hobby-icon">✈️</div>
+        <h3>旅行</h3>
+        <p>探索新的地方和文化，用脚步丈量世界的宽度</p>
+      </div>
+      <div class="card hobby-card animate-in" style="animation-delay: 0.25s">
+        <div class="hobby-icon">🍜</div>
+        <h3>美食</h3>
+        <p>尝试不同美食、探索新菜肴，味蕾是最好的旅行指南</p>
+      </div>
+      <div class="card hobby-card animate-in" style="animation-delay: 0.3s">
+        <div class="hobby-icon">🎬</div>
+        <h3>电影</h3>
+        <p>喜欢观看各种类型的电影，在光影中体验百态人生</p>
+      </div>
+      <div class="card hobby-card animate-in" style="animation-delay: 0.35s">
+        <div class="hobby-icon">📷</div>
+        <h3>摄影</h3>
+        <p>捕捉生活中的美好瞬间，定格值得珍藏的回忆</p>
+      </div>
+    </div>
+
+    <div class="card hobby-note animate-in" style="animation-delay: 0.4s">
+      <h2 class="section-title">关于爱好</h2>
+      <p>这些爱好不仅丰富了我的生活，也让我在工作之余能够更好地放松和充电。编程给我逻辑与创造的快感，阅读和电影给我思想的深度，旅行和美食让我感知世界的温度。每一种热爱，都是生活的一部分。</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2025 曾子墨 <span class="heart">❤</span> 好好学习，天天向上</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

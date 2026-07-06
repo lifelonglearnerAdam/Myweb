@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>关于我 — 曾子墨</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .info-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+    }
+
+    .info-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .info-label {
+      color: var(--text-light);
+      font-size: 13px;
+    }
+
+    .info-value {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .intro-card p {
+      margin-bottom: 14px;
+      line-height: 1.9;
+      font-size: 16px;
+      color: var(--text);
+    }
+
+    .intro-card p:last-child {
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 640px) {
+      .about-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">Zimo</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">首页</a></li>
+        <li><a href="about.html" class="active">关于我</a></li>
+        <li><a href="hobby.html">我的爱好</a></li>
+        <li><a href="photo.html">我的相册</a></li>
+        <li><a href="myessay.html">我的随笔</a></li>
+        <li><a href="contact.html">联系我</a></li>
+      </ul>
+      <button class="nav-toggle" aria-label="菜单">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <main class="main">
+    <h1 class="page-title animate-in">关于我</h1>
+    <p class="page-subtitle animate-in" style="animation-delay: 0.1s">一个热爱编程与生活的华科计科人</p>
+
+    <div class="about-grid animate-in" style="animation-delay: 0.15s">
+      <div class="info-item">
+        <span class="info-icon">👤</span>
+        <div>
+          <div class="info-label">姓名</div>
+          <div class="info-value">曾子墨</div>
+        </div>
+      </div>
+      <div class="info-item">
+        <span class="info-icon">🏫</span>
+        <div>
+          <div class="info-label">学校</div>
+          <div class="info-value">华中科技大学</div>
+        </div>
+      </div>
+      <div class="info-item">
+        <span class="info-icon">💻</span>
+        <div>
+          <div class="info-label">专业</div>
+          <div class="info-value">计算机科学与技术</div>
+        </div>
+      </div>
+      <div class="info-item">
+        <span class="info-icon">📚</span>
+        <div>
+          <div class="info-label">班级</div>
+          <div class="info-value">2507 班</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card intro-card animate-in" style="animation-delay: 0.2s">
+      <h2 class="section-title">自我介绍</h2>
+      <p>大家好！我是一个热爱编程和技术的开发者，目前就读于华中科技大学计算机科学与技术专业。</p>
+      <p>我喜欢探索新的技术，学习不同的编程语言，并且享受解决复杂问题的过程。从 C 语言到 Python，从算法到网页设计，每一行代码都让我感受到创造的乐趣。</p>
+      <p>在业余时间，我喜欢户外漫步，和女朋友一起下馆子，并且与志同道合的朋友交流经验。美食、旅行、摄影，都是我生活中不可或缺的色彩。</p>
+      <p>这是一个初步的个人网站，期待与您分享更多有趣的内容！</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2025 曾子墨 <span class="heart">❤</span> 好好学习，天天向上</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

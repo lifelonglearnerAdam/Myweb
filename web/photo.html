@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的相册 — 曾子墨</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .photo-item {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      aspect-ratio: 1;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      transition: all var(--transition);
+    }
+
+    .photo-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .photo-item:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-4px);
+    }
+
+    .photo-item:hover img {
+      transform: scale(1.08);
+    }
+
+    .photo-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 10px 12px;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+
+    .photo-item:hover .photo-overlay {
+      opacity: 1;
+    }
+
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      cursor: pointer;
+    }
+
+    .lightbox.open {
+      display: flex;
+    }
+
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 85vh;
+      border-radius: var(--radius-sm);
+      object-fit: contain;
+    }
+
+    @media (max-width: 640px) {
+      .photo-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">Zimo</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">首页</a></li>
+        <li><a href="about.html">关于我</a></li>
+        <li><a href="hobby.html">我的爱好</a></li>
+        <li><a href="photo.html" class="active">我的相册</a></li>
+        <li><a href="myessay.html">我的随笔</a></li>
+        <li><a href="contact.html">联系我</a></li>
+      </ul>
+      <button class="nav-toggle" aria-label="菜单">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <main class="main">
+    <h1 class="page-title animate-in">我的相册</h1>
+    <p class="page-subtitle animate-in" style="animation-delay: 0.1s">生活中的精彩瞬间，每一帧都值得珍藏</p>
+
+    <div class="photo-grid">
+      <div class="photo-item animate-in" style="animation-delay: 0.1s" onclick="openLightbox(this)">
+        <img src="../image/avatar.jpg" alt="我的头像" loading="lazy">
+        <span class="photo-overlay">我的头像</span>
+      </div>
+      <div class="photo-item animate-in" style="animation-delay: 0.13s" onclick="openLightbox(this)">
+        <img src="../image/sunshine.jpg" alt="阳光下的公园" loading="lazy">
+        <span class="photo-overlay">公园</span>
+      </div>
+      <div class="photo-item animate-in" style="animation-delay: 0.16s" onclick="openLightbox(this)">
+        <img src="../image/barbecue.jpg" alt="美味烧烤" loading="lazy">
+        <span class="photo-overlay">烧烤</span>
+      </div>
+      <div class="photo-item animate-in" style="animation-delay: 0.19s" onclick="openLightbox(this)">
+        <img src="../image/copperpan.jpg" alt="铜锅美食" loading="lazy">
+        <span class="photo-overlay">铜锅</span>
+      </div>
+      <div class="photo-item animate-in" style="animation-delay: 0.22s" onclick="openLightbox(this)">
+        <img src="../image/crab.jpg" alt="鲜美大闸蟹" loading="lazy">
+        <span class="photo-overlay">大闸蟹</span>
+      </div>
+      <div class="photo-item animate-in" style="animation-delay: 0.25s" onclick="openLightbox(this)">
+        <img src="../image/dessert.jpg" alt="精致甜点" loading="lazy">
+        <span class="photo-overlay">甜点</span>
+      </div>
+      <div class="photo-item animate-in" style="animation-delay: 0.28s" onclick="openLightbox(this)">
+        <img src="../image/Dominant.jpg" alt="达美乐披萨" loading="lazy">
+        <span class="photo-overlay">达美乐</span>
+      </div>
+      <div class="photo-item animate-in" style="animation-delay: 0.31s" onclick="openLightbox(this)">
+        <img src="../image/ginkgoleaf.jpg" alt="金色银杏林" loading="lazy">
+        <span class="photo-overlay">银杏林</span>
+      </div>
+      <div class="photo-item animate-in" style="animation-delay: 0.34s" onclick="openLightbox(this)">
+        <img src="../image/love1.jpg" alt="甜蜜时刻" loading="lazy">
+        <span class="photo-overlay">爱人</span>
+      </div>
+      <div class="photo-item animate-in" style="animation-delay: 0.37s" onclick="openLightbox(this)">
+        <img src="../image/love2.jpg" alt="甜蜜时刻" loading="lazy">
+        <span class="photo-overlay">爱人</span>
+      </div>
+      <div class="photo-item animate-in" style="animation-delay: 0.4s" onclick="openLightbox(this)">
+        <img src="../image/love3.jpg" alt="甜蜜时刻" loading="lazy">
+        <span class="photo-overlay">爱人</span>
+      </div>
+      <div class="photo-item animate-in" style="animation-delay: 0.43s" onclick="openLightbox(this)">
+        <img src="../image/Mstand.jpg" alt="M Stand 咖啡" loading="lazy">
+        <span class="photo-overlay">M Stand</span>
+      </div>
+      <div class="photo-item animate-in" style="animation-delay: 0.46s" onclick="openLightbox(this)">
+        <img src="../image/nightsnack.jpg" alt="深夜烤冷面" loading="lazy">
+        <span class="photo-overlay">烤冷面</span>
+      </div>
+      <div class="photo-item animate-in" style="animation-delay: 0.49s" onclick="openLightbox(this)">
+        <img src="../image/starbucks.jpg" alt="星巴克时光" loading="lazy">
+        <span class="photo-overlay">星巴克</span>
+      </div>
+      <div class="photo-item animate-in" style="animation-delay: 0.52s" onclick="openLightbox(this)">
+        <img src="../image/xihuayuan.jpg" alt="西华园风景" loading="lazy">
+        <span class="photo-overlay">西华园</span>
+      </div>
+    </div>
+  </main>
+
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" alt="">
+  </div>
+
+  <footer class="site-footer">
+    <p>© 2025 曾子墨 <span class="heart">❤</span> 好好学习，天天向上</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+  <script>
+    function openLightbox(el) {
+      const img = el.querySelector("img");
+      document.getElementById("lightbox-img").src = img.src;
+      document.getElementById("lightbox").classList.add("open");
+    }
+    function closeLightbox() {
+      document.getElementById("lightbox").classList.remove("open");
+    }
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeLightbox();
+    });
+  </script>
+</body>
+</html>

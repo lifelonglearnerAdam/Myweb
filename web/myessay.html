@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的随笔 — 曾子墨</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .timeline {
+      position: relative;
+      padding-left: 28px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 6px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 32px;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -28px;
+      top: 6px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 3px solid var(--primary-light);
+    }
+
+    .essay-card {
+      padding: 24px 28px;
+    }
+
+    .essay-date {
+      display: inline-block;
+      font-size: 13px;
+      color: var(--primary);
+      font-weight: 600;
+      background: var(--primary-light);
+      padding: 3px 12px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    .essay-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .essay-body {
+      color: var(--text-light);
+      line-height: 2;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../index.html" class="nav-logo">Zimo</a>
+      <ul class="nav-links">
+        <li><a href="../index.html">首页</a></li>
+        <li><a href="about.html">关于我</a></li>
+        <li><a href="hobby.html">我的爱好</a></li>
+        <li><a href="photo.html">我的相册</a></li>
+        <li><a href="myessay.html" class="active">我的随笔</a></li>
+        <li><a href="contact.html">联系我</a></li>
+      </ul>
+      <button class="nav-toggle" aria-label="菜单">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <main class="main">
+    <h1 class="page-title animate-in">我的随笔</h1>
+    <p class="page-subtitle animate-in" style="animation-delay: 0.1s">记录华科校园生活的点点滴滴</p>
+
+    <div class="timeline">
+      <div class="timeline-item animate-in" style="animation-delay: 0.15s">
+        <div class="timeline-dot"></div>
+        <div class="card essay-card">
+          <span class="essay-date">2025年11月27日</span>
+          <h2 class="essay-title">网页设计真是难啊，和女朋友在图书馆呆了一整天</h2>
+          <p class="essay-body">
+            今天和谊谊宝宝一起在图书馆学习了一整天，主要是我在学习网页设计，开始的时候在搞PPT，PPT很简单，真正上手后一下子就搞完了，然后就写HTML代码，虽然说有AI的帮助，但是每一行代码都是我手敲的，真的是累死了，晚上外面的牛肉包子很好吃，昨天团购的薄皮柚子谊谊宝宝说还挺好吃的，以后可以继续买。下周有我们学校的固体杨枝甘露团购，我会关注一下，尽早下单的。
+          </p>
+        </div>
+      </div>
+
+      <div class="timeline-item animate-in" style="animation-delay: 0.25s">
+        <div class="timeline-dot"></div>
+        <div class="card essay-card">
+          <span class="essay-date">2025年11月21日</span>
+          <h2 class="essay-title">匆忙而有趣的早晨，学习的下午和晚上</h2>
+          <p class="essay-body">
+            今天早上因为个人原因导致谊谊体育课没办法上，然后早十的微积分虽然很重要，但是有点不想去，所以一直拖延磨蹭，最后还有二十分钟的时候衣服都没穿整齐，随手拿了昨天只吃了一口的蛋糕盒子就出门了。一路上狂飙，差点迟到，中午自己在食堂吃的鸡蛋饼卷火腿肠，一个人吃饭还是没什么意思。下午把谊谊宝宝送到图书馆自习，然后我自己自学敲HTML代码，网页设计还是挺有意思的。
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2025 曾子墨 <span class="heart">❤</span> 好好学习，天天向上</p>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
