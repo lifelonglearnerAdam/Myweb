@@ -14,6 +14,7 @@
   let menuOpen = false;
   let sectionObserver;
   let toastTimeout;
+  let progressScheduled = false;
   const mobileNavigation = window.matchMedia("(max-width: 860px)");
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
@@ -36,6 +37,9 @@
     waveform: '<path d="M2 12h2l2-7 4 14 4-14 4 14 2-7h2"/>',
     "arrow-up": '<path d="M12 20V4m-6 6 6-6 6 6"/>',
     print: '<path d="M6 9V3h12v6M6 18H3V9h18v9h-3"/><path d="M6 14h12v8H6ZM17 11h1"/>',
+    volume: '<path d="m11 5-6 4H2v6h3l6 4ZM15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/>',
+    "volume-off": '<path d="m11 5-6 4H2v6h3l6 4Zm5 4 5 6m0-6-5 6"/>',
+    search: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',
     external: '<path d="M14 3h7v7m0-7L10 14M10 3H3v18h18v-7"/>'
   };
   function icon(name) {
@@ -53,19 +57,30 @@
   function externalLink(url, label, className = "text-link") {
     return `<a class="${className}" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer"><span>${escapeHTML(label)}</span><span aria-hidden="true">↗</span></a>`;
   }
-  function sectionHref(id) { return page === "home" ? `#${id}` : localHref(`index.html#${id}`); }
+  function sectionHref(id) { return id === "archive" ? localHref("archive.html") : page === "home" ? `#${id}` : localHref(`index.html#${id}`); }
   function renderHeader() {
     const root = document.getElementById("site-header");
     if (!root) return;
-    const sections = ["projects", "research", "writing", "about", "contact"];
-    root.innerHTML = `<div class="header-inner container"><div class="brand-group"><a class="brand" href="${localHref("index.html")}" aria-label="Zimo · ${t("home")}">zimo<span>.</span></a><span class="brand-suffix">A PERSONAL SPACE</span></div><nav class="header-links" id="header-navigation" aria-label="${t("navigation")}">${sections.map(id => `<a href="${sectionHref(id)}" data-nav-section="${id}">${t(id)}</a>`).join("")}</nav><div class="header-tools"><div class="language-switch" role="group" aria-label="${t("language")}"><button type="button" data-language="zh" lang="zh-CN" aria-label="切换到中文" aria-pressed="${language === "zh"}">中</button><button type="button" data-language="en" lang="en" aria-label="Switch to English" aria-pressed="${language === "en"}">EN</button></div><button class="icon-button theme-toggle" type="button" id="theme-toggle"></button><button class="icon-button nav-toggle" type="button" id="nav-toggle" aria-controls="header-navigation" aria-expanded="false" aria-label="${t("menuOpen")}">${icon("menu")}</button></div></div>`;
+    const sections = ["projects", "research", "writing", "archive", "about", "contact"];
+    root.innerHTML = `<div class="header-inner container"><div class="brand-group"><a class="brand" href="${localHref("index.html")}" aria-label="Zimo · ${t("home")}">zimo<span>.</span></a><span class="brand-suffix">A PERSONAL SPACE</span></div><nav class="header-links" id="header-navigation" aria-label="${t("navigation")}">${sections.map(id => `<a href="${sectionHref(id)}" data-nav-section="${id}">${t(id)}</a>`).join("")}</nav><div class="header-tools"><div class="language-switch" role="group" aria-label="${t("language")}"><button type="button" data-language="zh" lang="zh-CN" aria-label="切换到中文" aria-pressed="${language === "zh"}">中</button><button type="button" data-language="en" lang="en" aria-label="Switch to English" aria-pressed="${language === "en"}">EN</button></div><button class="icon-button theme-toggle" type="button" id="theme-toggle"></button><button class="icon-button nav-toggle" type="button" id="nav-toggle" aria-controls="header-navigation" aria-expanded="false" aria-label="${t("menuOpen")}">${icon("menu")}</button></div></div><div class="reading-progress" id="reading-progress" aria-hidden="true"></div>`;
     root.querySelectorAll("[data-language]").forEach(button => button.addEventListener("click", () => setLanguage(button.dataset.language)));
     root.querySelector("#theme-toggle").addEventListener("click", toggleTheme);
     root.querySelector("#nav-toggle").addEventListener("click", () => setMenuOpen(!menuOpen));
     root.querySelectorAll(".header-links a").forEach(link => link.addEventListener("click", () => setMenuOpen(false)));
     setMenuOpen(false);
     updateThemeButton();
+    updateReadingProgress();
   }
+  function updateReadingProgress() {
+    const progress = document.getElementById("reading-progress");
+    const range = document.documentElement.scrollHeight - innerHeight;
+    if (progress) progress.style.transform = `scaleX(${range > 0 ? Math.max(0, Math.min(1, scrollY / range)) : 0})`;
+    progressScheduled = false;
+  }
+  window.addEventListener("scroll", () => {
+    if (!progressScheduled) { progressScheduled = true; requestAnimationFrame(updateReadingProgress); }
+  }, { passive: true });
+  window.addEventListener("resize", updateReadingProgress, { passive: true });
   function setMenuOpen(open, restoreFocus = false) {
     menuOpen = open;
     const nav = document.getElementById("header-navigation");
@@ -135,6 +150,7 @@
     });
     const compact = document.getElementById("compact-projects");
     compact.innerHTML = data.projects.filter(project => !project.featured && project.category === "engineering").map(project => `<a class="compact-project panel" href="${localHref(`project.html?id=${project.id}`)}"><span class="compact-project-icon">${icon(project.icon)}</span><div><h4>${escapeHTML(localize(project.name))}</h4><p>${escapeHTML(project.stack.join(" · "))}</p></div><span class="compact-arrow" aria-hidden="true">↗</span></a>`).join("");
+    document.dispatchEvent(new CustomEvent("zimo:contentchange"));
   }
   function renderNotes() {
     const root = document.getElementById("notes-list");
@@ -157,6 +173,56 @@
     ];
     root.innerHTML = courses.map((course, i) => `<div class="course-item"><span aria-hidden="true">0${i + 1}</span><div><h4>${course[0]}</h4><p>${course[1]}</p></div></div>`).join("");
   }
+  function archiveState() {
+    const params = new URLSearchParams(location.search);
+    return { query: (params.get("q") || "").slice(0, 120), kind: ["projects", "notes"].includes(params.get("kind")) ? params.get("kind") : "all" };
+  }
+  function updateArchiveState(changes) {
+    const url = new URL(location.href);
+    for (const [key, value] of Object.entries(changes)) {
+      if (!value || value === "all") url.searchParams.delete(key);
+      else url.searchParams.set(key, value);
+    }
+    try { history.replaceState({}, "", url); } catch (_) { /* Optional for file previews. */ }
+    renderArchiveResults();
+  }
+  function renderArchiveResults() {
+    const root = document.getElementById("archive-results");
+    if (!root) return;
+    const state = archiveState();
+    const tokens = state.query.normalize("NFKC").toLocaleLowerCase().trim().split(/\s+/).filter(Boolean);
+    const items = [
+      ...data.projects.map(project => ({ id: project.id, type: "projects", title: project.name, summary: project.summary, label: project.label, stack: project.stack, href: `project.html?id=${project.id}` })),
+      ...data.notes.map(note => ({ id: note.id, type: "notes", title: note.title, summary: note.summary, label: note.category, stack: [], href: `note.html?id=${note.id}` }))
+    ].filter(item => {
+      if (state.kind !== "all" && item.type !== state.kind) return false;
+      const text = [item.title.zh, item.title.en, item.summary.zh, item.summary.en, item.label.zh, item.label.en, ...item.stack].join(" ").normalize("NFKC").toLocaleLowerCase();
+      return tokens.every(token => text.includes(token));
+    });
+    document.getElementById("archive-count").textContent = `${String(items.length).padStart(2, "0")} ${t("archiveCount")}`;
+    document.querySelectorAll("[data-archive-kind]").forEach(button => {
+      const active = button.dataset.archiveKind === state.kind;
+      button.setAttribute("aria-pressed", String(active));
+      button.classList.toggle("is-active", active);
+    });
+    root.innerHTML = items.length ? items.map((item, index) => `<a class="archive-entry panel" href="${localHref(item.href)}"><span class="archive-entry-number" aria-hidden="true">${String(index + 1).padStart(2, "0")}</span><div class="archive-entry-body"><div class="archive-entry-meta"><span>${t(item.type === "projects" ? "archiveProjects" : "archiveNotes")}</span><span>${escapeHTML(localize(item.label))}</span></div><h2>${escapeHTML(localize(item.title))}</h2><p>${escapeHTML(localize(item.summary))}</p>${item.stack.length ? `<div class="stack-tags">${item.stack.map(stack => `<span class="stack-tag">${escapeHTML(stack)}</span>`).join("")}</div>` : ""}</div><span class="archive-entry-arrow" aria-hidden="true">↗</span></a>`).join("") : `<div class="archive-empty panel"><span aria-hidden="true">✧</span><h2>${t("archiveEmpty")}</h2><p>${t("archiveEmptyText")}</p><button class="button button-secondary" type="button" id="clear-archive">${t("clearSearch")}</button></div>`;
+    document.getElementById("clear-archive")?.addEventListener("click", () => {
+      document.getElementById("archive-query").value = "";
+      updateArchiveState({ q: "", kind: "all" });
+      document.getElementById("archive-query").focus();
+    });
+    updateReadingProgress();
+  }
+  function renderArchive() {
+    const root = document.getElementById("archive-content");
+    if (!root) return;
+    const state = archiveState();
+    root.innerHTML = `<a class="breadcrumb" href="${localHref("index.html")}">← ${t("backHome")}</a><header class="archive-heading"><p class="eyebrow">${t("archiveEyebrow")}</p><h1 id="archive-title">${t("archiveTitle")}</h1><p>${t("archiveDescription")}</p></header><div class="archive-search panel"><label class="sr-only" for="archive-query">${t("archiveSearch")}</label><span aria-hidden="true">${icon("search")}</span><input id="archive-query" type="search" maxlength="120" autocomplete="off" spellcheck="false" placeholder="${t("archivePlaceholder")}" value="${escapeHTML(state.query)}"></div><div class="project-toolbar"><div class="filters" role="group" aria-label="${t("archive")}">${[["all", "archiveAll"], ["projects", "archiveProjects"], ["notes", "archiveNotes"]].map(([kind, key]) => `<button class="filter" type="button" data-archive-kind="${kind}" aria-pressed="false">${t(key)}</button>`).join("")}</div><p class="project-count" id="archive-count" aria-live="polite" aria-atomic="true"></p></div><div class="archive-results" id="archive-results"></div>`;
+    root.querySelector("#archive-query").addEventListener("input", event => updateArchiveState({ q: event.target.value }));
+    root.querySelectorAll("[data-archive-kind]").forEach(button => button.addEventListener("click", () => updateArchiveState({ kind: button.dataset.archiveKind })));
+    renderArchiveResults();
+    return t("archive");
+  }
   function notFound(root) {
     root.innerHTML = `<section class="not-found panel"><span aria-hidden="true">404 /</span><h1>${t("notFoundTitle")}</h1><p>${t("notFoundText")}</p><a class="button button-primary" href="${localHref("index.html")}">${t("backHome")} ↗</a></section>`;
     return t("notFoundTitle");
@@ -176,7 +242,7 @@
     const note = data.notes.find(item => item.id === new URLSearchParams(location.search).get("id"));
     if (!note) return notFound(root);
     const related = data.projects.find(project => project.id === note.project);
-    root.innerHTML = `<a class="breadcrumb" href="${localHref("index.html#writing")}"><span aria-hidden="true">←</span>${t("writing")}</a><article><header class="document-header panel"><p class="eyebrow">${escapeHTML(localize(note.category))}</p><h1>${escapeHTML(localize(note.title))}</h1><p class="document-lede">${escapeHTML(localize(note.summary))}</p><div class="document-meta"><span>${escapeHTML(localize(data.profile.name))} / Adam</span><span>${note.minutes} ${t("minutes")}</span><span>${t("noteContext")}</span></div></header><div class="note-article panel"><div class="prose">${note.sections.map(section => `<section><h2>${escapeHTML(localize(section.heading))}</h2>${localize(section.paragraphs).map(paragraph => `<p>${escapeHTML(paragraph)}</p>`).join("")}</section>`).join("")}</div></div></article><div class="document-bottom panel"><span>${t("noteRelated")}</span><a class="text-link" href="${localHref(`project.html?id=${related.id}`)}"><span>${escapeHTML(localize(related.name))}</span><span aria-hidden="true">↗</span></a></div>`;
+    root.innerHTML = `<a class="breadcrumb" href="${localHref("archive.html?kind=notes")}"><span aria-hidden="true">←</span>${t("writing")}</a><article><header class="document-header panel"><p class="eyebrow">${escapeHTML(localize(note.category))}</p><h1>${escapeHTML(localize(note.title))}</h1><p class="document-lede">${escapeHTML(localize(note.summary))}</p><div class="document-meta"><span>${escapeHTML(localize(data.profile.name))} / Adam</span><span>${note.minutes} ${t("minutes")}</span><span>${t("noteContext")}</span></div></header><div class="note-reading-layout"><aside class="note-toc panel" aria-label="${t("noteToc")}"><h2>${t("noteToc")}</h2><nav>${note.sections.map((section, index) => `<a href="#note-section-${index + 1}" data-no-scene><span aria-hidden="true">0${index + 1}</span>${escapeHTML(localize(section.heading))}</a>`).join("")}</nav></aside><div class="note-article panel"><div class="prose">${note.sections.map((section, index) => `<section id="note-section-${index + 1}" tabindex="-1"><h2>${escapeHTML(localize(section.heading))}</h2>${localize(section.paragraphs).map(paragraph => `<p>${escapeHTML(paragraph)}</p>`).join("")}</section>`).join("")}</div></div></div></article><div class="document-bottom panel"><div><span>${t("noteRelated")}: </span><a class="text-link" href="${localHref(`project.html?id=${related.id}`)}"><span>${escapeHTML(localize(related.name))}</span><span aria-hidden="true">↗</span></a></div><button class="button button-plain" type="button" data-copy-link>${icon("copy")}<span>${t("copyLink")}</span></button></div>`;
     return localize(note.title);
   }
   function renderResume() {
@@ -191,7 +257,7 @@
     const root = document.getElementById("detail-content");
     if (!root) return;
     const zh = language === "zh";
-    root.innerHTML = `<a class="breadcrumb" href="${localHref("index.html")}">← ${t("backHome")}</a><article class="document-header panel"><p class="eyebrow">MADE WITH CARE / THANK YOU</p><h1>${t("credits")}</h1><div class="prose" style="margin-top:30px"><section><h2>${zh ? "设计参考" : "Design references"}</h2><p>${zh ? "页面的信息结构受到学长的 Suwa shrine 启发：大幅头图、个人侧栏、内容卡片与陪伴式向导。排版与留白也参考了 Anthropic 和 Brittany Chiang 的个人网站。本网站的布局实现、蓝紫山峦插画、苦情树意象转场插画和项目示意图为重新设计，不复用参考站的角色插画、文章或个人资料。" : "The page structure is inspired by Suwa shrine: a panoramic header, personal sidebar, content cards, and a companion guide. Typography and spacing also take cues from Anthropic and Brittany Chiang’s portfolio. This site’s implementation, blue/lilac landscape, original wishing-tree transition, and project schematics were designed separately; reference-site artwork, articles, and personal information are not reused."}</p><p>${externalLink("https://sukunahust.moe", "Suwa shrine")} &nbsp; · &nbsp; ${externalLink("https://www.anthropic.com", "Anthropic")} &nbsp; · &nbsp; ${externalLink("https://brittanychiang.com", "Brittany Chiang")}</p></section><section><h2>${zh ? "涂山苏苏 · 同人动画向导" : "Tushan Susu · Fan-art animated guide"}</h2><p>${zh ? "动画素材由 legeling 提供，来自 awesome-codex-pet 的 tushan-susu--legeling。该素材是 AI 生成的社区同人演绎，并非《狐妖小红娘》官方模型或官方 Live2D；角色及原作权利归各自权利人所有。" : "Animation artwork by legeling, from the tushan-susu--legeling package in awesome-codex-pet. It is an AI-generated community fan interpretation, not an official Fox Spirit Matchmaker asset or Live2D model. Character and franchise rights remain with their respective owners."}</p><p>${zh ? "素材按来源标注仅用于非商业场景，遵循 CC BY-NC 4.0 与素材包中的非商业限制。本网站对精灵图进行有损 WebP 压缩，并独立实现网页动画、视线跟随与导航交互；未使用第三方桌宠运行时。若用于商业产品，请先更换素材或另行取得授权。" : "The artwork is used non-commercially under the source’s CC BY-NC 4.0 and package-specific non-commercial restriction. The atlas was recompressed to WebP; animation playback, directional looking, and site navigation were implemented independently, without a third-party pet runtime. Replace the artwork or obtain permission before commercial reuse."}</p><p>${externalLink("https://github.com/legeling/awesome-codex-pet/tree/main/pets/tushan-susu--legeling", zh ? "素材来源与作者" : "Artwork & creator")} &nbsp; · &nbsp; ${externalLink("https://creativecommons.org/licenses/by-nc/4.0/", "CC BY-NC 4.0")}</p></section><section><h2>${zh ? "项目图片与数据" : "Project imagery & data"}</h2><p>${zh ? "DocSift 与 AI 新品决策引擎的封面来自各项目公开演示页面。QuantPilot 与子墨记账封面为界面示意，图表不对应个人研究或实际收支；研究插图为原图 / 标注 / 预测对照的方法示意。头像来自本站原版本公开素材。" : "DocSift and the AI Product Decision Engine covers are screenshots of their public demos. QuantPilot and Zimo Ledger covers are interface studies, not private research or personal financial records. The research diagram illustrates image/GT/prediction comparison. The profile photo comes from the original public version of this site."}</p></section><section><h2>${zh ? "隐私与站点行为" : "Privacy & site behavior"}</h2><p>${zh ? "本网站没有接入访问统计、广告、聊天模型或第三方评论系统。语言、主题、樱花动效与向导收起状态仅保存在浏览器本地；向导回复是预设导航文案，不会把输入发送给任何模型。外部项目有各自的数据与登录政策。" : "This site does not embed analytics, advertising, a chat model, or a third-party comment service. Language, theme, sakura-effect, and guide preferences are stored locally in your browser. Guide replies are preset navigation copy, not model-generated responses. External projects have their own data and login policies."}</p></section></div></article>`;
+    root.innerHTML = `<a class="breadcrumb" href="${localHref("index.html")}">← ${t("backHome")}</a><article class="document-header panel"><p class="eyebrow">MADE WITH CARE / THANK YOU</p><h1>${t("credits")}</h1><div class="prose" style="margin-top:30px"><section><h2>${zh ? "设计参考" : "Design references"}</h2><p>${zh ? "页面的信息结构受到学长的 Suwa shrine 启发：大幅头图、个人侧栏、内容卡片与陪伴式向导。排版与留白也参考了 Anthropic 和 Brittany Chiang 的个人网站。本网站的布局与交互为独立实现。樱花古树场景由 gpt-image-2.6 生成并压缩为 WebP，按苦情树意象创作，不是官方动画截图；项目示意图为重新设计，不复用参考站的角色插画、文章或个人资料。" : "The page structure is inspired by Suwa shrine: a panoramic header, personal sidebar, content cards, and a companion guide. Typography and spacing also take cues from Anthropic and Brittany Chiang’s portfolio. The layout and interactions were implemented independently. The original wishing-tree scene was generated with gpt-image-2.6 and compressed to WebP, not extracted from an official animation; project schematics were designed separately; reference-site artwork, articles, and personal information are not reused."}</p><p>${externalLink("https://sukunahust.moe", "Suwa shrine")} &nbsp; · &nbsp; ${externalLink("https://www.anthropic.com", "Anthropic")} &nbsp; · &nbsp; ${externalLink("https://brittanychiang.com", "Brittany Chiang")}</p></section><section><h2>${zh ? "涂山苏苏 · 同人动画向导" : "Tushan Susu · Fan-art animated guide"}</h2><p>${zh ? "动画素材由 legeling 提供，来自 awesome-codex-pet 的 tushan-susu--legeling。该素材是 AI 生成的社区同人演绎，并非《狐妖小红娘》官方模型或官方 Live2D；角色及原作权利归各自权利人所有。" : "Animation artwork by legeling, from the tushan-susu--legeling package in awesome-codex-pet. It is an AI-generated community fan interpretation, not an official Fox Spirit Matchmaker asset or Live2D model. Character and franchise rights remain with their respective owners."}</p><p>${zh ? "素材按来源标注仅用于非商业场景，遵循 CC BY-NC 4.0 与素材包中的非商业限制。本网站对精灵图进行有损 WebP 压缩，并独立实现网页动画、视线跟随与导航交互；未使用第三方桌宠运行时。若用于商业产品，请先更换素材或另行取得授权。" : "The artwork is used non-commercially under the source’s CC BY-NC 4.0 and package-specific non-commercial restriction. The atlas was recompressed to WebP; animation playback, directional looking, and site navigation were implemented independently, without a third-party pet runtime. Replace the artwork or obtain permission before commercial reuse."}</p><p>${externalLink("https://github.com/legeling/awesome-codex-pet/tree/main/pets/tushan-susu--legeling", zh ? "素材来源与作者" : "Artwork & creator")} &nbsp; · &nbsp; ${externalLink("https://creativecommons.org/licenses/by-nc/4.0/", "CC BY-NC 4.0")}</p></section><section><h2>${zh ? "项目图片与数据" : "Project imagery & data"}</h2><p>${zh ? "DocSift 与 AI 新品决策引擎的封面来自各项目公开演示页面。QuantPilot 与子墨记账封面为界面示意，图表不对应个人研究或实际收支；研究插图为原图 / 标注 / 预测对照的方法示意。头像由 gpt-image-2.6 生成，是以涂山苏苏为灵感的非官方同人插画，不使用真人照片；向导动画与头像为不同素材，分别说明来源。" : "DocSift and the AI Product Decision Engine covers are screenshots of their public demos. QuantPilot and Zimo Ledger covers are interface studies, not private research or personal financial records. The research diagram illustrates image/GT/prediction comparison. The profile avatar is a gpt-image-2.6-generated, non-official fan-art interpretation inspired by Tushan Susu, not a personal photograph. The avatar and animated guide are separate assets with separate provenance."}</p></section><section id="music-credit"><h2>${zh ? "背景音乐 · 卡农钢琴版" : "Background piano · Canon in D"}</h2><p>${zh ? "曲目：Johann Pachelbel《D 大调卡农》钢琴改编；演奏：Lee Galloway。录音来自 Wikimedia Commons 的 Pachelbel’s Canon.ogg，按 CC BY-SA 3.0 授权使用。录音未经剪辑或转码，仅设置播放器音量与单曲循环；原曲进入公有领域不意味着演奏录音没有版权，因此保留演奏者与录音许可署名。" : "Johann Pachelbel’s Canon in D, piano transcription performed by Lee Galloway. The recording is Pachelbel’s Canon.ogg from Wikimedia Commons, licensed under CC BY-SA 3.0. The audio is unmodified; only playback volume and looping are configured. The composition’s public-domain status does not erase rights in the performance, so performer and recording-license attribution are retained."}</p><p>${externalLink("https://commons.wikimedia.org/wiki/File:Pachelbel%27s_Canon.ogg", zh ? "录音来源与许可" : "Recording source & license")} &nbsp; · &nbsp; ${externalLink("https://www.leegalloway.com/", "Lee Galloway")} &nbsp; · &nbsp; ${externalLink("https://creativecommons.org/licenses/by-sa/3.0/", "CC BY-SA 3.0")}</p></section><section><h2>${zh ? "隐私与站点行为" : "Privacy & site behavior"}</h2><p>${zh ? "本网站没有接入访问统计、广告、聊天模型或第三方评论系统。语言、主题、音乐、樱花动效与向导收起状态仅保存在浏览器本地；向导回复是预设导航文案，不会把输入发送给任何模型。外部项目有各自的数据与登录政策。" : "This site does not embed analytics, advertising, a chat model, or a third-party comment service. Language, theme, music, sakura-effect, and guide preferences are stored locally in your browser. Guide replies are preset navigation copy, not model-generated responses. External projects have their own data and login policies."}</p></section></div></article>`;
     return t("credits");
   }
   function updateMetadata(title) {
@@ -231,11 +297,21 @@
     else if (page === "note") title = renderNote();
     else if (page === "resume") title = renderResume();
     else if (page === "credits") title = renderCredits();
+    else if (page === "archive") title = renderArchive();
     else if (page === "not-found") title = t("notFoundTitle");
     renderFooter();
     updateMetadata(title);
     observeSections();
+    if (page !== "home") setActiveSection({ project: "projects", note: "writing", archive: "archive", resume: "about" }[page]);
     document.dispatchEvent(new CustomEvent("zimo:languagechange", { detail: { language } }));
+    // Resolve deep links once, after local content has supplied the target elements.
+    const initialRender = !document.body.dataset.rendered;
+    document.body.dataset.rendered = "true";
+    if (initialRender && location.hash) requestAnimationFrame(() => {
+      let id;
+      try { id = decodeURIComponent(location.hash.slice(1)); } catch (_) { return; }
+      document.getElementById(id)?.scrollIntoView({ behavior: "instant", block: "start" });
+    });
   }
   function setLanguage(next) {
     if (!["zh", "en"].includes(next) || next === language) return;
@@ -256,12 +332,12 @@
     root.classList.add("is-visible");
     toastTimeout = setTimeout(() => root.classList.remove("is-visible"), 3500);
   }
-  async function copyEmail() {
+  async function copyText(text, successMessage) {
     try {
-      if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(data.profile.email);
+      if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(text);
       else {
         const input = document.createElement("textarea");
-        input.value = data.profile.email;
+        input.value = text;
         input.setAttribute("readonly", "");
         input.style.cssText = "position:fixed;left:-9999px;top:0;";
         document.body.append(input);
@@ -271,7 +347,7 @@
         try { copied = document.execCommand("copy"); } finally { input.remove(); focused?.focus({ preventScroll: true }); }
         if (!copied) throw new Error("Clipboard unavailable");
       }
-      toast(t("emailCopied"));
+      toast(successMessage);
     } catch (_) { toast(t("copyFailed")); }
   }
   window.Zimo = { t, localize, localHref, icon, escapeHTML, storage, toast, get language() { return language; }, get page() { return page; } };
@@ -280,7 +356,12 @@
     if (!target) return;
     const filter = target.closest("[data-filter]");
     if (filter) { activeFilter = filter.dataset.filter; renderProjects(); }
-    if (target.closest("[data-copy-email]")) copyEmail();
+    if (target.closest("[data-copy-email]")) copyText(data.profile.email, t("emailCopied"));
+    if (target.closest("[data-copy-link]")) {
+      const url = new URL(location.href);
+      url.searchParams.delete("v");
+      copyText(url.href, t("linkCopied"));
+    }
     if (target.closest("[data-print-resume]")) window.print();
     if (menuOpen && !event.composedPath().includes(document.getElementById("site-header"))) setMenuOpen(false);
     const section = target.closest("[data-nav-section]");

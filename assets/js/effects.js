@@ -15,6 +15,9 @@
   let width = innerWidth;
   let height = innerHeight;
   let scale = Math.min(devicePixelRatio || 1, 2);
+  let revealObserver;
+  const revealAnimations = new Set();
+  const revealed = new WeakSet();
   const petals = [];
   const canvas = document.createElement("canvas");
   canvas.className = "sakura-canvas";
@@ -24,7 +27,7 @@
   const overlay = document.createElement("div");
   overlay.className = "scene-overlay";
   overlay.setAttribute("aria-hidden", "true");
-  overlay.innerHTML = `<div class="scene-glow"></div><div class="scene-tree"><img src="assets/images/wish-tree.svg" width="960" height="700" alt=""></div><div class="scene-copy"><p id="scene-words"></p><span>ZIMO’S LITTLE CORNER OF THE WORLD</span></div><div class="scene-petals">${Array.from({ length: 27 }, (_, i) => `<i style="--x:${(i * 37.3 + 5) % 100}%;--delay:${(i % 7) * -.19}s;--duration:${1.6 + (i % 5) * .19}s;--size:${9 + (i % 5) * 3}px;--drift:${(i % 2 ? 1 : -1) * (60 + i * 3)}px;--turn:${130 + i * 41}deg"></i>`).join("")}</div>`;
+  overlay.innerHTML = `<div class="scene-glow"></div><div class="scene-tree"><img src="assets/images/wishing-tree-scene.webp" width="1536" height="1024" alt=""></div><div class="scene-copy"><p id="scene-words"></p><span>ZIMO’S LITTLE CORNER OF THE WORLD</span></div><div class="scene-petals">${Array.from({ length: 27 }, (_, i) => `<i style="--x:${(i * 37.3 + 5) % 100}%;--delay:${(i % 7) * -.19}s;--duration:${1.6 + (i % 5) * .19}s;--size:${9 + (i % 5) * 3}px;--drift:${(i % 2 ? 1 : -1) * (60 + i * 3)}px;--turn:${130 + i * 41}deg"></i>`).join("")}</div>`;
   document.body.append(overlay);
   function storagePreference() {
     const saved = site.storage.get("effects");
@@ -127,9 +130,35 @@
     if (remember) site.storage.set("effects", enabled ? "on" : "off");
     canvas.hidden = !enabled;
     document.documentElement.dataset.effects = enabled ? "on" : "off";
-    if (enabled) start();
-    else { petals.length = 0; stop(); finishScene(); }
+    if (enabled) { start(); observeReveals(); }
+    else {
+      petals.length = 0; stop(); finishScene(); revealObserver?.disconnect();
+      revealAnimations.forEach(animation => animation.cancel());
+      revealAnimations.clear();
+    }
     syncLabels();
+  }
+  function observeReveals() {
+    revealObserver?.disconnect();
+    if (!enabled || !("IntersectionObserver" in window) || !Element.prototype.animate) return;
+    revealObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting || revealed.has(entry.target)) return;
+        revealed.add(entry.target);
+        revealObserver.unobserve(entry.target);
+        // Do not animate already-visible content or hide content before it is read.
+        if (entry.boundingClientRect.top < innerHeight * .35) return;
+        const animation = entry.target.animate([
+          { opacity: .35, transform: "translateY(17px)" },
+          { opacity: 1, transform: "translateY(0)" }
+        ], { duration: 650, easing: "cubic-bezier(.2,.65,.3,1)", fill: "none" });
+        revealAnimations.add(animation);
+        animation.finished.catch(() => {}).finally(() => revealAnimations.delete(animation));
+      });
+    }, { threshold: .07, rootMargin: "0px 0px -20px 0px" });
+    document.querySelectorAll(".section-heading, .project-card, .compact-project, .research-card, .research-methods, .note-card, .about-card, .contact-panel").forEach(element => {
+      if (!revealed.has(element)) revealObserver.observe(element);
+    });
   }
   document.addEventListener("pointermove", event => {
     if (!enabled || transitioning || event.pointerType !== "mouse") return;
@@ -149,7 +178,7 @@
     if (toggle) { setEnabled(!enabled); return; }
     if (!enabled || event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     const link = target.closest("a[href]");
-    if (!link || link.classList.contains("skip-link") || link.target === "_blank" || link.hasAttribute("download")) return;
+    if (!link || link.classList.contains("skip-link") || link.hasAttribute("data-no-scene") || link.target === "_blank" || link.hasAttribute("download")) return;
     const url = new URL(link.href, document.baseURI);
     if (url.origin !== location.origin || !/\.html$|\/$/.test(url.pathname)) return;
     const sameDocument = url.pathname === location.pathname && url.search === location.search;
@@ -177,7 +206,8 @@
   });
   document.addEventListener("keydown", event => { if (event.key === "Escape" && transitioning) finishScene(); });
   document.addEventListener("visibilitychange", () => { if (document.hidden) stop(); else start(); });
-  document.addEventListener("zimo:languagechange", syncLabels);
+  document.addEventListener("zimo:languagechange", () => { syncLabels(); observeReveals(); });
+  document.addEventListener("zimo:contentchange", observeReveals);
   window.addEventListener("resize", resize, { passive: true });
   window.addEventListener("pageshow", event => { if (event.persisted) { finishScene(); start(); } });
   reducedMotion.addEventListener("change", () => setEnabled(storagePreference(), false));

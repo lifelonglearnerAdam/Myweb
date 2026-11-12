@@ -129,6 +129,23 @@ test("mascot attribution and reasonable asset budgets are present", () => {
   for (const file of ["docsift.webp", "miniso.webp", "avatar.webp"]) assert.ok(fs.statSync(path.join(root, "assets/images", file)).size < 100_000, file);
 });
 
+test("generated artwork stays lightweight and does not expose the personal photo", () => {
+  assert.ok(fs.statSync(path.join(root, "assets/images/wishing-tree-scene.webp")).size < 500_000);
+  assert.ok(!fs.readFileSync(path.join(root, "index.html"), "utf8").includes("image/zimo.png"));
+  assert.ok(!fs.existsSync(path.join(root, "assets/images/wish-tree.svg")), "The coarse scene draft should not be published");
+});
+
+test("piano recording is unmodified and attributed under its own license", () => {
+  const crypto = require("node:crypto");
+  const recording = fs.readFileSync(path.join(root, "assets/audio/canon-in-d-lee-galloway.ogg"));
+  assert.equal(recording.subarray(0, 4).toString(), "OggS");
+  assert.equal(crypto.createHash("sha256").update(recording).digest("hex"), "dbde7ed591f33e3dcfc941bce6494ec74b523a955d8c7342224290801e68d195");
+  const credit = fs.readFileSync(path.join(root, "assets/audio/ATTRIBUTION.md"), "utf8");
+  assert.match(credit, /Lee Galloway/);
+  assert.match(credit, /CC BY-SA 3\.0/);
+  assert.match(credit, /commons\.wikimedia\.org/);
+});
+
 test("old URLs are redirects and do not retain obsolete personal content", () => {
   for (const name of ["about", "hobby", "photo", "myessay", "contact"]) {
     for (const prefix of ["", "web/"]) {

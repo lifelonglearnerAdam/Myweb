@@ -2,14 +2,13 @@
 
 ## Original site assets
 
-- `landscape.svg`: original blue/lilac landscape designed for this homepage.
-- `wish-tree.svg`: original pink wishing-tree illustration inspired by the relationship-tree motif in *Fox Spirit Matchmaker*. Not an official image or extracted game/anime asset.
+- `wishing-tree-scene.webp`: scene generated with `gpt-image-2.6` through the owner-configured image provider, then compressed to WebP. A pink wishing tree, reflective lake, and pale lavender mountains, inspired by the wishing-tree motif in *Fox Spirit Matchmaker*. Not an official frame or extracted game/anime asset. The earlier SVG drafts have been removed.
+- `avatar.webp`: separately generated with `gpt-image-2.6`, then resized and compressed. A non-official fan-art portrait inspired by Tushan Susu, not a photograph or a crop of the third-party animation atlas. Character/franchise rights remain with their respective owners; no official endorsement is implied.
 - `favicon.svg`: original Z monogram.
 - `quantpilot.svg`, `ledger.svg`: original interface studies with illustrative, non-personal data; not screenshots of private accounts.
 - `research.svg`: original diagram illustrating image / ground-truth / prediction comparison.
 - `social-preview.png`: original social preview based on the site’s visual identity.
 - `docsift.webp`, `miniso.webp`: resized screenshots of the owner’s public project demos.
-- `avatar.webp`: crop of the profile photograph already present in the original public Myweb repository.
 
 ## Tushan Susu / 涂山苏苏
 
