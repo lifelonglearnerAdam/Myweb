@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lifelonglearneradam.github.io/Myweb/sitemap.xml

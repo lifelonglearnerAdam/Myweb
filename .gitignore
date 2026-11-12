@@ -4,3 +4,11 @@ Thumbs.db
 .vscode/
 .idea/
 node_modules/
+.playwright-cli/
+playwright-report/
+test-results/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
