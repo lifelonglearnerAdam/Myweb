@@ -37,7 +37,7 @@ A bilingual personal portfolio and small technical blog, rebuilt from a first-ye
 - **动漫头像与涂山苏苏向导**：不展示真人照片；非官方同人动画；待机、眨眼、招手、跳跃、16 方向视线跟随、章节导航与间隔提示。支持鼠标 / 触屏拖动、位置记忆、方向键微调与一键复位；顶部可在“指引 / 聊天”之间切换，返回指引不会清空对话；桌面形象约放大 15%，手机保持原尺寸。手机默认收起，可随时展开 / 收起。
 - **性能与舒适度**：离开标签页暂停动画；遵循 `prefers-reduced-motion`；页脚可以关闭樱花与转场。滚动时内容轻柔显现，顶部显示阅读进度。没有统计、广告或第三方字体。固定台词不调用模型；只有主动打开“聊一句”并发送时才调用 AI。
 - **卡农钢琴循环**：Lee Galloway 演奏的《D 大调卡农》，本地托管 Ogg，默认轻音量、可暂停 / 调节音量，站内跳转保留同一个音频元素，音乐不因换页而重启；直接刷新时恢复位置。尝试有声自动播放，被浏览器拦截时等待第一次真实交互，不绕过浏览器策略。音源按 CC BY-SA 3.0 使用，见 [`assets/audio/ATTRIBUTION.md`](assets/audio/ATTRIBUTION.md)。
-- **苏苏 AI 短句**：点击苏苏直接打开嘴边对话框，显示你与苏苏的双方气泡，记住最近 6 轮聊天（刷新 / 重新聊即清空）。失败有可见提示与手动重试，不再是只显示输入框。免费主站通过同源 `/api/chat` + 内部服务绑定调用 `gpt-6.1-sol`，不依赖浏览器连接另一个代理子域名；后端前置人设 Prompt + 单句长度限制，不是浏览器 skill。风格可爱乖巧、一次一小句，不读取网页或私有项目。API Key 只存后端 Secret；有公开聊天提示、来源白名单和持久化每日限额。上游 API 调用仍消耗本人余额，目前全站每日最多 60 次。详见 [`server/susu-worker/README.md`](server/susu-worker/README.md)。
+- **苏苏 AI 短句**：点击苏苏直接打开嘴边对话框，显示你与苏苏的双方气泡，记住最近 16 轮聊天（刷新 / 重新聊即清空）。失败有可见提示与手动重试，不再是只显示输入框。免费主站通过同源 `/api/chat` + 内部服务绑定调用 `gpt-6.1-sol`，不依赖浏览器连接另一个代理子域名；后端前置人设 Prompt + 句数 / 字符限制，不是浏览器 skill。参考公开角色资料，采用真诚、元气、偶尔小机灵的轻甜同人陪伴风格，通常一两句，可自然回应亲昵，不做机械客服，不读取网页或私有项目。API Key 只存后端 Secret；有公开聊天提示、来源白名单和持久化每日限额。上游 API 调用仍消耗本人余额，目前全站每日最多 60 次。详见 [`server/susu-worker/README.md`](server/susu-worker/README.md) 与 [人设依据](server/susu-worker/PERSONALITY.md)。
 - **兼容旧链接**：原始根目录与 `web/` 下的旧页面跳转到新版对应章节。
 
 > 苏苏**向导动画**为 **legeling** 制作的 AI 生成社区同人演绎，并非官方 Live2D；头像与场景则为本轮单独生成，分别说明来源。仅限非商业使用，见 [公开致谢](https://lifelonglearneradam.github.io/Myweb/credits.html) 与 [`assets/images/ATTRIBUTION.md`](assets/images/ATTRIBUTION.md)。角色权利归原权利人。若改作商业产品，请更换素材或另行取得授权。

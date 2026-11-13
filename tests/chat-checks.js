@@ -16,7 +16,7 @@ async page => {
   const cooldown = async () => page.waitForFunction(() => !document.getElementById("susu-chat-retry").disabled);
   let submittedAt = 0;
   const send = async text => {
-    if (submittedAt) await page.waitForFunction(time => Date.now() - time >= 4050, submittedAt);
+    if (submittedAt) await page.waitForFunction(time => Date.now() - time >= 2050, submittedAt);
     await page.locator("#susu-chat-input").fill(text);
     await page.locator("#susu-chat-input").press("Enter");
     submittedAt = Date.now();
@@ -42,9 +42,9 @@ async page => {
     await page.locator('[data-language="en"]').click();
     assert((await page.locator("#susu-message").textContent()).includes("记住啦"), "language switch does not overwrite a model reply with a preset");
     await page.locator('[data-language="zh"]').click();
-    for (let i = 0; i < 6; i++) await send(i === 5 ? "你还记得怎么叫我吗" : `我们再聊第${i + 1}句吧`);
-    assert(posts.at(-1).history.length === 12, "six complete conversation turns are sent as context");
-    assert(posts.at(-1).history[0].content.includes("小墨"), "earlier nickname remains in the sixth-turn context");
+    for (let i = 0; i < 16; i++) await send(i === 15 ? "你还记得怎么叫我吗" : `我们再聊第${i + 1}句吧`);
+    assert(posts.at(-1).history.length === 32, "sixteen complete conversation turns are sent as context");
+    assert(posts.at(-1).history[0].content.includes("小墨"), "earlier nickname remains in the sixteenth-turn context");
     assert(await page.locator(".susu-chat-line.is-assistant:not(.is-error)").count() >= 6, "the conversation shows prior replies rather than only an input");
     await page.locator("#susu-dismiss").click(); await page.locator("#susu-greet").click();
     assert((await page.locator("#susu-message").textContent()).includes("小墨"), "closing and reopening preserves the last reply");

@@ -316,7 +316,7 @@
     clearTimeout(bubbleTimer);
     messageKey = null;
     lastSpeechAt = performance.now();
-    message.textContent = String(text).slice(0, 220);
+    message.textContent = String(text).slice(0, 400);
     bubbleOpen = true; bubble.hidden = false;
     stage.setAttribute("aria-expanded", "true");
     positionBubble();
