@@ -21,7 +21,9 @@
 
 ## 苏苏聊天的独立后端
 
-- 代理：https://zimo-susu-chat.zimo-personal-space.workers.dev
+- 网页聊天入口：**https://me.zimo-personal-space.workers.dev/api/chat**。
+- 主站通过内部 Service Binding 转发到苏苏 Worker，浏览器不再额外请求独立代理子域名；GitHub 镜像也使用这个入口。
+- 后端 Worker：https://zimo-susu-chat.zimo-personal-space.workers.dev（供维护，不是前端直连地址）。
 - `server/susu-worker/` 保存**不含密钥**的后端源码与公开配置。
 - API 地址、API Key 与限频盐值只存在 Cloudflare Secret 中。
 - 来源白名单包括上述 Cloudflare 站点和 GitHub Pages。

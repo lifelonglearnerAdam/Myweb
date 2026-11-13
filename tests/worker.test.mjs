@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import worker, { ChatBudget, chatInput, shortReply } from "../server/susu-worker/worker.mjs";
+import staticSite from "../server/static-site/worker.mjs";
 
 const origin = "https://lifelonglearneradam.github.io";
 const input = { message: "你好呀", language: "zh", history: [] };
@@ -42,6 +43,29 @@ test("wrong origins and content types are rejected before model calls", async ()
   assert.equal(preflight.headers.get("Access-Control-Allow-Origin"), origin);
 });
 
+test("six conversation turns survive validation without private context or system roles", () => {
+  const turns = Array.from({ length: 9 }, (_, i) => [{ role: "user", content: `message ${i}` }, { role: "assistant", content: `reply ${i}` }]).flat();
+  const value = chatInput({ message: "remember my nickname", history: turns });
+  assert.equal(value.history.length, 12);
+  assert.equal(value.history[0].content, "message 3");
+  assert.equal(value.history.at(-1).content, "reply 8");
+});
+
+test("static host routes chat through an internal service binding, not a public hostname", async () => {
+  let forwarded;
+  const env = { SUSU_CHAT: { fetch: async request => { forwarded = request; return Response.json({ reply: "Hello～" }); } }, ASSETS: { fetch: async () => new Response("public asset") } };
+  const response = await staticSite.fetch(new Request("https://me.example/api/chat", { method: "POST", headers: { Origin: "https://me.example", "Content-Type": "application/json", "CF-Connecting-IP": "192.0.2.1" }, body: JSON.stringify(input) }), env);
+  assert.equal(response.status, 200);
+  assert.equal(new URL(forwarded.url).pathname, "/chat");
+  assert.equal(new URL(forwarded.url).hostname, "susu.internal");
+  assert.equal(forwarded.headers.get("Origin"), "https://me.example");
+  assert.equal(forwarded.headers.get("CF-Connecting-IP"), "192.0.2.1");
+  assert.deepEqual(await forwarded.json(), input);
+  assert.equal(await (await staticSite.fetch(new Request("https://me.example/archive"), env)).text(), "public asset");
+  assert.equal((await staticSite.fetch(new Request("https://me.example/api/chat"), env)).status, 405);
+  assert.equal((await staticSite.fetch(new Request("https://me.example/api/chat", { method: "POST" }), { ASSETS: env.ASSETS })).status, 503);
+});
+
 test("chat fails closed without secrets or a budget binding", async () => {
   const response = await worker.fetch(request(), { ALLOWED_ORIGINS: origin });
   assert.equal(response.status, 503);
@@ -65,7 +89,7 @@ test("rapid repeats are limited, and only hashed visitor counters are stored", a
   assert.equal((await consume()).status, 200);
   const response = await consume();
   assert.equal(response.status, 429);
-  assert.equal(response.headers.get("Retry-After"), "60");
+  assert.ok(Number(response.headers.get("Retry-After")) > 0 && Number(response.headers.get("Retry-After")) <= 4);
   const value = await ctx.storage.get("budget");
   assert.equal(value.total, 1);
   assert.ok(!JSON.stringify(value).includes("message"));

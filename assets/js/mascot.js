@@ -75,14 +75,24 @@
   function positionBubble() {
     if (!expanded || !bubbleOpen) return;
     const rect = mascot.getBoundingClientRect();
-    const width = Math.min(245, innerWidth - 24);
+    const view = window.visualViewport;
+    const viewLeft = view?.offsetLeft || 0, viewTop = view?.offsetTop || 0;
+    const viewWidth = view?.width || innerWidth, viewHeight = view?.height || innerHeight;
+    const width = Math.min(bubble.classList.contains("is-chatting") ? 310 : 245, viewWidth - 24);
     bubble.style.width = `${width}px`;
-    const left = Math.max(12, Math.min(innerWidth - width - 12, rect.left + rect.width / 2 - width / 2));
+    bubble.style.maxHeight = `${Math.max(160, viewHeight - 28)}px`;
+    const height = bubble.offsetHeight;
+    const beside = rect.left - viewLeft > width + 4;
+    let left = beside ? rect.left - width + 12 : rect.left + rect.width / 2 - width / 2;
+    left = Math.max(viewLeft + 12, Math.min(viewLeft + viewWidth - width - 12, left));
+    const preferredTop = beside ? rect.top + 78 - height : rect.top - height - 12;
+    const below = !beside && preferredTop < viewTop + 12 && rect.bottom + height + 12 < viewTop + viewHeight;
+    const top = Math.max(viewTop + 12, Math.min(viewTop + viewHeight - height - 12, below ? rect.bottom + 12 : preferredTop));
     bubble.style.left = `${left - rect.left}px`; bubble.style.right = "auto";
-    const below = rect.top < bubble.offsetHeight + 26;
-    bubble.style.top = below ? "172px" : "auto";
-    bubble.style.bottom = below ? "auto" : "178px";
+    bubble.style.top = `${top - rect.top}px`; bubble.style.bottom = "auto";
+    bubble.style.setProperty("--tail-y", `${Math.max(18, Math.min(height - 18, rect.top + 65 - top))}px`);
     bubble.classList.toggle("is-below", below);
+    bubble.classList.toggle("is-beside", beside);
   }
   function updateLabels() {
     mascot.setAttribute("aria-label", t("mascotName"));
@@ -203,6 +213,7 @@
   }
   function greet(event) {
     if (event?.detail !== 0 && performance.now() - lastDragAt < 450) return;
+    if (site.chat?.open) { site.chat.open(true); return; }
     const key = replyIndex === 0 ? "mascotGreeting" : `mascotReply${(replyIndex - 1) % 4 + 1}`;
     replyIndex++; showBubble(key); play(replyIndex % 3 === 0 ? "jump" : "wave", true);
   }
@@ -249,7 +260,14 @@
   stage.addEventListener("click", greet);
   document.getElementById("susu-greet").addEventListener("click", greet);
   document.getElementById("susu-reset").addEventListener("click", resetPosition);
-  launcher.addEventListener("click", () => { setExpanded(true); showBubble("mascotGreeting"); play("wave", true); stage.focus({ preventScroll: true }); });
+  window.visualViewport?.addEventListener("resize", positionBubble);
+  window.visualViewport?.addEventListener("scroll", positionBubble);
+  launcher.addEventListener("click", () => {
+    setExpanded(true);
+    if (site.chat?.open) site.chat.open(false);
+    else showBubble("mascotGreeting");
+    play("wave", true); stage.focus({ preventScroll: true });
+  });
   document.getElementById("susu-minimize").addEventListener("click", () => { setExpanded(false); launcher.focus({ preventScroll: true }); });
   document.getElementById("susu-dismiss").addEventListener("click", () => { hideBubble(); stage.focus({ preventScroll: true }); });
   document.getElementById("susu-choices").addEventListener("click", event => { if (event.target.closest("[data-susu-section]")) { play("jump", true); hideBubble(); } });
@@ -298,12 +316,12 @@
     positionBubble();
     if (expanded) play(thinking ? "thinking" : "wave", true);
   }
-  site.mascot = { resetPosition, say, positionBubble, get expanded() { return expanded; }, get dragging() { return Boolean(drag?.moved); }, get position() { return customPosition; } };
+  site.mascot = { resetPosition, say, positionBubble, show: () => setExpanded(true), get expanded() { return expanded; }, get dragging() { return Boolean(drag?.moved); }, get position() { return customPosition; } };
   updateLabels(); setExpanded(expanded, false);
   let greeted = false;
   try { greeted = sessionStorage.getItem("zimo.susu.greeted") === "true"; } catch (_) { /* Optional. */ }
   if (expanded && !greeted) greetingTimer = setTimeout(() => {
-    if (!expanded || document.hidden || drag) return;
+    if (!expanded || document.hidden || drag || site.chat?.active) return;
     showBubble("mascotGreeting", true); play("wave", true);
     try { sessionStorage.setItem("zimo.susu.greeted", "true"); } catch (_) { /* Optional. */ }
   }, 1600);

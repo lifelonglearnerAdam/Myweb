@@ -32,11 +32,12 @@ A bilingual personal portfolio and small technical blog, rebuilt from a first-ye
 - **完整中英文切换**：正文、项目详情、手记、简历、按钮、向导与无障碍标签，均有两种语言；支持 `?lang=zh` / `?lang=en` 和本地偏好保存。
 - **浅色 / 深色主题**：首次跟随系统，可手动切换并记住选择。
 - **樱花效果**：鼠标经过留下散落花瓣，辅以稀疏的背景飘落；粒子数有上限，不拦截点击。
+- **桌面独立布局**：诗卡使用接近半幅的大图、项目使用图文交错的宽幅卡片，调整正文宽度与字号；手机端保留原有上下布局，不强行套用桌面排版。
 - **花树转场**：首页与转场使用 gpt-image-2.6 生成的樱花古树、湖面和蓝紫远山场景。首次进入、章节跳转与站内换页配合花瓣与柔和揭幕；不是官方图片。
 - **动漫头像与涂山苏苏向导**：不展示真人照片；非官方同人动画；待机、眨眼、招手、跳跃、16 方向视线跟随、章节导航与间隔提示。支持鼠标 / 触屏拖动、位置记忆、方向键微调与一键复位；手机默认收起，可随时展开 / 收起。
 - **性能与舒适度**：离开标签页暂停动画；遵循 `prefers-reduced-motion`；页脚可以关闭樱花与转场。滚动时内容轻柔显现，顶部显示阅读进度。没有统计、广告或第三方字体。固定台词不调用模型；只有主动打开“聊一句”并发送时才调用 AI。
 - **卡农钢琴循环**：Lee Galloway 演奏的《D 大调卡农》，本地托管 Ogg，默认轻音量、可暂停 / 调节音量，站内跳转保留同一个音频元素，音乐不因换页而重启；直接刷新时恢复位置。尝试有声自动播放，被浏览器拦截时等待第一次真实交互，不绕过浏览器策略。音源按 CC BY-SA 3.0 使用，见 [`assets/audio/ATTRIBUTION.md`](assets/audio/ATTRIBUTION.md)。
-- **苏苏 AI 短句**：通过独立 Cloudflare Worker 调用本人配置的 `gpt-6.1-sol`；后端前置人设 Prompt + 单句长度限制，不是浏览器 skill。风格可爱乖巧、一次一小句，不读取网页或私有项目。API Key 只存后端 Secret；有公开聊天提示、来源白名单和持久化每日限额。上游 API 调用仍消耗本人余额，目前全站每日最多 60 次。详见 [`server/susu-worker/README.md`](server/susu-worker/README.md)。
+- **苏苏 AI 短句**：点击苏苏直接打开嘴边对话框，显示你与苏苏的双方气泡，记住最近 6 轮聊天（刷新 / 重新聊即清空）。失败有可见提示与手动重试，不再是只显示输入框。免费主站通过同源 `/api/chat` + 内部服务绑定调用 `gpt-6.1-sol`，不依赖浏览器连接另一个代理子域名；后端前置人设 Prompt + 单句长度限制，不是浏览器 skill。风格可爱乖巧、一次一小句，不读取网页或私有项目。API Key 只存后端 Secret；有公开聊天提示、来源白名单和持久化每日限额。上游 API 调用仍消耗本人余额，目前全站每日最多 60 次。详见 [`server/susu-worker/README.md`](server/susu-worker/README.md)。
 - **兼容旧链接**：原始根目录与 `web/` 下的旧页面跳转到新版对应章节。
 
 > 苏苏**向导动画**为 **legeling** 制作的 AI 生成社区同人演绎，并非官方 Live2D；头像与场景则为本轮单独生成，分别说明来源。仅限非商业使用，见 [公开致谢](https://lifelonglearneradam.github.io/Myweb/credits.html) 与 [`assets/images/ATTRIBUTION.md`](assets/images/ATTRIBUTION.md)。角色权利归原权利人。若改作商业产品，请更换素材或另行取得授权。
@@ -114,6 +115,7 @@ playwright-cli run-code --filename=tests/experience-checks.js
 playwright-cli run-code --filename=tests/companion-checks.js
 playwright-cli run-code --filename=tests/touch-checks.js
 playwright-cli run-code --filename=tests/chat-checks.js
+playwright-cli run-code --filename=tests/desktop-layout-checks.js
 ```
 
 测试覆盖桌面 / 平板 / 手机、320–1440 px、中英文、深浅主题、筛选、剪贴板、菜单键盘操作、向导、动效偏好、详情 / 文章 / 简历 / 旧链接与本地资源错误。也在 `/Myweb/` 子路径下执行，防止 GitHub Pages 路径失效。新增的体验检查覆盖归档搜索、URL 状态、文章目录 / 深链接、真实音频解码、暂停 / 音量偏好与跨页播放位置。

@@ -6,15 +6,15 @@ The public homepage never receives an upstream API key. An optional, user-initia
 
 The persona is a **server-side system prompt**, not a browser skill: gentle, friendly, cute but not clingy, no stage directions, no invented knowledge about the owner, and one tiny sentence. `shortReply()` imposes an additional one-sentence / character limit. The upstream request is capped at 160 output tokens.
 
-Preset companion lines never call the model. Only the explicit chat form sends a message. It sends at most two previous turns, kept only in browser memory. No file, page text, private research, model configuration, or API credential is included in the prompt.
+Preset companion lines never call the model. Only the explicit chat form sends a message. It sends at most six previous turns, kept only in browser memory; Start fresh or a refresh clears them. No file, page text, private research, model configuration, or API credential is included in the prompt.
 
 ## Cost and abuse limits
 
 A single SQLite-backed Durable Object shares the budget across Worker locations:
 
 - **60 model requests per UTC day for the entire public site**.
-- **12 requests per source IP per UTC day**, with daily salted hashed identifiers, not stored raw addresses.
-- At most 3 requests per minute per source and a 4-second minimum interval.
+- **20 requests per source IP per UTC day**, with daily salted hashed identifiers, not stored raw addresses.
+- At most 10 requests per minute per source and a 1.5-second server minimum interval; the client holds a 2-second interval. This permits natural short replies while the global daily budget remains unchanged.
 - Reservations count even if the model request fails; failures do not create unlimited retries.
 - Input is limited to 160 characters and a byte-limited JSON body.
 - Only allowlisted site origins may call the proxy. Origin checking alone is not authentication; the shared hard budget is the backstop against a fabricated Origin or distributed abuse.
@@ -43,7 +43,9 @@ Wrangler itself is not a frontend dependency. The site remains plain static HTML
 
 ## Maintenance
 
-- Public endpoint is configured in `assets/js/companion-chat.js`.
+- The free homepage calls its own **`/api/chat`**, handled by `server/static-site/worker.mjs` and forwarded over the **`SUSU_CHAT` service binding** inside Cloudflare. The browser no longer contacts the proxy's separate public subdomain. GitHub Pages calls the free homepage's `/api/chat` endpoint with CORS.
+- The conversation visibly shows both sides, thinking, connection failure/retry, and daily limits. Failed messages and presets never enter model context. There are no automatic upstream retries.
+- Public endpoint selection is configured in `assets/js/companion-chat.js`.
 - Allowed site origins and the daily caps live in `wrangler.jsonc`.
 - Changing a site domain requires adding its exact origin, redeploying, and testing CORS.
 - Delete/disable the Worker or remove its upstream secret to disable AI replies. Preset lines and the rest of the website continue working.
