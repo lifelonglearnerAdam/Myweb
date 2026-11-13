@@ -53,7 +53,7 @@ async page => {
     await page.context().grantPermissions(["clipboard-read", "clipboard-write"], { origin: new URL(base).origin });
     await page.locator("[data-copy-email]").click();
     await page.waitForFunction(() => document.getElementById("toast").classList.contains("is-visible"));
-    assert(await page.evaluate(() => navigator.clipboard.readText()) === "2319597720@qq.com", "copy email writes the correct address");
+    assert(await page.evaluate(() => navigator.clipboard.readText()) === "zimozeng961@gmail.com", "copy email writes the correct address");
 
     for (const lang of ["zh", "en"]) {
       for (const width of [320, 390, 768, 1024, 1440]) {

@@ -10,6 +10,27 @@
 - `social-preview.png`: original social preview based on the site’s visual identity.
 - `docsift.webp`, `miniso.webp`: resized screenshots of the owner’s public project demos.
 
+## Poetry photography · external sources
+
+These are landscape photographs, not hand-drawn or newly generated illustrations. All are cropped and resized to 900 × 540 and compressed to WebP; derivative files retain their respective licenses. Attribution is shown on the cards and in `credits.html#poetry-credit`.
+
+- `poem-road.webp` — **Stiller Beobachter**, *Autumn path ^2*, **CC BY 2.0**.
+  Source: https://commons.wikimedia.org/wiki/File:Autumn_path_%5E2_-_Flickr_-_Stiller_Beobachter.jpg
+  License: https://creativecommons.org/licenses/by/2.0/
+- `poem-stars.webp` — **Giles Laurent**, *Milky Way during Perseids seen from Oeschinensee with water reflections*, **CC BY-SA 4.0**.
+  Source: https://commons.wikimedia.org/wiki/File:036_Milky_Way_during_Perseids_seen_from_Oeschinensee_with_water_reflections_Photo_by_Giles_Laurent.jpg
+  License: https://creativecommons.org/licenses/by-sa/4.0/
+- `poem-flower.webp` — **NPS Photo**, *Castilleja parviflora*, **Public domain**, as recorded by the source.
+  Source: https://commons.wikimedia.org/wiki/File:Castilleja_parviflora_(8dc220e9-26dd-4244-b7f8-e9790a1427e6).jpg
+- `poem-sea.webp` — **Leonhard Lenz**, *Sunrise in Kristianopel at Baltic sea 04*, **CC BY-SA 4.0**.
+  Source: https://commons.wikimedia.org/wiki/File:Sunrise_in_Kristianopel_at_Baltic_sea_04.jpg
+  License: https://creativecommons.org/licenses/by-sa/4.0/
+- `poem-mountain.webp` — **Basile Morin**, *Karst mountains colorful clouds and mist at sunrise from the top of Mount Nam Xay, Vang Vieng, Laos*, **CC BY-SA 4.0**.
+  Source: https://commons.wikimedia.org/wiki/File:Karst_mountains_colorful_clouds_and_mist_at_sunrise_from_the_top_of_Mount_Nam_Xay_Vang_Vieng_Laos.jpg
+  License: https://creativecommons.org/licenses/by-sa/4.0/
+
+Poetry and the photographs are independently attributed; a photograph's license does not grant ownership of the paired poem.
+
 ## Tushan Susu / 涂山苏苏
 
 Files: `susu-spritesheet.webp`, `susu-idle.webp`.

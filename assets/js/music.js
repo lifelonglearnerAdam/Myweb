@@ -2,14 +2,15 @@
 (() => {
   "use strict";
   const site = window.Zimo;
-  if (!site) return;
+  if (!site || site.music) return;
   const audio = new Audio();
   audio.loop = true;
-  audio.preload = "none";
+  audio.preload = "metadata";
   const savedVolume = Number(site.storage.get("musicVolume"));
   let volume = site.storage.get("musicVolume") !== null && Number.isFinite(savedVolume) ? Math.max(0, Math.min(.6, savedVolume)) : .18;
   audio.volume = volume;
   let requested = site.storage.get("music") !== "off";
+  audio.autoplay = requested;
   let pending = false;
   let unavailable = false;
   let lastSavedPosition = 0;
@@ -47,10 +48,6 @@
     lastSavedPosition = audio.currentTime;
     try { sessionStorage.setItem("zimo.music.position", String(audio.currentTime)); } catch (_) { /* Optional. */ }
   }
-  function unbindGesture() {
-    document.removeEventListener("pointerdown", gestureStart);
-    document.removeEventListener("keydown", gestureStart);
-  }
   async function start(manual = false) {
     if (pending || !requested || document.hidden) return;
     unavailable = false;
@@ -59,18 +56,17 @@
     if (manual && audio.error) audio.load();
     update();
     try {
+      audio.loop = true;
       await audio.play();
-      unbindGesture();
     } catch (error) {
       // Unmuted autoplay may need a real user gesture; never simulate a click to bypass it.
       if (error.name !== "NotAllowedError" && error.name !== "AbortError") {
         unavailable = true;
-        unbindGesture();
       }
     } finally { pending = false; update(); }
   }
   function gestureStart(event) {
-    if (!event.isTrusted || event.target instanceof Element && event.target.closest("#music-player")) return;
+    if (!event.isTrusted || event.composedPath().includes(root)) return;
     if (event.type === "keydown" && ["Shift", "Control", "Alt", "Meta", "Escape"].includes(event.key)) return;
     if (requested && audio.paused) start();
   }
@@ -78,12 +74,14 @@
     if (!audio.paused || pending) {
       requested = false;
       site.storage.set("music", "off");
+      audio.autoplay = false;
       audio.pause();
       savePosition();
       pending = false;
     } else {
       requested = true;
       site.storage.set("music", "on");
+      audio.autoplay = true;
       start(true);
     }
     update();
@@ -121,12 +119,21 @@
   });
   audio.addEventListener("playing", () => { pending = false; unavailable = false; update(); });
   audio.addEventListener("pause", update);
+  audio.addEventListener("ended", () => {
+    if (!requested) return;
+    audio.currentTime = 0;
+    start();
+  });
   audio.addEventListener("error", () => { pending = false; unavailable = true; update(); });
   audio.addEventListener("timeupdate", () => { if (Math.abs(audio.currentTime - lastSavedPosition) > 4) savePosition(); });
   window.addEventListener("pagehide", savePosition);
-  document.addEventListener("visibilitychange", () => { if (document.hidden) savePosition(); });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) savePosition();
+    else if (requested && audio.paused && !audio.error) start();
+  });
   document.addEventListener("zimo:languagechange", update);
-  document.addEventListener("pointerdown", gestureStart, { passive: true });
+  // Touch activation is granted on release in several browsers, not on pointerdown.
+  for (const event of ["pointerdown", "pointerup", "touchend", "click"]) document.addEventListener(event, gestureStart, { passive: true });
   document.addEventListener("keydown", gestureStart);
   site.music = { audio, get requested() { return requested; }, get playing() { return !audio.paused; } };
   update();

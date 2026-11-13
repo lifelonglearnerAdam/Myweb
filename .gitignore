@@ -11,4 +11,8 @@ __pycache__/
 *.py[cod]
 .env
 .env.*
+.dev.vars
+.dev.vars.*
+.wrangler/
+.public-site/
 !.env.example

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  "name": "zimo-susu-chat",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-01-01",
+  "workers_dev": true,
+  "observability": { "enabled": false },
+  "vars": {
+    "MODEL": "gpt-6.1-sol",
+    "ALLOWED_ORIGINS": "https://lifelonglearneradam.github.io,https://me.zimo-personal-space.workers.dev",
+    "MAX_DAILY_REQUESTS": "60",
+    "MAX_VISITOR_REQUESTS": "12"
+  },
+  "durable_objects": {
+    "bindings": [{ "name": "CHAT_BUDGET", "class_name": "ChatBudget" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ChatBudget"] }]
+}

@@ -2,7 +2,7 @@
   "use strict";
   const data = window.PORTFOLIO;
   if (!data) return;
-  const page = document.body.dataset.page || "home";
+  let page = document.body.dataset.page || "home";
   const storage = {
     get(key) { try { return localStorage.getItem(`zimo.${key}`); } catch (_) { return null; } },
     set(key, value) { try { localStorage.setItem(`zimo.${key}`, value); } catch (_) { /* Storage is optional. */ } }
@@ -124,6 +124,15 @@
       if (!link.dataset.originalHref) link.dataset.originalHref = link.getAttribute("href");
       link.href = localHref(link.dataset.originalHref);
     });
+    document.querySelectorAll("[data-email]").forEach(link => {
+      const address = link.dataset.email === "secondary" ? data.profile.secondaryEmail : data.profile.email;
+      link.href = `mailto:${address}`;
+      if (link.hasAttribute("data-email-text")) link.textContent = address;
+    });
+    document.querySelectorAll("[data-count]").forEach(element => {
+      const value = element.dataset.count === "projects" ? data.projects.length : data.notes.length;
+      element.textContent = String(value).padStart(2, "0");
+    });
     const filters = document.querySelector(".filters");
     if (filters) filters.setAttribute("aria-label", t("filterLabel"));
     document.querySelectorAll("[data-copy-email]").forEach(button => { button.setAttribute("aria-label", t("copyEmail")); button.title = t("copyEmail"); });
@@ -157,6 +166,22 @@
     if (!root) return;
     root.innerHTML = data.notes.map(note => `<a class="note-card panel" href="${localHref(`note.html?id=${note.id}`)}"><span class="note-number" aria-hidden="true">${note.number}</span><div class="note-content"><div class="note-meta"><span>${escapeHTML(localize(note.category))}</span><span>${note.minutes} ${t("minutes")}</span></div><h3>${escapeHTML(localize(note.title))}</h3><p>${escapeHTML(localize(note.summary))}</p></div><span class="note-arrow" aria-hidden="true">↗</span></a>`).join("");
   }
+  function renderPoetry() {
+    document.querySelectorAll("#main-content > .poetry-card").forEach(element => element.remove());
+    document.querySelector(".intro-signature")?.remove();
+    document.querySelector(".intro")?.insertAdjacentHTML("beforeend", `<p class="intro-signature"><span>WHAT’S UP</span><q lang="en">${escapeHTML(data.profile.motto)}</q></p>`);
+    for (const poem of data.poems || []) {
+      const target = document.getElementById(poem.before);
+      if (!target) continue;
+      target.insertAdjacentHTML("beforebegin", `<figure class="poetry-card panel"><div class="poetry-photo"><img src="${poem.image}" width="900" height="540" alt="" loading="lazy" decoding="async"><a href="${escapeHTML(poem.imageSource)}" target="_blank" rel="noopener noreferrer" class="poetry-photo-credit">© ${escapeHTML(poem.imageAuthor)} · ${escapeHTML(poem.imageLicense)}</a></div><figcaption><p class="eyebrow">${escapeHTML(poem.theme)}</p><blockquote class="poetry-verse" lang="en">${escapeHTML(poem.lines)}</blockquote><p class="poetry-byline">${escapeHTML(poem.author)} <span aria-hidden="true">/</span> <a href="${escapeHTML(poem.source)}" target="_blank" rel="noopener noreferrer">${escapeHTML(poem.work)} ↗</a></p></figcaption></figure>`);
+    }
+  }
+  function renderResearch() {
+    const root = document.getElementById("research-workspace");
+    if (!root) return;
+    const projects = data.researchInterests || [];
+    root.innerHTML = `<div class="research-workspace-heading"><h3>${t("researchWorkspace")}</h3><p>${t("researchWorkspaceNote")}</p></div><div class="research-workspace-grid">${projects.map((project, index) => `<article class="research-workspace-card panel"><div class="research-workspace-top"><span class="eyebrow">R / 0${index + 1}</span><span class="project-status">${escapeHTML(localize(project.status))}</span></div><h4>${escapeHTML(localize(project.name))}</h4><p>${escapeHTML(localize(project.summary))}</p><div class="stack-tags">${project.stack.slice(0, 3).map(stack => `<span class="stack-tag">${escapeHTML(stack)}</span>`).join("")}</div></article>`).join("")}</div><div class="research-reading"><span class="eyebrow">${t("researchReading")}</span><p>${t("researchReadingText")}</p></div>`;
+  }
   function renderCoursework() {
     const root = document.getElementById("coursework");
     if (!root) return;
@@ -183,7 +208,7 @@
       if (!value || value === "all") url.searchParams.delete(key);
       else url.searchParams.set(key, value);
     }
-    try { history.replaceState({}, "", url); } catch (_) { /* Optional for file previews. */ }
+    try { history.replaceState(history.state, "", url); } catch (_) { /* Optional for file previews. */ }
     renderArchiveResults();
   }
   function renderArchiveResults() {
@@ -249,15 +274,15 @@
     const root = document.getElementById("resume-content");
     if (!root) return;
     const selected = data.projects.filter(project => project.featured);
-    const research = data.projects.find(project => project.id === "monkeyocr");
-    root.innerHTML = `<header class="resume-heading"><h1>${t("resumeTitle")}</h1><p class="resume-role">${t("resumeRole")}</p><div class="resume-contact"><a href="mailto:${data.profile.email}">${data.profile.email}</a><a href="${data.profile.github}" target="_blank" rel="noopener noreferrer">github.com/lifelonglearnerAdam</a><a href="https://lifelonglearneradam.github.io/Myweb/">lifelonglearneradam.github.io/Myweb/</a></div></header><section class="resume-section"><h2>${t("resumeSummaryTitle")}</h2><p>${t("resumeSummary")}</p></section><section class="resume-section"><h2>${t("educationTitle")}</h2><div class="resume-row"><h3>${t("educationSchool")}</h3><span>${t("educationTime")}</span></div><p>${t("educationMajor")}</p></section><section class="resume-section"><h2>${t("resumeResearch")}</h2><div class="resume-project"><h3>${escapeHTML(localize(research.name))}</h3><p>${escapeHTML(localize(research.resume))}</p><a class="resume-project-link" href="https://github.com/lifelonglearnerAdam/monkeyocr-note-defects">github.com/lifelonglearnerAdam/monkeyocr-note-defects</a></div></section><section class="resume-section"><h2>${t("resumeProjects")}</h2>${selected.map(project => `<div class="resume-project"><div class="resume-row"><h3>${escapeHTML(localize(project.name))}</h3><span>${escapeHTML(localize(project.status))}</span></div><p class="resume-stack">${project.stack.join(" · ")}</p><p>${escapeHTML(localize(project.resume))}</p><a class="resume-project-link" href="${project.links.find(link => link.kind === "source").url}">${project.links.find(link => link.kind === "source").url.replace("https://", "")}</a></div>`).join("")}</section><section class="resume-section"><h2>${t("resumeSkills")}</h2><div class="resume-skills"><div><h3>${t("skillLanguages")}</h3><p>C / C++ · Python · JavaScript / TypeScript</p></div><div><h3>${t("skillProduct")}</h3><p>Flutter · SQLite · NestJS · PostgreSQL</p></div><div><h3>${t("skillAI")}</h3><p>Document Parsing · Error Analysis · Model APIs</p></div><div><h3>${t("skillWorkflow")}</h3><p>Git · Linux · Testing · CI</p></div></div><p style="margin-top:8px">${language === "zh" ? "课程实践：数据结构、计算机系统、数字逻辑、模式识别；C99 SAT 求解器（DPLL / CDCL）与数独约束编码。" : "Course practice: data structures, computer systems, digital logic, and pattern recognition; a C99 SAT solver (DPLL/CDCL) with Sudoku constraint encoding."}</p></section><p class="resume-footnote">${t("resumeFootnote")}</p>`;
+    const research = data.projects.filter(project => project.id === "monkeyocr");
+    root.innerHTML = `<header class="resume-heading"><h1>${t("resumeTitle")}</h1><p class="resume-role">${t("resumeRole")}</p><div class="resume-contact"><a href="mailto:${data.profile.email}">${data.profile.email}</a><a href="${data.profile.github}" target="_blank" rel="noopener noreferrer">github.com/lifelonglearnerAdam</a><a href="https://lifelonglearneradam.github.io/Myweb/">lifelonglearneradam.github.io/Myweb/</a></div></header><section class="resume-section"><h2>${t("resumeSummaryTitle")}</h2><p>${t("resumeSummary")}</p></section><section class="resume-section"><h2>${t("educationTitle")}</h2><div class="resume-row"><h3>${t("educationSchool")}</h3><span>${t("educationTime")}</span></div><p>${t("educationMajor")}</p></section><section class="resume-section"><h2>${t("resumeResearch")}</h2>${research.map(project => `<div class="resume-project"><h3>${escapeHTML(localize(project.name))}</h3><p>${escapeHTML(localize(project.resume))}</p></div>`).join("")}</section><section class="resume-section"><h2>${t("resumeProjects")}</h2>${selected.map(project => `<div class="resume-project"><div class="resume-row"><h3>${escapeHTML(localize(project.name))}</h3><span>${escapeHTML(localize(project.status))}</span></div><p class="resume-stack">${project.stack.join(" · ")}</p><p>${escapeHTML(localize(project.resume))}</p><a class="resume-project-link" href="${project.links.find(link => link.kind === "source").url}">${project.links.find(link => link.kind === "source").url.replace("https://", "")}</a></div>`).join("")}</section><section class="resume-section"><h2>${t("resumeSkills")}</h2><div class="resume-skills"><div><h3>${t("skillLanguages")}</h3><p>C / C++ · Python · JavaScript / TypeScript</p></div><div><h3>${t("skillProduct")}</h3><p>Flutter · SQLite · NestJS · PostgreSQL</p></div><div><h3>${t("skillAI")}</h3><p>Document Parsing · Error Analysis · Model APIs</p></div><div><h3>${t("skillWorkflow")}</h3><p>Git · Linux · Testing · CI</p></div></div><p style="margin-top:8px">${language === "zh" ? "课程实践：数据结构、计算机系统、数字逻辑、模式识别；C99 SAT 求解器（DPLL / CDCL）与数独约束编码。" : "Course practice: data structures, computer systems, digital logic, and pattern recognition; a C99 SAT solver (DPLL/CDCL) with Sudoku constraint encoding."}</p></section><p class="resume-footnote">${t("resumeFootnote")}</p>`;
     return t("viewResume");
   }
   function renderCredits() {
     const root = document.getElementById("detail-content");
     if (!root) return;
     const zh = language === "zh";
-    root.innerHTML = `<a class="breadcrumb" href="${localHref("index.html")}">← ${t("backHome")}</a><article class="document-header panel"><p class="eyebrow">MADE WITH CARE / THANK YOU</p><h1>${t("credits")}</h1><div class="prose" style="margin-top:30px"><section><h2>${zh ? "设计参考" : "Design references"}</h2><p>${zh ? "页面的信息结构受到学长的 Suwa shrine 启发：大幅头图、个人侧栏、内容卡片与陪伴式向导。排版与留白也参考了 Anthropic 和 Brittany Chiang 的个人网站。本网站的布局与交互为独立实现。樱花古树场景由 gpt-image-2.6 生成并压缩为 WebP，按苦情树意象创作，不是官方动画截图；项目示意图为重新设计，不复用参考站的角色插画、文章或个人资料。" : "The page structure is inspired by Suwa shrine: a panoramic header, personal sidebar, content cards, and a companion guide. Typography and spacing also take cues from Anthropic and Brittany Chiang’s portfolio. The layout and interactions were implemented independently. The original wishing-tree scene was generated with gpt-image-2.6 and compressed to WebP, not extracted from an official animation; project schematics were designed separately; reference-site artwork, articles, and personal information are not reused."}</p><p>${externalLink("https://sukunahust.moe", "Suwa shrine")} &nbsp; · &nbsp; ${externalLink("https://www.anthropic.com", "Anthropic")} &nbsp; · &nbsp; ${externalLink("https://brittanychiang.com", "Brittany Chiang")}</p></section><section><h2>${zh ? "涂山苏苏 · 同人动画向导" : "Tushan Susu · Fan-art animated guide"}</h2><p>${zh ? "动画素材由 legeling 提供，来自 awesome-codex-pet 的 tushan-susu--legeling。该素材是 AI 生成的社区同人演绎，并非《狐妖小红娘》官方模型或官方 Live2D；角色及原作权利归各自权利人所有。" : "Animation artwork by legeling, from the tushan-susu--legeling package in awesome-codex-pet. It is an AI-generated community fan interpretation, not an official Fox Spirit Matchmaker asset or Live2D model. Character and franchise rights remain with their respective owners."}</p><p>${zh ? "素材按来源标注仅用于非商业场景，遵循 CC BY-NC 4.0 与素材包中的非商业限制。本网站对精灵图进行有损 WebP 压缩，并独立实现网页动画、视线跟随与导航交互；未使用第三方桌宠运行时。若用于商业产品，请先更换素材或另行取得授权。" : "The artwork is used non-commercially under the source’s CC BY-NC 4.0 and package-specific non-commercial restriction. The atlas was recompressed to WebP; animation playback, directional looking, and site navigation were implemented independently, without a third-party pet runtime. Replace the artwork or obtain permission before commercial reuse."}</p><p>${externalLink("https://github.com/legeling/awesome-codex-pet/tree/main/pets/tushan-susu--legeling", zh ? "素材来源与作者" : "Artwork & creator")} &nbsp; · &nbsp; ${externalLink("https://creativecommons.org/licenses/by-nc/4.0/", "CC BY-NC 4.0")}</p></section><section><h2>${zh ? "项目图片与数据" : "Project imagery & data"}</h2><p>${zh ? "DocSift 与 AI 新品决策引擎的封面来自各项目公开演示页面。QuantPilot 与子墨记账封面为界面示意，图表不对应个人研究或实际收支；研究插图为原图 / 标注 / 预测对照的方法示意。头像由 gpt-image-2.6 生成，是以涂山苏苏为灵感的非官方同人插画，不使用真人照片；向导动画与头像为不同素材，分别说明来源。" : "DocSift and the AI Product Decision Engine covers are screenshots of their public demos. QuantPilot and Zimo Ledger covers are interface studies, not private research or personal financial records. The research diagram illustrates image/GT/prediction comparison. The profile avatar is a gpt-image-2.6-generated, non-official fan-art interpretation inspired by Tushan Susu, not a personal photograph. The avatar and animated guide are separate assets with separate provenance."}</p></section><section id="music-credit"><h2>${zh ? "背景音乐 · 卡农钢琴版" : "Background piano · Canon in D"}</h2><p>${zh ? "曲目：Johann Pachelbel《D 大调卡农》钢琴改编；演奏：Lee Galloway。录音来自 Wikimedia Commons 的 Pachelbel’s Canon.ogg，按 CC BY-SA 3.0 授权使用。录音未经剪辑或转码，仅设置播放器音量与单曲循环；原曲进入公有领域不意味着演奏录音没有版权，因此保留演奏者与录音许可署名。" : "Johann Pachelbel’s Canon in D, piano transcription performed by Lee Galloway. The recording is Pachelbel’s Canon.ogg from Wikimedia Commons, licensed under CC BY-SA 3.0. The audio is unmodified; only playback volume and looping are configured. The composition’s public-domain status does not erase rights in the performance, so performer and recording-license attribution are retained."}</p><p>${externalLink("https://commons.wikimedia.org/wiki/File:Pachelbel%27s_Canon.ogg", zh ? "录音来源与许可" : "Recording source & license")} &nbsp; · &nbsp; ${externalLink("https://www.leegalloway.com/", "Lee Galloway")} &nbsp; · &nbsp; ${externalLink("https://creativecommons.org/licenses/by-sa/3.0/", "CC BY-SA 3.0")}</p></section><section><h2>${zh ? "隐私与站点行为" : "Privacy & site behavior"}</h2><p>${zh ? "本网站没有接入访问统计、广告、聊天模型或第三方评论系统。语言、主题、音乐、樱花动效与向导收起状态仅保存在浏览器本地；向导回复是预设导航文案，不会把输入发送给任何模型。外部项目有各自的数据与登录政策。" : "This site does not embed analytics, advertising, a chat model, or a third-party comment service. Language, theme, music, sakura-effect, and guide preferences are stored locally in your browser. Guide replies are preset navigation copy, not model-generated responses. External projects have their own data and login policies."}</p></section></div></article>`;
+    root.innerHTML = `<a class="breadcrumb" href="${localHref("index.html")}">← ${t("backHome")}</a><article class="document-header panel"><p class="eyebrow">MADE WITH CARE / THANK YOU</p><h1>${t("credits")}</h1><div class="prose" style="margin-top:30px"><section><h2>${zh ? "设计参考" : "Design references"}</h2><p>${zh ? "页面的信息结构受到学长的 Suwa shrine 启发：大幅头图、个人侧栏、内容卡片与陪伴式向导。排版与留白也参考了 Anthropic 和 Brittany Chiang 的个人网站。本网站的布局与交互为独立实现。樱花古树场景由 gpt-image-2.6 生成并压缩为 WebP，按苦情树意象创作，不是官方动画截图；项目示意图为重新设计，不复用参考站的角色插画、文章或个人资料。" : "The page structure is inspired by Suwa shrine: a panoramic header, personal sidebar, content cards, and a companion guide. Typography and spacing also take cues from Anthropic and Brittany Chiang’s portfolio. The layout and interactions were implemented independently. The original wishing-tree scene was generated with gpt-image-2.6 and compressed to WebP, not extracted from an official animation; project schematics were designed separately; reference-site artwork, articles, and personal information are not reused."}</p><p>${externalLink("https://sukunahust.moe", "Suwa shrine")} &nbsp; · &nbsp; ${externalLink("https://www.anthropic.com", "Anthropic")} &nbsp; · &nbsp; ${externalLink("https://brittanychiang.com", "Brittany Chiang")}</p></section><section><h2>${zh ? "涂山苏苏 · 同人动画向导" : "Tushan Susu · Fan-art animated guide"}</h2><p>${zh ? "动画素材由 legeling 提供，来自 awesome-codex-pet 的 tushan-susu--legeling。该素材是 AI 生成的社区同人演绎，并非《狐妖小红娘》官方模型或官方 Live2D；角色及原作权利归各自权利人所有。" : "Animation artwork by legeling, from the tushan-susu--legeling package in awesome-codex-pet. It is an AI-generated community fan interpretation, not an official Fox Spirit Matchmaker asset or Live2D model. Character and franchise rights remain with their respective owners."}</p><p>${zh ? "素材按来源标注仅用于非商业场景，遵循 CC BY-NC 4.0 与素材包中的非商业限制。本网站对精灵图进行有损 WebP 压缩，并独立实现网页动画、视线跟随与导航交互；未使用第三方桌宠运行时。若用于商业产品，请先更换素材或另行取得授权。" : "The artwork is used non-commercially under the source’s CC BY-NC 4.0 and package-specific non-commercial restriction. The atlas was recompressed to WebP; animation playback, directional looking, and site navigation were implemented independently, without a third-party pet runtime. Replace the artwork or obtain permission before commercial reuse."}</p><p>${externalLink("https://github.com/legeling/awesome-codex-pet/tree/main/pets/tushan-susu--legeling", zh ? "素材来源与作者" : "Artwork & creator")} &nbsp; · &nbsp; ${externalLink("https://creativecommons.org/licenses/by-nc/4.0/", "CC BY-NC 4.0")}</p></section><section><h2>${zh ? "项目图片与数据" : "Project imagery & data"}</h2><p>${zh ? "DocSift 与 AI 新品决策引擎的封面来自各项目公开演示页面。QuantPilot 与子墨记账封面为界面示意，图表不对应个人研究或实际收支；研究插图为原图 / 标注 / 预测对照的方法示意。头像由 gpt-image-2.6 生成，是以涂山苏苏为灵感的非官方同人插画，不使用真人照片；向导动画与头像为不同素材，分别说明来源。" : "DocSift and the AI Product Decision Engine covers are screenshots of their public demos. QuantPilot and Zimo Ledger covers are interface studies, not private research or personal financial records. The research diagram illustrates image/GT/prediction comparison. The profile avatar is a gpt-image-2.6-generated, non-official fan-art interpretation inspired by Tushan Susu, not a personal photograph. The avatar and animated guide are separate assets with separate provenance."}</p></section><section id="poetry-credit"><h2>${zh ? "诗句与摄影" : "Poetry & photography"}</h2><p>${zh ? "诗句为署名短摘，不把名家作品当作本站原创。仅保留英文原文、作者与篇名，不附中文翻译或解读。照片来自 Wikimedia Commons，已裁切与压缩；以下署名与各自许可适用于处理后的照片。" : "Poems are brief attributed excerpts, not claimed as original writing for this site. Only the English excerpts, author names, and titles are displayed, with links to the source texts. Photographs come from Wikimedia Commons and were cropped and compressed; their respective credits and licenses apply to these versions."}</p><ul>${(data.poems || []).map(poem => `<li>${escapeHTML(poem.author)} · ${externalLink(poem.source, poem.work)}<br>${escapeHTML(poem.imageAuthor)} · ${externalLink(poem.imageSource, poem.imageLicense)}</li>`).join("")}</ul></section><section id="music-credit"><h2>${zh ? "背景音乐 · 卡农钢琴版" : "Background piano · Canon in D"}</h2><p>${zh ? "曲目：Johann Pachelbel《D 大调卡农》钢琴改编；演奏：Lee Galloway。录音来自 Wikimedia Commons 的 Pachelbel’s Canon.ogg，按 CC BY-SA 3.0 授权使用。录音未经剪辑或转码，仅设置播放器音量与单曲循环；原曲进入公有领域不意味着演奏录音没有版权，因此保留演奏者与录音许可署名。" : "Johann Pachelbel’s Canon in D, piano transcription performed by Lee Galloway. The recording is Pachelbel’s Canon.ogg from Wikimedia Commons, licensed under CC BY-SA 3.0. The audio is unmodified; only playback volume and looping are configured. The composition’s public-domain status does not erase rights in the performance, so performer and recording-license attribution are retained."}</p><p>${externalLink("https://commons.wikimedia.org/wiki/File:Pachelbel%27s_Canon.ogg", zh ? "录音来源与许可" : "Recording source & license")} &nbsp; · &nbsp; ${externalLink("https://www.leegalloway.com/", "Lee Galloway")} &nbsp; · &nbsp; ${externalLink("https://creativecommons.org/licenses/by-sa/3.0/", "CC BY-SA 3.0")}</p></section><section><h2>${zh ? "隐私与站点行为" : "Privacy & site behavior"}</h2><p>${zh ? "本网站没有访问统计、广告或第三方评论系统。固定向导台词在本地显示；只有主动发送“聊一句”时，当前文字及最多两轮聊天历史才会通过 Cloudflare 后端发送给模型服务，不附带网站内容、私有研究、文件或个人配置。前后端不记录聊天正文；限频服务短期保存按日加盐的来源标识与计数，不保存原始 IP。请勿在聊天中输入隐私；模型服务有其自身的数据政策。语言、主题、音乐与向导偏好保存在本机。" : "There are no analytics, ads, or third-party comments. Preset guide lines run locally. Only an explicitly sent chat message and up to two previous turns go through a Cloudflare proxy to the model service—never page content, private research, files, or configuration. The site does not log dialogue; the rate limiter briefly stores daily salted source identifiers and counts, not raw IP addresses. Please do not enter private information. The model provider has its own data policies. Language, theme, music, and guide preferences remain local."}</p></section></div></article>`;
     return t("credits");
   }
   function updateMetadata(title) {
@@ -292,7 +317,7 @@
     renderHeader();
     translateStaticContent();
     let title;
-    if (page === "home") { renderProjects(); renderNotes(); renderCoursework(); }
+    if (page === "home") { renderProjects(); renderNotes(); renderCoursework(); renderResearch(); renderPoetry(); }
     else if (page === "project") title = renderProject();
     else if (page === "note") title = renderNote();
     else if (page === "resume") title = renderResume();
@@ -320,7 +345,7 @@
     storage.set("language", language);
     const url = new URL(location.href);
     url.searchParams.set("lang", language);
-    try { history.replaceState({}, "", url); } catch (_) { /* file:// may restrict history. */ }
+    try { history.replaceState(history.state, "", url); } catch (_) { /* file:// may restrict history. */ }
     render();
     if (focusKey) document.querySelector(`[data-language="${next}"]`)?.focus({ preventScroll: true });
   }
@@ -350,7 +375,38 @@
       toast(successMessage);
     } catch (_) { toast(t("copyFailed")); }
   }
-  window.Zimo = { t, localize, localHref, icon, escapeHTML, storage, toast, get language() { return language; }, get page() { return page; } };
+  function pageNodes(doc) {
+    const hero = doc.querySelector(".hero");
+    const layout = doc.querySelector(".page-layout");
+    const main = doc.querySelector("body > main, #page-content > main");
+    return hero && layout ? [hero, layout] : main ? [main] : [];
+  }
+  const pageContent = document.createElement("div");
+  pageContent.id = "page-content";
+  const initialNodes = pageNodes(document);
+  if (initialNodes.length) {
+    initialNodes[0].before(pageContent);
+    pageContent.append(...initialNodes);
+  }
+  function mountDocument(source) {
+    const type = source.body?.dataset.page;
+    const nodes = pageNodes(source);
+    if (!["home", "project", "note", "archive", "resume", "credits"].includes(type) || !nodes.length) throw new Error("Unsupported page");
+    page = type;
+    document.body.dataset.page = type;
+    activeFilter = "all";
+    const requested = new URLSearchParams(location.search).get("lang");
+    if (["zh", "en"].includes(requested)) { language = requested; storage.set("language", language); }
+    const imported = nodes.map(node => document.importNode(node, true));
+    imported.forEach(node => node.querySelectorAll("script,noscript").forEach(element => element.remove()));
+    pageContent.replaceChildren(...imported);
+    const canonical = document.querySelector('link[rel="canonical"]');
+    const sourceCanonical = source.querySelector('link[rel="canonical"]');
+    if (canonical && sourceCanonical) canonical.href = sourceCanonical.href;
+    render();
+    document.dispatchEvent(new CustomEvent("zimo:contentchange"));
+  }
+  window.Zimo = { t, localize, localHref, icon, escapeHTML, storage, toast, mountDocument, get language() { return language; }, get page() { return page; } };
   document.addEventListener("click", event => {
     const target = event.target instanceof Element ? event.target : null;
     if (!target) return;
@@ -372,7 +428,16 @@
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", event => {
     if (!storage.get("theme")) { document.documentElement.dataset.theme = event.matches ? "dark" : "light"; updateThemeButton(); }
   });
-  const backTop = document.getElementById("back-top");
+  let backTop = document.getElementById("back-top");
+  if (!backTop) {
+    backTop = document.createElement("button");
+    backTop.id = "back-top";
+    backTop.className = "back-top icon-button";
+    backTop.type = "button";
+    backTop.hidden = true;
+    backTop.innerHTML = icon("arrow-up");
+    document.body.append(backTop);
+  }
   if (backTop) {
     let scheduled = false;
     const update = () => { backTop.hidden = window.scrollY < 650; scheduled = false; };

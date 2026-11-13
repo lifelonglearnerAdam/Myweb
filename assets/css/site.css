@@ -209,6 +209,36 @@ h1, h2, h3, h4 { color: var(--ink); font-weight: 600; line-height: 1.45; }
 .compact-project p { color: var(--muted); font-size: 10px; margin-top: 6px; line-height: 1.8; }
 .compact-project .compact-arrow { margin-left: auto; font-size: 13px; color: var(--muted); }
 .github-more { margin-top: 21px; font-size: 11px; }
+.research-workspace-heading { margin-bottom: 18px; }
+.research-workspace-heading h3 { font-size: 17px; }
+.research-workspace-heading p { font-size: 11px; color: var(--muted); margin-top: 6px; }
+.research-workspace-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 17px; }
+.research-workspace-card { padding: 25px; min-width: 0; }
+.research-workspace-card:first-child { grid-column: 1 / -1; background: linear-gradient(120deg,var(--surface),var(--lilac)); }
+.research-workspace-top { display: flex; justify-content: space-between; gap: 13px; align-items: center; flex-wrap: wrap; }
+.research-workspace-card h4 { margin-top: 14px; font-size: 19px; }
+.research-workspace-card > p { font-size: 12px; margin-top: 11px; line-height: 1.95; }
+.research-workspace-card > .text-link { margin-top: 20px; font-size: 11px; }
+.research-reading { padding: 20px 3px 26px; }
+.research-reading > p { margin-top: 8px; color: var(--muted); font-size: 11px; line-height: 1.95; }
+.secondary-email { font-size: 10px; color: var(--muted); margin: 3px 0 9px; }
+.secondary-email a { font-family: var(--mono); }
+.intro-signature { padding-top: 18px; margin-top: 20px !important; border-top: 1px solid var(--line); display: flex; align-items: baseline; gap: 13px; flex-wrap: wrap; }
+.intro-signature > span { color: var(--purple); font: 8px/1.7 var(--mono); letter-spacing: .12em; }
+.intro-signature q { font: italic 13px/1.8 Georgia,serif; color: var(--body); quotes: none; }
+.poetry-card { display: grid; grid-template-columns: 200px minmax(0,1fr); overflow: hidden; margin: 38px 0 0; box-shadow: none; }
+.poetry-photo { position: relative; min-height: 180px; overflow: hidden; }
+.poetry-photo img { height: 100%; width: 100%; object-fit: cover; filter: saturate(.8); }
+.poetry-photo-credit { position: absolute; inset: auto 0 0; padding: 5px 8px; color: #fff; background: rgb(29 26 39 / 78%); font: 7px/1.7 var(--sans); }
+.poetry-photo-credit:hover { color: white; background: rgb(29 26 39 / 90%); }
+.poetry-card figcaption { padding: 23px 25px 21px; align-self: center; min-width: 0; }
+.poetry-card .eyebrow { font-size: 8px; color: var(--purple); letter-spacing: .1em; }
+.poetry-verse { margin: 12px 0 9px; white-space: pre-line; font: italic 18px/1.55 Georgia,serif; color: var(--ink); }
+.poetry-byline { font: 9px/1.8 var(--sans); color: var(--muted); }
+.poetry-byline > span { padding-inline: 4px; opacity: .7; }
+.poetry-reflection { color: var(--muted); font-size: 10px; margin-top: 8px; line-height: 1.8; }
+.poetry-card + .content-section { margin-top: 35px; }
+@media (max-width:580px) { .research-workspace-grid { grid-template-columns: 1fr; } .research-workspace-card { padding: 22px; } .research-workspace-card h4 { font-size: 18px; } .poetry-card { grid-template-columns: 1fr; margin-top: 30px; } .poetry-photo { height: 116px; min-height: 0; } .poetry-card figcaption { padding: 21px; } .poetry-verse { font-size: 18px; } .intro-signature { gap: 5px; flex-direction: column; } .intro-signature q { font-size: 12px; } }
 .research-card { overflow: hidden; }
 .research-visual { height: 190px; overflow: hidden; background: var(--lilac); border-bottom: 1px solid var(--line); }
 .research-visual img { width: 100%; height: 100%; object-fit: cover; object-position: center 46%; }
@@ -445,7 +475,13 @@ html[lang="en"] .archive-heading h1 { font: 400 41px/1.25 Georgia,serif; letter-
 .resume-footnote { border-top: 1px solid var(--line); margin-top: 23px; padding-top: 12px; font-size: 9px; color: var(--muted); }
 /* Mascot: same personal-blog spirit, without a third-party runtime or tracking. */
 .mascot { position: fixed; bottom: 14px; right: 14px; width: 144px; z-index: 40; }
-.mascot-stage { display: block; width: 144px; height: 156px; padding: 0; border: 0; background-color: transparent; background-repeat: no-repeat; background-size: 1152px 1716px; cursor: pointer; filter: drop-shadow(0 6px 8px rgb(90 73 111 / 10%)); transition: none; }
+.mascot-stage { position: relative; display: block; width: 144px; height: 156px; padding: 0; border: 0; background-color: transparent; background-repeat: no-repeat; background-size: 1152px 1716px; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; filter: drop-shadow(0 6px 8px rgb(90 73 111 / 10%)); transition: none; }
+.mascot-blend { position: absolute; inset: 0; background-size: 1152px 1716px; background-repeat: no-repeat; opacity: 0; pointer-events: none; }
+.mascot.is-dragging { z-index: 60; }
+.mascot.is-dragging .mascot-stage { cursor: grabbing; filter: drop-shadow(0 10px 12px rgb(90 73 111 / 19%)); }
+html[data-effects="on"] .mascot[data-motion="idle"]:not(.is-dragging) .mascot-stage { animation: susu-breathe 5.4s ease-in-out infinite; }
+@keyframes susu-breathe { 0%,100% { transform: translateY(0) rotate(-.25deg); } 50% { transform: translateY(-2px) rotate(.25deg); } }
+.mascot-bubble.is-below::after { top: -5px; bottom: auto; transform: rotate(225deg); }
 .mascot-stage:hover { filter: drop-shadow(0 6px 10px rgb(90 73 111 / 17%)); }
 .mascot-stage.is-loading { background-image: url("../images/susu-idle.webp"); background-size: 144px 156px; }
 .mascot-controls { display: flex; gap: 4px; justify-content: center; align-items: center; margin-top: -4px; }
@@ -461,6 +497,16 @@ html[lang="en"] .archive-heading h1 { font: 400 41px/1.25 Georgia,serif; letter-
 .mascot-message { font-size: 11px; line-height: 1.9; }
 .mascot-choices { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 11px; }
 .mascot-choices a { font-size: 9px; color: var(--accent); background: var(--sky); border-radius: 5px; padding: 4px 7px; }
+.susu-chat-toggle { display: block; width: 100%; text-align: left; margin-top: 10px; border: 0; border-top: 1px solid var(--line); padding: 9px 0 0; background: none; color: var(--purple); font-size: 10px; line-height: 1.8; }
+.susu-chat-toggle:hover { color: var(--accent); }
+.susu-chat-form { margin-top: 8px; }
+.susu-chat-input-row { display: flex; gap: 6px; align-items: center; }
+.susu-chat-input-row input { width: 100%; min-width: 0; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-soft); color: var(--ink); padding: 6px 8px; font-size: 11px; line-height: 1.8; }
+.susu-chat-input-row input::placeholder { color: var(--muted); }
+.susu-chat-input-row button { flex-shrink: 0; color: var(--accent); background: var(--sky); border: 1px solid transparent; border-radius: 6px; padding: 6px 9px; min-height: 34px; font-size: 10px; }
+.susu-chat-input-row button:disabled { opacity: .55; }
+.susu-chat-privacy { color: var(--muted); font-size: 8px; margin-top: 8px; line-height: 1.75; }
+.susu-chat-badge { display: inline-block; color: var(--purple); font: 7px/1.8 var(--mono); margin-top: 4px; }
 .mascot-launch { position: fixed; right: 17px; bottom: 19px; display: flex; align-items: center; gap: 5px; padding: 5px 9px 5px 5px; min-height: 42px; background: var(--surface); border: 1px solid var(--line); border-radius: 25px; box-shadow: var(--shadow-hover); z-index: 40; font-size: 10px; color: var(--purple); }
 .mascot-launch img { width: 31px; height: 34px; object-fit: contain; }
 /* Latin typography gets breathing room without changing the composition. */
@@ -674,7 +720,7 @@ html[lang="en"] .document-header h1 { font-family: Georgia,serif; font-weight: 4
   .resume-contact { font-size: 9px; }
   .resume-skills { grid-template-columns: 1fr; }
   .resume-row { flex-wrap: wrap; gap: 4px; }
-  .mascot { bottom: 10px; right: 6px; transform: scale(.88); transform-origin: bottom right; }
+  .mascot { bottom: 10px; right: 6px; transform: none; }
   .mascot-launch { font-size: 9px; bottom: 14px; right: 13px; }
   .back-top { left: 13px; bottom: 16px; width: 32px; height: 32px; }
   html[lang="en"] .hero h1 { font-size: clamp(32px,10.3vw,47px); margin-top: 24px; line-height: 1.18; }

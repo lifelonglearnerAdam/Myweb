@@ -3,7 +3,8 @@
 **文档智能 · AI 应用 · 软件工程**
 Document intelligence. Applied AI. Thoughtful engineering.
 
-- **在线访问 / Live:** https://lifelonglearneradam.github.io/Myweb/
+- **免费新网址 / Free hosting:** https://me.zimo-personal-space.workers.dev/
+- **GitHub Pages 镜像 / Mirror:** https://lifelonglearneradam.github.io/Myweb/
 - **English:** https://lifelonglearneradam.github.io/Myweb/?lang=en
 - **中英文简历 / Résumé:** https://lifelonglearneradam.github.io/Myweb/resume.html
 
@@ -16,12 +17,13 @@ A bilingual personal portfolio and small technical blog, rebuilt from a first-ye
 ## 内容 / Content
 
 - **7 份项目档案**：DocSift、AI 新品决策引擎、QuantPilot AI、子墨记账、SAT / 星形数独、DecibelMeter、手写文档表格与公式缺陷分析。
-- **研究专题**：明确个人承担的表格 / 公式诊断范围，链接公开报告；区分评测、训练与待验证工作。
+- **研究与兴趣**：已经公开的诊断报告保留公开入口；其他工作只展示宽泛研究兴趣，不披露私有仓库、未发表方法、数据、结果或实验过程。
 - **3 篇中英文手记**：围绕文档解析评测、可核验的 AI 交互、本地优先工程整理；附文章目录、深链接与复制链接。
 - **完整归档与搜索**：统一检索 7 份项目与 3 篇手记，支持中英文关键词、类型筛选与可分享的搜索 URL。
 - **教育与课程实践**：在校课程与 CS:APP 自学区分，不公开学号、课程原始材料或作业原包。
 - **中英文简历**：随页面语言切换，浏览器打印 / 保存为 PDF 时自动使用简洁 A4 布局。
-- **公开联系**：GitHub 与邮箱，不公布电话号码、私人社交账号或私人相册。
+- **公开联系**：`zimozeng961@gmail.com` 为主邮箱，原 QQ 邮箱为备用；不公布电话号码、私人社交账号或私人相册。
+- **个人签名与诗句**：签名为 `stay young, stay simple, stay hungry, stay foolish`。五处摄影诗卡只使用弗罗斯特、泰戈尔、布莱克、狄金森、华兹华斯的署名英文短摘，无生成诗、中文翻译或附加解读，见 [`docs/POETRY.md`](docs/POETRY.md)。
 
 内容依据与更新原则见 [`docs/CONTENT.md`](docs/CONTENT.md)。手记是本轮结合项目实现新整理的草稿，未伪造历史发表日期；作为正式申请材料使用前，建议本人复核表达与个人贡献。
 
@@ -31,16 +33,17 @@ A bilingual personal portfolio and small technical blog, rebuilt from a first-ye
 - **浅色 / 深色主题**：首次跟随系统，可手动切换并记住选择。
 - **樱花效果**：鼠标经过留下散落花瓣，辅以稀疏的背景飘落；粒子数有上限，不拦截点击。
 - **花树转场**：首页与转场使用 gpt-image-2.6 生成的樱花古树、湖面和蓝紫远山场景。首次进入、章节跳转与站内换页配合花瓣与柔和揭幕；不是官方图片。
-- **动漫头像与涂山苏苏向导**：不展示真人照片；非官方同人动画；待机、眨眼、招手、跳跃、16 方向视线跟随、章节导航与间隔提示。手机默认收起，可随时展开 / 收起。
-- **性能与舒适度**：离开标签页暂停动画；遵循 `prefers-reduced-motion`；页脚可以关闭樱花与转场。滚动时内容轻柔显现，顶部显示阅读进度。没有统计、广告、第三方字体或聊天模型请求。
-- **卡农钢琴循环**：Lee Galloway 演奏的《D 大调卡农》，本地托管 Ogg，默认轻音量、可暂停 / 调节音量，并跨页恢复位置。尝试有声自动播放，被浏览器拦截时等待第一次真实交互，不绕过浏览器策略。音源按 CC BY-SA 3.0 使用，见 [`assets/audio/ATTRIBUTION.md`](assets/audio/ATTRIBUTION.md)。
+- **动漫头像与涂山苏苏向导**：不展示真人照片；非官方同人动画；待机、眨眼、招手、跳跃、16 方向视线跟随、章节导航与间隔提示。支持鼠标 / 触屏拖动、位置记忆、方向键微调与一键复位；手机默认收起，可随时展开 / 收起。
+- **性能与舒适度**：离开标签页暂停动画；遵循 `prefers-reduced-motion`；页脚可以关闭樱花与转场。滚动时内容轻柔显现，顶部显示阅读进度。没有统计、广告或第三方字体。固定台词不调用模型；只有主动打开“聊一句”并发送时才调用 AI。
+- **卡农钢琴循环**：Lee Galloway 演奏的《D 大调卡农》，本地托管 Ogg，默认轻音量、可暂停 / 调节音量，站内跳转保留同一个音频元素，音乐不因换页而重启；直接刷新时恢复位置。尝试有声自动播放，被浏览器拦截时等待第一次真实交互，不绕过浏览器策略。音源按 CC BY-SA 3.0 使用，见 [`assets/audio/ATTRIBUTION.md`](assets/audio/ATTRIBUTION.md)。
+- **苏苏 AI 短句**：通过独立 Cloudflare Worker 调用本人配置的 `gpt-6.1-sol`；后端前置人设 Prompt + 单句长度限制，不是浏览器 skill。风格可爱乖巧、一次一小句，不读取网页或私有项目。API Key 只存后端 Secret；有公开聊天提示、来源白名单和持久化每日限额。上游 API 调用仍消耗本人余额，目前全站每日最多 60 次。详见 [`server/susu-worker/README.md`](server/susu-worker/README.md)。
 - **兼容旧链接**：原始根目录与 `web/` 下的旧页面跳转到新版对应章节。
 
 > 苏苏**向导动画**为 **legeling** 制作的 AI 生成社区同人演绎，并非官方 Live2D；头像与场景则为本轮单独生成，分别说明来源。仅限非商业使用，见 [公开致谢](https://lifelonglearneradam.github.io/Myweb/credits.html) 与 [`assets/images/ATTRIBUTION.md`](assets/images/ATTRIBUTION.md)。角色权利归原权利人。若改作商业产品，请更换素材或另行取得授权。
 
 ## 技术方案 / Technical approach
 
-**原生 HTML + CSS + JavaScript**，无生产依赖、无构建步骤、无需服务端，直接部署到 GitHub Pages。
+**原生 HTML + CSS + JavaScript**，主页无生产依赖或前端框架，可直接部署到 GitHub Pages；Cloudflare Static Assets 另提供免费短网址。只有可选的 AI 聊天使用独立 Cloudflare Worker 后端。
 
 - CSS Grid / Flexbox、CSS 变量、响应式布局、打印样式。
 - Canvas 樱花粒子 + CSS 花树转场。
@@ -63,13 +66,17 @@ MyWeb/
 │   ├── js/app.js               # 语言、主题、页面渲染与交互
 │   ├── js/effects.js           # 樱花与花树转场
 │   ├── js/mascot.js            # 苏苏动画与向导
-│   ├── js/music.js             # 轻音量卡农、播放偏好与跨页位置
+│   ├── js/music.js             # 轻音量卡农、播放偏好与真实循环
+│   ├── js/navigation.js        # 渐进式站内导航，保留播放器与向导
+│   ├── js/companion-chat.js    # 主动发起的短句聊天，无上游密钥
 │   ├── audio/                  # 原始授权录音与署名
 │   ├── js/theme-init.js        # 首屏主题
 │   └── images/                 # 本地素材与署名
 ├── web/                        # 旧链接兼容入口
 ├── tests/                      # 内容测试、浏览器回归测试
 ├── scripts/check_site.py       # 静态链接、资源与公开数据检查
+├── scripts/stage_site.py       # 只打包公开文件，供免费静态主机部署
+├── server/susu-worker/         # AI 代理：源码与配置，不含凭证
 ├── docs/                       # 预览、内容依据、域名指南
 ├── .github/workflows/validate.yml
 ├── .nojekyll
@@ -104,6 +111,9 @@ npm run check
 playwright-cli open http://127.0.0.1:4173/
 playwright-cli run-code --filename=tests/browser-checks.js
 playwright-cli run-code --filename=tests/experience-checks.js
+playwright-cli run-code --filename=tests/companion-checks.js
+playwright-cli run-code --filename=tests/touch-checks.js
+playwright-cli run-code --filename=tests/chat-checks.js
 ```
 
 测试覆盖桌面 / 平板 / 手机、320–1440 px、中英文、深浅主题、筛选、剪贴板、菜单键盘操作、向导、动效偏好、详情 / 文章 / 简历 / 旧链接与本地资源错误。也在 `/Myweb/` 子路径下执行，防止 GitHub Pages 路径失效。新增的体验检查覆盖归档搜索、URL 状态、文章目录 / 深链接、真实音频解码、暂停 / 音量偏好与跨页播放位置。
@@ -113,7 +123,7 @@ playwright-cli run-code --filename=tests/experience-checks.js
 1. 修改 `assets/js/content.js` 中 `profile`、`ui.zh / ui.en`、`projects`、`notes`。
 2. 两种语言同时更新；若增加项目，更新头像卡统计、站点地图与测试数量断言。
 3. 截图或示意图放入 `assets/images/`，检查许可，不上传账号信息或私人数据。
-4. 在项目中写清个人 / 团队范围、可查看的代码 / 报告、结果与验证条件。
+4. 公开项目写清个人 / 团队范围与已经公开的入口。**能读取本地资料不代表允许发布**：未发表研究只写宽泛兴趣，方法、实验、数据和私有仓库内容须经本人另行确认。
 5. 跑 `npm run check`，再做浏览器预览。
 
 ## 发布 / Deployment
@@ -128,7 +138,7 @@ git push origin HEAD:master HEAD:main
 
 不要盲目 `git add -A`：目录内可能存在未选择公开的个人图片。不要使用 `--force` 覆盖远端历史。
 
-**免费域名候选：`zimo.is-a.dev`。尚未获批，不是已生效网址。** 社区明确限制 AI 代建申请 PR，需由本人按照 [`docs/DOMAIN.md`](docs/DOMAIN.md) 完成人工申请；通过后再设置 CNAME / HTTPS，不提前破坏原站。
+**免费新网址已上线： https://me.zimo-personal-space.workers.dev/** 。不需要付费域名或社区审核；GitHub 镜像继续保留。部署与域名状态见 [`docs/DOMAIN.md`](docs/DOMAIN.md)。
 
 ## Design references
 

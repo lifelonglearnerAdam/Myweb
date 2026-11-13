@@ -1,12 +1,12 @@
 {
   "name": "zimo-personal-space",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "private": true,
   "description": "Zimo Zeng’s bilingual personal portfolio. Static HTML, CSS and JavaScript; no build dependencies.",
   "scripts": {
     "dev": "python3 -m http.server 4173 --bind 127.0.0.1",
-    "test": "node --test tests/content.test.cjs && python3 scripts/check_site.py",
-    "check": "node --check assets/js/app.js && node --check assets/js/content.js && node --check assets/js/mascot.js && node --check assets/js/effects.js && node --check assets/js/music.js && node --check assets/js/theme-init.js && node --check assets/js/legacy-redirect.js && npm test"
+    "test": "node --test tests/content.test.cjs tests/worker.test.mjs && python3 scripts/check_site.py",
+    "check": "node --check assets/js/app.js && node --check assets/js/content.js && node --check assets/js/mascot.js && node --check assets/js/effects.js && node --check assets/js/music.js && node --check assets/js/navigation.js && node --check assets/js/companion-chat.js && node --check server/susu-worker/worker.mjs && node --check assets/js/theme-init.js && node --check assets/js/legacy-redirect.js && npm test"
   },
   "engines": { "node": ">=20" }
 }

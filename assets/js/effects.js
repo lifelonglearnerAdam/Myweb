@@ -123,6 +123,8 @@
   }
   function showScene() {
     transitioning = true;
+    clearTimeout(arrivalTimer);
+    clearTimeout(navigationTimer);
     overlay.classList.add("is-visible");
   }
   function setEnabled(value, remember = true) {
@@ -156,7 +158,7 @@
         animation.finished.catch(() => {}).finally(() => revealAnimations.delete(animation));
       });
     }, { threshold: .07, rootMargin: "0px 0px -20px 0px" });
-    document.querySelectorAll(".section-heading, .project-card, .compact-project, .research-card, .research-methods, .note-card, .about-card, .contact-panel").forEach(element => {
+    document.querySelectorAll(".section-heading, .project-card, .compact-project, .research-card, .research-methods, .research-workspace-card, .poetry-card, .note-card, .about-card, .contact-panel").forEach(element => {
       if (!revealed.has(element)) revealObserver.observe(element);
     });
   }
@@ -184,6 +186,7 @@
     const sameDocument = url.pathname === location.pathname && url.search === location.search;
     const anchor = sameDocument && url.hash ? document.getElementById(decodeURIComponent(url.hash.slice(1))) : null;
     if (sameDocument && !anchor) return;
+    if (!sameDocument && site.navigation?.canVisit(url)) return;
     event.preventDefault();
     if (transitioning) return;
     showScene();
@@ -208,6 +211,8 @@
   document.addEventListener("visibilitychange", () => { if (document.hidden) stop(); else start(); });
   document.addEventListener("zimo:languagechange", () => { syncLabels(); observeReveals(); });
   document.addEventListener("zimo:contentchange", observeReveals);
+  document.addEventListener("zimo:navigationstart", () => { if (enabled) showScene(); });
+  document.addEventListener("zimo:navigationend", () => { if (transitioning) arrivalTimer = setTimeout(finishScene, 160); });
   window.addEventListener("resize", resize, { passive: true });
   window.addEventListener("pageshow", event => { if (event.persisted) { finishScene(); start(); } });
   reducedMotion.addEventListener("change", () => setEnabled(storagePreference(), false));

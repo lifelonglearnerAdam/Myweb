@@ -146,6 +146,35 @@ test("piano recording is unmodified and attributed under its own license", () =>
   assert.match(credit, /commons\.wikimedia\.org/);
 });
 
+test("unpublished research stays at interest level without methods or detailed case studies", () => {
+  assert.equal(data.researchInterests.length, 3);
+  for (const item of data.researchInterests) {
+    assert.equal(item.overviewOnly, true);
+    assert.ok(!item.overview && !item.highlights && !item.boundary && !item.results && !item.metrics);
+    assert.equal(item.links.length, 0);
+    assert.ok(!data.projects.some(project => project.id === item.id));
+  }
+  assert.equal(data.profile.email, "zimozeng961@gmail.com");
+  assert.equal(data.profile.secondaryEmail, "2319597720@qq.com");
+});
+
+test("all poetry excerpts are attributed, English-only and paired with licensed photography", () => {
+  const authors = ["Robert Frost", "Rabindranath Tagore", "William Blake", "Emily Dickinson", "William Wordsworth"];
+  assert.equal(data.poems.length, authors.length);
+  for (const poem of data.poems) {
+    assert.ok(authors.includes(poem.author));
+    assert.equal(typeof poem.lines, "string");
+    assert.ok(!/[\u4e00-\u9fff]/.test(poem.lines));
+    assert.ok(!poem.reflection && !poem.translation);
+    assert.ok(poem.work && poem.source.startsWith("https://"));
+    assert.ok(poem.imageSource.startsWith("https://commons.wikimedia.org/"));
+    assert.ok(poem.imageAuthor && poem.imageLicense);
+    assert.ok(fs.existsSync(path.join(root, poem.image)));
+    assert.ok(fs.statSync(path.join(root, poem.image)).size < 200_000);
+  }
+  assert.equal(data.poems.find(poem => poem.author === "Robert Frost").lines.length < 90, true);
+});
+
 test("old URLs are redirects and do not retain obsolete personal content", () => {
   for (const name of ["about", "hobby", "photo", "myessay", "contact"]) {
     for (const prefix of ["", "web/"]) {
