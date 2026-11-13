@@ -4,7 +4,9 @@
   const site = window.Zimo;
   if (!site?.mountDocument || !window.fetch || !window.DOMParser || location.protocol === "file:") return;
   const directory = new URL(".", location.href).pathname;
-  const routes = new Set(["", "index.html", "archive.html", "project.html", "note.html", "resume.html", "credits.html"]);
+  // Static Assets canonicalizes /archive.html to /archive on a cold visit.
+  // Accept both forms so Back/Forward also works when the entry URL was canonicalized.
+  const routes = new Set(["", "index", "archive", "project", "note", "resume", "credits", "index.html", "archive.html", "project.html", "note.html", "resume.html", "credits.html"]);
   const templates = new Map();
   let renderedURL = location.href;
   let controller;

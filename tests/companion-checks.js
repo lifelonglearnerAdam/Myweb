@@ -24,6 +24,7 @@ async page => {
     });
     await page.reload(); await settled();
     await page.waitForFunction(() => !document.getElementById("susu-stage").classList.contains("is-loading"));
+    assert(await page.evaluate(() => window.Zimo.navigation.canVisit(new URL("archive", document.baseURI))), "navigation accepts static-host canonical URLs without .html");
     assert(await page.locator(".research-workspace-card").count() === 3, "research interests are represented without detailed unpublished case studies");
     assert(await page.locator("#research-workspace a").count() === 0, "unpublished research has no public detail or repository links");
     assert(await page.evaluate(() => window.PORTFOLIO.researchInterests.every(item => item.overviewOnly && !item.overview && !item.highlights && !item.boundary && item.links.length === 0)), "no hidden unpublished research methods are embedded in JavaScript");
