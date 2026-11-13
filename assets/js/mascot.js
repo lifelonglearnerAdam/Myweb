@@ -85,12 +85,13 @@
     const beside = rect.left - viewLeft > width + 4;
     let left = beside ? rect.left - width + 12 : rect.left + rect.width / 2 - width / 2;
     left = Math.max(viewLeft + 12, Math.min(viewLeft + viewWidth - width - 12, left));
-    const preferredTop = beside ? rect.top + 78 - height : rect.top - height - 12;
+    const mouthY = rect.top + stage.getBoundingClientRect().height * .42;
+    const preferredTop = beside ? mouthY + 13 - height : rect.top - height - 12;
     const below = !beside && preferredTop < viewTop + 12 && rect.bottom + height + 12 < viewTop + viewHeight;
     const top = Math.max(viewTop + 12, Math.min(viewTop + viewHeight - height - 12, below ? rect.bottom + 12 : preferredTop));
     bubble.style.left = `${left - rect.left}px`; bubble.style.right = "auto";
     bubble.style.top = `${top - rect.top}px`; bubble.style.bottom = "auto";
-    bubble.style.setProperty("--tail-y", `${Math.max(18, Math.min(height - 18, rect.top + 65 - top))}px`);
+    bubble.style.setProperty("--tail-y", `${Math.max(18, Math.min(height - 18, mouthY - top))}px`);
     bubble.classList.toggle("is-below", below);
     bubble.classList.toggle("is-beside", beside);
   }
@@ -115,11 +116,11 @@
     if (!textureReady || (pose.row === row && pose.column === column && stage.dataset.pose)) return;
     poseFade?.cancel();
     if (soften && !reducedMotion.matches) {
-      blend.style.backgroundPosition = `${-pose.column * 144}px ${-pose.row * 156}px`;
+      blend.style.backgroundPosition = `${pose.column * 100 / 7}% ${pose.row * 10}%`;
       poseFade = blend.animate([{ opacity: .75 }, { opacity: 0 }], { duration: 110, easing: "ease-out" });
     }
     pose = { row, column };
-    stage.style.backgroundPosition = `${-column * 144}px ${-row * 156}px`;
+    stage.style.backgroundPosition = `${column * 100 / 7}% ${row * 10}%`;
     stage.dataset.pose = `${row}:${column}`;
   }
   function stopAnimation() { cancelAnimationFrame(frameRequest); frameRequest = 0; poseFade?.cancel(); }
@@ -192,7 +193,7 @@
     clearTimeout(ambientTimer);
     if (!expanded || document.hidden || reducedMotion.matches) return;
     ambientTimer = setTimeout(() => {
-      if (!drag && !bubbleOpen && !site.effects?.transitioning && performance.now() - lastSpeechAt > 30000) {
+      if (!drag && !bubbleOpen && !site.chat?.active && !site.effects?.transitioning && performance.now() - lastSpeechAt > 30000) {
         const section = document.querySelector('[data-nav-section][aria-current="location"]')?.dataset.navSection;
         const contexts = { projects: "mascotAtProjects", research: "mascotAtResearch", writing: "mascotAtWriting", about: "mascotAtAbout", contact: "mascotAtContact" };
         let key;
@@ -213,7 +214,8 @@
   }
   function greet(event) {
     if (event?.detail !== 0 && performance.now() - lastDragAt < 450) return;
-    if (site.chat?.open) { site.chat.open(true); return; }
+    if (site.chat?.active) { site.chat.open(true); return; }
+    if (site.chat?.guide) { site.chat.guide(); return; }
     const key = replyIndex === 0 ? "mascotGreeting" : `mascotReply${(replyIndex - 1) % 4 + 1}`;
     replyIndex++; showBubble(key); play(replyIndex % 3 === 0 ? "jump" : "wave", true);
   }
@@ -258,13 +260,17 @@
     play(movement[0] < 0 ? "left" : "right", true);
   });
   stage.addEventListener("click", greet);
-  document.getElementById("susu-greet").addEventListener("click", greet);
+  document.getElementById("susu-greet").addEventListener("click", event => {
+    if (site.chat?.open) site.chat.open(true);
+    else greet(event);
+  });
   document.getElementById("susu-reset").addEventListener("click", resetPosition);
   window.visualViewport?.addEventListener("resize", positionBubble);
   window.visualViewport?.addEventListener("scroll", positionBubble);
   launcher.addEventListener("click", () => {
     setExpanded(true);
-    if (site.chat?.open) site.chat.open(false);
+    if (site.chat?.active) site.chat.open(false);
+    else if (site.chat?.guide) site.chat.guide();
     else showBubble("mascotGreeting");
     play("wave", true); stage.focus({ preventScroll: true });
   });
@@ -316,7 +322,10 @@
     positionBubble();
     if (expanded) play(thinking ? "thinking" : "wave", true);
   }
-  site.mascot = { resetPosition, say, positionBubble, show: () => setExpanded(true), get expanded() { return expanded; }, get dragging() { return Boolean(drag?.moved); }, get position() { return customPosition; } };
+  function guide() {
+    setExpanded(true); showBubble("mascotGreeting"); play("wave", true);
+  }
+  site.mascot = { resetPosition, say, guide, positionBubble, show: () => setExpanded(true), get expanded() { return expanded; }, get dragging() { return Boolean(drag?.moved); }, get position() { return customPosition; } };
   updateLabels(); setExpanded(expanded, false);
   let greeted = false;
   try { greeted = sessionStorage.getItem("zimo.susu.greeted") === "true"; } catch (_) { /* Optional. */ }

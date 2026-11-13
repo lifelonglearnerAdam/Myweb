@@ -18,6 +18,13 @@
   panel.id = "susu-chat-panel"; panel.hidden = true;
   panel.innerHTML = '<div class="susu-chat-toolbar"><span id="susu-chat-badge" class="susu-chat-badge"></span><button type="button" id="susu-chat-clear"></button></div><ol id="susu-chat-log" class="susu-chat-log" aria-live="polite" aria-relevant="additions text"></ol><form id="susu-chat-form" class="susu-chat-form"><label class="sr-only" for="susu-chat-input" id="susu-chat-input-label"></label><div class="susu-chat-input-row"><input id="susu-chat-input" name="message" type="text" maxlength="160" autocomplete="off" spellcheck="false" aria-describedby="susu-chat-privacy"><button id="susu-chat-send" type="submit"></button></div></form><p id="susu-chat-status" class="susu-chat-status" role="status" aria-live="polite" aria-atomic="true"></p><button type="button" id="susu-chat-retry" class="susu-chat-retry" hidden></button><p id="susu-chat-privacy" class="susu-chat-privacy"></p>';
   bubble.append(toggle, panel);
+  const modes = document.createElement("div");
+  modes.className = "susu-mode-switch"; modes.setAttribute("role", "group");
+  const guide = document.createElement("button");
+  guide.type = "button"; guide.id = "susu-guide-mode";
+  toggle.className = "susu-mode-chat";
+  modes.append(guide, toggle);
+  bubble.insertBefore(modes, bubble.querySelector(".mascot-message"));
   const form = document.getElementById("susu-chat-form");
   const input = document.getElementById("susu-chat-input"), send = document.getElementById("susu-chat-send");
   const log = document.getElementById("susu-chat-log"), status = document.getElementById("susu-chat-status");
@@ -38,7 +45,11 @@
     site.mascot.positionBubble();
   }
   function update() {
-    toggle.textContent = site.t(panel.hidden ? "chatOpen" : "chatCollapse");
+    modes.setAttribute("aria-label", site.t("mascotModes"));
+    guide.textContent = site.t(panel.hidden ? "guideMode" : "chatBackGuide");
+    guide.setAttribute("aria-pressed", String(panel.hidden));
+    toggle.textContent = site.t("chatMode");
+    toggle.setAttribute("aria-pressed", String(!panel.hidden));
     panel.setAttribute("aria-label", site.t("chatLabel"));
     log.setAttribute("aria-label", site.t("chatConversation"));
     input.placeholder = site.t("chatPlaceholder");
@@ -65,6 +76,7 @@
   }
   function closePanel() {
     panel.hidden = true; toggle.setAttribute("aria-expanded", "false"); update();
+    site.mascot.guide();
   }
   function cancel(reason = "closed") { controller?.abort(reason); }
   function clear() {
@@ -94,7 +106,7 @@
     function failure(key) {
       pending.pending = false; pending.error = true; pending.text = site.t(key);
       statusKey = key; lastFailed = key === "chatDailyLimit" ? null : message;
-      if (!bubble.hidden) site.mascot.say(pending.text);
+      if (!bubble.hidden && !panel.hidden) site.mascot.say(pending.text);
     }
     try {
       const response = await fetch(ENDPOINT, {
@@ -118,7 +130,7 @@
       pending.pending = false; pending.text = reply;
       history = [...history, { role: "user", content: message }, { role: "assistant", content: reply }].slice(-CONTEXT_MESSAGES);
       statusKey = "chatMemory";
-      if (!bubble.hidden) site.mascot.say(reply);
+      if (!bubble.hidden && !panel.hidden) site.mascot.say(reply);
     } catch (_) {
       if (id !== sequence) return;
       if (request.signal.aborted && request.signal.reason !== "timeout") {
@@ -130,7 +142,8 @@
       if (id === sequence) { controller = null; busy = false; update(); scheduleCooldownUpdate(); }
     }
   }
-  toggle.addEventListener("click", () => panel.hidden ? open(true) : closePanel());
+  toggle.addEventListener("click", () => open(true));
+  guide.addEventListener("click", closePanel);
   input.addEventListener("compositionstart", () => { composing = true; });
   input.addEventListener("compositionend", () => { composing = false; });
   input.addEventListener("keydown", event => { if (event.key === "Enter" && (event.isComposing || event.keyCode === 229)) event.preventDefault(); });
@@ -142,6 +155,6 @@
   // Navigation does not cancel an in-flight reply or discard context; reopening shows it.
   document.addEventListener("zimo:languagechange", update);
   document.addEventListener("keydown", event => { if (event.key === "Escape") cancel(); });
-  site.chat = { open, clear, get busy() { return busy; }, get active() { return !panel.hidden; }, get endpoint() { return new URL(ENDPOINT, location.href).href; } };
+  site.chat = { open, guide: closePanel, clear, get busy() { return busy; }, get active() { return !panel.hidden; }, get endpoint() { return new URL(ENDPOINT, location.href).href; } };
   update();
 })();

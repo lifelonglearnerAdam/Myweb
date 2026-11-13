@@ -49,7 +49,7 @@ The browser animation and navigation code is independently implemented. No upstr
 
 ### Animation layout
 
-Each original cell is 192 × 208; browser cells are displayed at 144 × 156 CSS pixels.
+Each original cell is 192 × 208; browser cells are displayed at 144 × 156 CSS pixels on phones and approximately 166 × 179.83 CSS pixels on desktop. The source atlas is unchanged.
 
 | Row | Motion | Non-empty frames |
 | --- | --- | --- |

@@ -1,0 +1,76 @@
+/* Reversible guide/chat state, late replies, and desktop-only companion enlargement. */
+async page => {
+  const base = new URL(".", page.url()).href;
+  const checks = [];
+  const assert = (value, label) => { if (!value) throw new Error(`FAIL: ${label}`); checks.push(label); };
+  let calls = 0, hold = false, release, lastPayload;
+  const pattern = "**/api/chat";
+  await page.route(pattern, async route => {
+    calls++; lastPayload = route.request().postDataJSON();
+    if (hold) await new Promise(resolve => { release = resolve; });
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ reply: calls === 1 ? "记住啦，小墨，慢慢聊呀～" : "小墨呀，我还记着你的小名字～" }) });
+  });
+  try {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.goto(base + "?lang=zh");
+    await page.waitForFunction(() => Boolean(window.Zimo.chat));
+    await page.evaluate(() => { localStorage.setItem("zimo.mascot", "open"); localStorage.setItem("zimo.music", "off"); localStorage.removeItem("zimo.mascotPosition.desktop"); localStorage.removeItem("zimo.mascotPosition.mobile"); sessionStorage.setItem("zimo.susu.greeted", "true"); });
+    await page.reload();
+    await page.waitForFunction(() => Boolean(window.Zimo.chat) && !window.Zimo.effects.transitioning);
+    await page.locator("#susu-stage").click();
+    assert(await page.locator("#susu-choices").isVisible() && !await page.evaluate(() => window.Zimo.chat.active), "clicking Susu defaults to the guide rather than trapping the visitor in chat");
+    assert(await page.locator("#susu-stage").evaluate(element => Math.abs(element.getBoundingClientRect().width - 166) < 1), "desktop companion is approximately 15 percent larger");
+    await page.locator("#susu-greet").click();
+    assert(await page.locator("#susu-chat-form").isVisible(), "Say hi explicitly opens chat");
+    assert(await page.locator("#susu-guide-mode").textContent() === "← 返回指引", "a named Back to guide control is always visible in chat");
+    await page.locator("#susu-guide-mode").click();
+    assert(await page.locator("#susu-choices").isVisible(), "Back to guide restores all three navigation shortcuts");
+    assert(await page.locator("#susu-chat-panel").isHidden(), "Back to guide hides the conversation panel");
+    assert((await page.locator("#susu-message").textContent()).includes("想先看看"), "returning restores the guide greeting instead of leaving a stale chat reply");
+    assert(await page.locator("#susu-guide-mode").getAttribute("aria-pressed") === "true", "mode controls expose the guide selection to assistive technology");
+    await page.locator("#susu-chat-toggle").click();
+    await page.locator("#susu-chat-input").fill("叫我小墨吧");
+    await page.locator("#susu-chat-send").click();
+    const sentAt = Date.now();
+    await page.waitForFunction(() => !window.Zimo.chat.busy);
+    assert(calls === 1, "one visitor message causes exactly one request");
+    await page.locator("#susu-guide-mode").click();
+    await page.locator("#susu-stage").click();
+    assert(!await page.evaluate(() => window.Zimo.chat.active), "clicking the character keeps the explicitly selected guide mode");
+    await page.locator("#susu-chat-toggle").click();
+    assert((await page.locator("#susu-message").textContent()).includes("小墨"), "reopening chat preserves the latest model reply");
+    assert(await page.locator(".susu-chat-line").count() === 2, "returning to the guide does not erase conversation history");
+    await page.waitForFunction(time => Date.now() - time >= 2100, sentAt);
+    hold = true;
+    await page.locator("#susu-chat-input").fill("你还记得我吗");
+    await page.locator("#susu-chat-send").click();
+    await page.waitForFunction(() => window.Zimo.chat.busy);
+    await page.locator("#susu-guide-mode").click();
+    const greeting = await page.locator("#susu-message").textContent();
+    release();
+    await page.waitForFunction(() => !window.Zimo.chat.busy);
+    assert(await page.locator("#susu-message").textContent() === greeting, "a late AI reply cannot overwrite the guide after a mode switch");
+    assert(await page.locator("#susu-choices").isVisible(), "guide remains usable while an in-flight chat finishes");
+    assert(lastPayload.history.length === 2, "chat context survives guide/chat switches");
+    await page.locator("#susu-chat-toggle").click();
+    assert((await page.locator("#susu-message").textContent()).includes("小名字"), "the completed background reply is available when chat is reopened");
+    await page.locator("#susu-guide-mode").click();
+    await page.locator('[data-language="en"]').click();
+    assert(await page.locator("#susu-guide-mode").textContent() === "Guide", "guide and chat modes translate without resetting the selected mode");
+    await page.locator("#susu-greet").click();
+    assert(await page.locator("#susu-guide-mode").textContent() === "← Back to guide", "English chat has an explicit Back to guide control");
+    await page.locator("#susu-guide-mode").click();
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.waitForFunction(() => Math.abs(document.getElementById("susu-stage").getBoundingClientRect().width - 144) < 1);
+    assert(await page.locator("#susu-stage").evaluate(element => Math.abs(element.getBoundingClientRect().height - 156) < 1), "phone companion keeps its existing 144 by 156 dimensions");
+    await page.locator("#susu-greet").click();
+    await page.waitForFunction(() => { const b = document.getElementById("susu-bubble").getBoundingClientRect(); return b.x >= 0 && b.y >= 0 && b.right <= innerWidth + 1 && b.bottom <= innerHeight + 1; });
+    assert(await page.locator("#susu-guide-mode").isVisible(), "phone chat keeps the return control visible within the viewport");
+    await page.locator("#susu-guide-mode").click();
+    await page.locator("#susu-minimize").click();
+    await page.locator("#susu-launch").click();
+    assert(await page.locator("#susu-choices").isVisible() && !await page.evaluate(() => window.Zimo.chat.active), "minimize/reopen respects the selected guide mode");
+    assert(calls === 2, "mode switches never issue extra model requests");
+    return { passed: checks.length, checks };
+  } finally { release?.(); await page.unroute(pattern); }
+}
