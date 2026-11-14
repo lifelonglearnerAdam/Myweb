@@ -43,6 +43,7 @@ async page => {
     const selected = await page.evaluate(() => Array.from({ length: 16 }, () => window.Zimo.companionLines.pick("winter")));
     assert(new Set(selected).size === 16, "local remarks avoid immediate repeats");
     await page.setViewportSize({ width: 390, height: 844 });
+    await page.locator("#profile-sidebar").waitFor({ state: "hidden" });
     assert(await page.locator("#profile-sidebar").isHidden(), "phone sidebar starts closed");
     await page.locator("#nav-toggle").click();
     assert(await page.locator("#profile-sidebar").isVisible(), "phone menu opens the same navigation as a drawer");
