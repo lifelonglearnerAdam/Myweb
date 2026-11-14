@@ -19,6 +19,7 @@ site_url = f"https://{site.hostname}/"
 out = Path(args.destination).resolve()
 if out == ROOT or ROOT.is_relative_to(out) or (out.is_relative_to(ROOT) and out != ROOT / ".public-site"):
     raise SystemExit("Use the reserved .public-site output or a separate build destination outside the repository.")
+subprocess.run([sys.executable, str(ROOT / "scripts/build_resumes.py"), "--check"], check=True)
 out.mkdir(parents=True, exist_ok=True)
 # This is a dedicated build output; do not reuse it for personal files.
 for child in out.iterdir():

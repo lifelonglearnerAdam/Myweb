@@ -457,6 +457,10 @@ html[lang="en"] .archive-heading h1 { font: 400 41px/1.25 Georgia,serif; letter-
 .resume-shell { max-width: 900px; padding-top: 29px; }
 .resume-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 20px; }
 .resume-toolbar .breadcrumb { margin: 0; }
+.resume-actions,.resume-downloads { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; }
+.resume-actions { justify-content: flex-end; }
+.resume-downloads .button { font-size: 11px; min-height: 38px; padding: 7px 12px; }
+.resume-coursework { margin-top: 9px; }
 .resume-sheet { padding: 44px 48px; }
 .resume-heading { border-bottom: 2px solid var(--accent); padding-bottom: 23px; }
 .resume-heading h1 { font-size: 32px; letter-spacing: -.025em; }
@@ -491,6 +495,10 @@ html[data-effects="on"] .mascot[data-motion="idle"]:not(.is-dragging) .mascot-st
 .mascot-controls .mascot-minimize { padding: 1px 7px; }
 .mascot-bubble { position: absolute; bottom: 178px; right: 5px; width: 245px; padding: 16px; border: 1px solid #e0ddec; border-radius: 18px 18px 5px 18px; background: var(--surface); box-shadow: 0 8px 32px rgb(72 58 102 / 12%); overflow-y: auto; scrollbar-width: thin; }
 .mascot-bubble.is-chatting { border-color: #dac9e3; }
+.mascot-bubble.is-commenting { border-color: var(--purple); }
+.mascot-bubble.is-commenting .mascot-message { font-size: 13px; line-height: 1.9; color: var(--ink); }
+.mascot-bubble.is-commenting .mascot-choices { display: none; }
+.mascot-peek { position: fixed; z-index: 41; width: min(245px,calc(100vw - 24px)); padding: 12px 15px; border: 1px solid var(--purple); border-radius: 15px 15px 5px 15px; background: var(--surface); color: var(--ink); box-shadow: var(--shadow-hover); font-size: 12px; line-height: 1.9; pointer-events: none; }
 .mascot-bubble.is-beside::after { right: -5px; bottom: auto; top: var(--tail-y, 60px); transform: rotate(-45deg); }
 .mascot-bubble.is-chatting .mascot-message { font: 500 14px/1.8 var(--sans); color: var(--ink); padding: 10px 12px; border-radius: 12px 12px 3px 12px; background: linear-gradient(125deg,var(--lilac),var(--sky)); }
 .mascot-bubble.is-chatting .mascot-choices { display: none; }
@@ -782,7 +790,9 @@ html[lang="en"] .document-header h1 { font-family: Georgia,serif; font-weight: 4
   .document-bottom { flex-direction: column; align-items: flex-start; }
   .note-article { padding: 28px 24px; margin-top: 18px; }
   .note-article .prose h2 { font-size: 21px; }
-  .resume-toolbar { align-items: flex-start; }
+  .resume-toolbar { align-items: flex-start; flex-wrap: wrap; }
+  .resume-actions { width: 100%; justify-content: flex-start; }
+  .resume-actions [data-print-resume] { min-height: 38px; }
   .resume-toolbar .button { font-size: 10px; padding-inline: 12px; }
   .resume-toolbar .breadcrumb { font-size: 11px; margin-top: 10px; }
   .resume-sheet { padding: 28px 23px; }

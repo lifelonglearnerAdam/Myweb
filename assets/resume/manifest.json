@@ -1,0 +1,20 @@
+{
+  "sourceHashes": {
+    "resume.html": "46646248043bcc6f9ef68d5ee8434083d6193510a0f199cf6f50f0511f912817",
+    "assets/js/content.js": "685544c41cbe6a4eabd65c165a60cd95564d181eb30c242f6a20dc3876ec95e4",
+    "assets/js/app.js": "ffe40c361452e95b43d883a7117e4d8a058702e939d683ed74f140d1e5d1af11",
+    "assets/css/site.css": "7350fa724208fdf9a61e18b6567d75f0a06928a5f0d28d49a92b047676037f22",
+    "assets/css/blog.css": "94b93f1dab21f2cf44b35d1d688f4eb8f6aed4c2efeefe7126cb6c731dceee62",
+    "assets/js/theme-init.js": "687091ed4742b0becfc30748812b413ebbf07d84b8e105a1c280e5823223eb3d"
+  },
+  "files": {
+    "Zimo-Zeng-Resume-zh.pdf": {
+      "sha256": "2f5b028834333e77bb365a0a33548dc570a79ff93ea4f25fb0772ba742a7de04",
+      "bytes": 410562
+    },
+    "Zimo-Zeng-Resume-en.pdf": {
+      "sha256": "96edfc1324a0fd2b79fb5a6098f3107da27a5a659a848356d53d3fa65b7ffb35",
+      "bytes": 69569
+    }
+  }
+}

@@ -47,6 +47,21 @@ test("every static translation and profile binding exists", () => {
   }
 });
 
+test("résumé coursework contains only reviewed numeric results at least 85, with no transcript data", () => {
+  assert.ok(data.profile.resumeCourses.length > 0);
+  for (const course of data.profile.resumeCourses) {
+    assert.deepEqual(Object.keys(course).sort(), ["name", "score"]);
+    bilingual(course.name, "résumé course");
+    assert.ok(Number.isFinite(course.score) && course.score >= 85 && course.score <= 100);
+    assert.doesNotMatch(JSON.stringify(course), /学号|U\d{8,}|cjd\.hust\.edu\.cn|学生编号/);
+  }
+  const html = fs.readFileSync(path.join(root, "resume.html"), "utf8");
+  for (const lang of ["zh", "en"]) {
+    assert.ok(html.includes(`assets/resume/Zimo-Zeng-Resume-${lang}.pdf`));
+    assert.ok(html.includes(`download="Zimo-Zeng-Resume-${lang}.pdf"`));
+  }
+});
+
 test("project IDs are unique, safe, and complete in both languages", () => {
   const ids = data.projects.map(project => project.id);
   assert.equal(new Set(ids).size, ids.length);

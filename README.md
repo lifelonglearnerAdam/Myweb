@@ -43,6 +43,14 @@ python3 -m http.server 4173 --bind 127.0.0.1
 
 Node.js 20+、Python 3 即可。前端不依赖框架或外部字体，也没有 npm 依赖要安装。
 
+简单的 Python 预览服务器不支持音频字节范围请求。要测音乐跨页续播、定位或 PDF 分段读取，请使用和主站相同的 Worker：
+
+```bash
+python3 scripts/stage_site.py .public-site
+wrangler dev --local --config server/static-site/wrangler.jsonc --port 4175
+# http://127.0.0.1:4175/
+```
+
 ## 目录
 
 ```text
@@ -69,11 +77,13 @@ server/susu-worker/           独立 AI 后端；凭证只在 Secret
 - 联系方式是 GitHub、邮箱、复制邮箱的小图标；主邮箱为 `zimozeng961@gmail.com`。
 - 冬日共学是个人整理的自学与讨论路线，不声称已经举办，不带原资料里的机构、群号和原始手册。
 - 项目可以有公开源码或演示；未发表研究只写宽泛兴趣，不复制私有仓库的细节。
-- 气泡台词按页面和时间选取，避免短时间重复，不调用模型；聊天、输入或拖动时不插话。
+- 鼠标移入苏苏、侧栏入口、项目卡片等位置，会冒出一句对应台词；移开再移入就换一句。在同一元素里移动不会刷屏，聊天、输入或拖动时不插话，也不调用模型。收起状态下，移到小苏苏按钮上也能看到提示。
+- 侧栏保留“简历 / CV”。简历页有中文、英文两份实际 PDF 下载，不只是打开打印对话框；在线预览也保留。
+- 简历的课程成绩只列已核对、专业相关且数字成绩在 85 分及以上的课程，不公开完整成绩单、学号，也不把“优”擅自换算为数字。
 - 苏苏 AI 使用 `gpt-6.1-sol`，最近 16 轮聊天只在页面内存里，刷新或“重新聊”清空。主站通过同源 `/api/chat` 转发，API Key 不在网页中。
 - AI 服务有每日全站上限，目前为 60 次；Cloudflare 托管免费，不等于上游模型调用免费。
 - 《卡农》是 Lee Galloway 的授权钢琴录音，低音量循环、可暂停；首次播放受浏览器自动播放规则约束。
-- 苏苏**没有冒充官方原声**，也没有克隆配音演员。当前没有授权明确的苏苏录音，原声尚未加入。
+- 苏苏**没有冒充官方原声**，也没有克隆配音演员。复核参考站后，找到了 Shizuku 模型自带的 MP3，但那不是苏苏的声音；苏苏原声仍未加入。具体出处见 [docs/VOICE.md](docs/VOICE.md)。
 - 樱花背景和头像沿用已生成的素材；诗卡是有署名和许可的外部摄影，英文诗只摘名家原文。
 
 素材、音乐与隐私说明：[credits.html](https://zengzimo.cn/credits.html)、[图片署名](assets/images/ATTRIBUTION.md)、[音乐署名](assets/audio/ATTRIBUTION.md)。
@@ -81,10 +91,14 @@ server/susu-worker/           独立 AI 后端；凭证只在 Secret
 ## 检查与发布
 
 ```bash
+# 简历或相关排版改动后，重新导出两份 PDF（需要 playwright-cli）
+npm run resumes
 npm run check
 
 # 浏览器回归（已安装 playwright-cli 时）
 playwright-cli open http://127.0.0.1:4173/
+playwright-cli run-code --filename=tests/hover-checks.js
+playwright-cli run-code --filename=tests/resume-checks.js
 playwright-cli run-code --filename=tests/blog-checks.js
 playwright-cli run-code --filename=tests/browser-checks.js
 playwright-cli run-code --filename=tests/experience-checks.js

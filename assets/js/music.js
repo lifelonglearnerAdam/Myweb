@@ -44,7 +44,7 @@
     document.getElementById("music-credit-link").href = site.localHref("credits.html#music-credit");
   }
   function savePosition() {
-    if (!audio.src || audio.readyState === 0 || !Number.isFinite(audio.currentTime)) return;
+    if (!audio.src || audio.readyState === 0 || restorePosition > 0 || !Number.isFinite(audio.currentTime)) return;
     lastSavedPosition = audio.currentTime;
     try { sessionStorage.setItem("zimo.music.position", String(audio.currentTime)); } catch (_) { /* Optional. */ }
   }
@@ -111,12 +111,14 @@
       if (restoreFocus) volumeButton.focus({ preventScroll: true });
     }
   });
-  audio.addEventListener("loadedmetadata", () => {
-    if (restorePosition > 0 && Number.isFinite(audio.duration)) {
+  function restorePlaybackPosition() {
+    if (!(restorePosition > 0) || !Number.isFinite(audio.duration) || audio.duration <= 0) return;
+    try {
       audio.currentTime = restorePosition < audio.duration - .3 ? restorePosition : 0;
       restorePosition = 0;
-    }
-  });
+    } catch (_) { /* Metadata may precede seekability; retry on the next readiness event. */ }
+  }
+  for (const event of ["loadedmetadata", "durationchange", "canplay"]) audio.addEventListener(event, restorePlaybackPosition);
   audio.addEventListener("playing", () => { pending = false; unavailable = false; update(); });
   audio.addEventListener("pause", update);
   audio.addEventListener("ended", () => {

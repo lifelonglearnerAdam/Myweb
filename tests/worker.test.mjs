@@ -90,6 +90,29 @@ test("static host routes chat through an internal service binding, not a public 
   assert.equal((await staticSite.fetch(new Request("https://me.example/api/chat", { method: "POST" }), { ASSETS: env.ASSETS })).status, 503);
 });
 
+test("audio and résumé downloads support real byte ranges and safe validators", async () => {
+  const env = { ASSETS: { fetch: async req => {
+    assert.equal(req.headers.get("Range"), null);
+    return new Response(req.method === "HEAD" ? null : "0123456789", { headers: { "Content-Type": new URL(req.url).pathname.endsWith(".pdf") ? "application/pdf" : "audio/ogg", "Content-Length": "10", ETag: '"stable"' } });
+  } } };
+  const get = (range, extra = {}) => staticSite.fetch(new Request("https://zengzimo.cn/assets/audio/track.ogg", { headers: { ...(range ? { Range: range } : {}), ...extra } }), env);
+  for (const [range, expected, header] of [["bytes=2-4", "234", "bytes 2-4/10"], ["bytes=-3", "789", "bytes 7-9/10"], ["bytes=5-", "56789", "bytes 5-9/10"], ["bytes=9-999", "9", "bytes 9-9/10"]]) {
+    const r = await get(range);
+    assert.equal(r.status, 206); assert.equal(r.headers.get("Content-Range"), header); assert.equal(await r.text(), expected);
+  }
+  for (const range of ["bytes=10-", "bytes=8-2", "bytes=-0", "bytes=999999999999999999999999-"]) {
+    const r = await get(range); assert.equal(r.status, 416); assert.equal(r.headers.get("Content-Range"), "bytes */10");
+  }
+  assert.equal((await get("bytes=0-1,4-5")).status, 200);
+  assert.equal((await get("bytes=0-1", { "If-Range": '"changed"' })).status, 200);
+  assert.equal((await get("bytes=0-1", { "If-Range": '"stable"' })).status, 206);
+  assert.equal((await get()).headers.get("Accept-Ranges"), "bytes");
+  const pdf = await staticSite.fetch(new Request("https://zengzimo.cn/assets/resume/cv.pdf", { headers: { Range: "bytes=0-3" } }), env);
+  assert.equal(pdf.status, 206); assert.equal(pdf.headers.get("Content-Type"), "application/pdf");
+  const head = await staticSite.fetch(new Request("https://zengzimo.cn/assets/resume/cv.pdf", { method: "HEAD" }), env);
+  assert.equal(head.status, 200); assert.equal(head.headers.get("Content-Length"), "10"); assert.equal(await head.text(), "");
+});
+
 test("chat fails closed without secrets or a budget binding", async () => {
   const response = await worker.fetch(request(), { ALLOWED_ORIGINS: origin });
   assert.equal(response.status, 503);

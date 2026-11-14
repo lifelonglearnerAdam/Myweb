@@ -12,7 +12,7 @@
   let expanded = preference ? preference === "open" : !smallScreen.matches;
   let bubbleOpen = false, messageKey = "mascotGreeting", replyIndex = 0;
   let textureReady = false, textureRequested = false, frameRequest = 0;
-  let lookResetTimer, bubbleTimer, greetingTimer, ambientTimer, gestureTimer;
+  let lookResetTimer, bubbleTimer, greetingTimer, ambientTimer, gestureTimer, peekTimer;
   let ambientIndex = 0, lastAmbientSection, lastSpeechAt = 0, lastPointerUpdate = 0;
   let drag = null, lastDragAt = -Infinity, customPosition = null;
   let pose = { row: 0, column: 0 }, poseFade;
@@ -25,10 +25,18 @@
     review: { row: 8, frames: 6, fps: 4 }
   };
   let current = { ...animations.idle, name: "idle", once: false, started: performance.now(), frame: -1 };
-  root.innerHTML = `<div class="mascot" id="susu-mascot"><div class="mascot-bubble" id="susu-bubble" hidden><div class="mascot-bubble-title"><span id="susu-name"></span><button type="button" id="susu-dismiss">×</button></div><p class="mascot-message" id="susu-message"></p><nav class="mascot-choices" id="susu-choices"></nav></div><button class="mascot-stage is-loading" id="susu-stage" type="button" aria-controls="susu-bubble" aria-expanded="false" aria-describedby="susu-drag-hint"><span class="mascot-blend" aria-hidden="true"></span></button><span class="sr-only" id="susu-drag-hint"></span><div class="mascot-controls"><button type="button" id="susu-greet"></button><button type="button" id="susu-reset">⌖</button><button class="mascot-minimize" type="button" id="susu-minimize">−</button></div></div><button class="mascot-launch" id="susu-launch" type="button" aria-controls="susu-mascot" aria-expanded="false"><img src="assets/images/susu-idle.webp" width="31" height="34" alt=""><span id="susu-launch-label"></span></button>`;
+  root.innerHTML = `<div class="mascot" id="susu-mascot"><div class="mascot-bubble" id="susu-bubble" hidden><div class="mascot-bubble-title"><span id="susu-name"></span><button type="button" id="susu-dismiss">×</button></div><p class="mascot-message" id="susu-message"></p><nav class="mascot-choices" id="susu-choices"></nav></div><button class="mascot-stage is-loading" id="susu-stage" type="button" aria-controls="susu-bubble" aria-expanded="false" aria-describedby="susu-drag-hint"><span class="mascot-blend" aria-hidden="true"></span></button><span class="sr-only" id="susu-drag-hint"></span><div class="mascot-controls"><button type="button" id="susu-greet"></button><button type="button" id="susu-reset">⌖</button><button class="mascot-minimize" type="button" id="susu-minimize">−</button></div></div><button class="mascot-launch" id="susu-launch" type="button" aria-controls="susu-mascot" aria-expanded="false"><img src="assets/images/susu-idle.webp" width="31" height="34" alt=""><span id="susu-launch-label"></span></button><div class="mascot-peek" id="susu-peek" role="status" aria-live="polite" aria-atomic="true" hidden></div>`;
   const mascot = document.getElementById("susu-mascot"), stage = document.getElementById("susu-stage");
   const bubble = document.getElementById("susu-bubble"), launcher = document.getElementById("susu-launch");
   const message = document.getElementById("susu-message"), blend = stage.querySelector(".mascot-blend");
+  const peek = document.getElementById("susu-peek");
+  function hidePeek() { clearTimeout(peekTimer); peek.hidden = true; }
+  function positionPeek() {
+    if (peek.hidden) return;
+    const rect = launcher.getBoundingClientRect();
+    peek.style.left = `${Math.max(12, Math.min(innerWidth - peek.offsetWidth - 12, rect.right - peek.offsetWidth))}px`;
+    peek.style.bottom = `${Math.max(12, innerHeight - rect.top + 10)}px`;
+  }
   function positionKey() { return `mascotPosition.${smallScreen.matches ? "mobile" : "desktop"}`; }
   function readPosition() {
     try {
@@ -167,7 +175,8 @@
     image.src = "assets/images/susu-spritesheet.webp";
   }
   function showBubble(key = messageKey, autoHide = false) {
-    clearTimeout(bubbleTimer); messageKey = key; lastSpeechAt = performance.now();
+    clearTimeout(bubbleTimer); clearTimeout(greetingTimer); hidePeek();
+    bubble.classList.remove("is-commenting"); messageKey = key; lastSpeechAt = performance.now();
     message.textContent = t(key); bubbleOpen = true; bubble.hidden = false;
     stage.setAttribute("aria-expanded", "true"); positionBubble();
     if (autoHide) bubbleTimer = setTimeout(() => {
@@ -209,7 +218,7 @@
     }, 22000 + Math.random() * 16000);
   }
   function setExpanded(value, remember = true) {
-    expanded = value; mascot.hidden = !value; launcher.hidden = value;
+    hidePeek(); expanded = value; mascot.hidden = !value; launcher.hidden = value;
     launcher.setAttribute("aria-expanded", String(value));
     if (remember) storage.set("mascot", value ? "open" : "closed");
     if (value) { loadTexture(); restorePosition(); scheduleAmbient(); scheduleGesture(); }
@@ -311,12 +320,13 @@
       restorePosition();
     }
   });
-  window.addEventListener("resize", () => { if (expanded && customPosition) restorePosition(); positionBubble(); }, { passive: true });
-  document.addEventListener("zimo:languagechange", updateLabels);
-  document.addEventListener("zimo:navigationstart", hideBubble);
+  window.addEventListener("resize", () => { if (expanded && customPosition) restorePosition(); positionBubble(); positionPeek(); }, { passive: true });
+  document.addEventListener("zimo:languagechange", () => { hidePeek(); if (bubble.classList.contains("is-commenting")) hideBubble(); updateLabels(); });
+  document.addEventListener("zimo:navigationstart", () => { hideBubble(); hidePeek(); });
   document.addEventListener("zimo:navigationend", () => { updateLabels(); if (expanded) play("wave", true); });
   function say(text, thinking = false) {
-    clearTimeout(bubbleTimer);
+    clearTimeout(bubbleTimer); clearTimeout(greetingTimer); hidePeek();
+    bubble.classList.remove("is-commenting");
     messageKey = null;
     lastSpeechAt = performance.now();
     message.textContent = String(text).slice(0, 400);
@@ -325,12 +335,20 @@
     positionBubble();
     if (expanded) play(thinking ? "thinking" : "wave", true);
   }
-  function comment(text) {
-    if (!expanded || document.hidden || drag || site.chat?.active || site.chat?.busy) return;
-    say(text);
+  function comment(text, { preview = false } = {}) {
+    const typing = document.activeElement?.matches('textarea,[contenteditable]:not([contenteditable="false"]),input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"])');
+    if (document.hidden || drag || typing || site.chat?.active || site.chat?.busy || site.effects?.transitioning) return false;
+    if (!expanded) {
+      if (!preview) return false;
+      clearTimeout(peekTimer); peek.textContent = String(text).slice(0, 400);
+      peek.hidden = false; positionPeek(); peekTimer = setTimeout(hidePeek, 6500);
+      return true;
+    }
+    say(text); bubble.classList.add("is-commenting"); positionBubble();
     bubbleTimer = setTimeout(() => {
       if (!site.chat?.active && !bubble.matches(":hover") && !bubble.contains(document.activeElement)) hideBubble();
     }, 8500);
+    return true;
   }
   function guide() {
     setExpanded(true); showBubble("mascotGreeting"); play("wave", true);

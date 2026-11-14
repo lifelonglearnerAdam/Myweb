@@ -68,8 +68,30 @@
       ["没做完的事可以留个记号，不用把今天拉得无限长。", "Leave a marker in unfinished work. Today doesn’t have to stretch forever."]
     ],
     theme: [
-      ["换了盏灯，还是同一只小狐狸。", "A different lamp, the same little fox."],
+      ["亮一点，还是暗一点？小狐狸都陪着你。", "Light or dark? This little fox can keep you company in either."],
       ["嗯，这个颜色看久一点眼睛舒服吗？不舒服就换回来呀。", "Does this shade feel comfortable? It’s fine to switch back."]
+    ],
+    courses: [
+      ["这些是子墨上课时写过的代码。想翻哪一门，小狐狸给你找找～", "These are bits of code from Zimo’s courses. Which shelf shall we open?"],
+      ["这里放的是自己的练习，不是把老师的资料一股脑搬上来啦。", "These are personal exercises, not a bundle of the teachers’ handouts."],
+      ["以前写得笨一点的代码也留着呀，回头看还挺有意思的。", "Some early code is a little clumsy. It can still be fun to look back at."]
+    ],
+    resume: [
+      ["想带走一份简历吗？中文和英文都准备了 PDF。", "Want a copy of the résumé? There’s a PDF in both Chinese and English."],
+      ["不用截图啦，下载按钮就在简历上面。小狐狸指路成功！", "No screenshots needed—the download buttons are above the résumé. Directions delivered!"]
+    ],
+    contact: [
+      ["想给子墨留句话？小信封就是邮箱入口呀。", "Want to leave Zimo a note? The little envelope opens his email."],
+      ["写信的话，简单说说来意就好，不用准备一篇小作文。", "A short email with a little context is enough. No essay required."],
+      ["点旁边的小方框，就能把邮箱抄走啦。", "The little copy button will take the email address with you."]
+    ],
+    poetry: [
+      ["这里的小诗可以慢慢读。作者和出处都在旁边，我就不抢着解释啦。", "Take your time with the poem. Its author and source are beside it; I won’t talk over it."],
+      ["先歇一小会儿吧。看两行诗，再回去和代码较劲。", "A tiny break? Two lines of poetry, then back to the code."]
+    ],
+    language: [
+      ["想换成英文看看吗？小狐狸还在原来的位置。", "Want to switch languages? This little fox stays right here."],
+      ["中英文的入口在一起，找不到的话就叫我呀。", "Both language buttons live together. Give me a nudge if you lose them."]
     ],
     about: [
       ["关于页写的是人，不用写成一张奖状墙。", "An About page is about a person, not a wall of certificates."],
@@ -82,12 +104,58 @@
     const hour = new Date().getHours();
     const period = hour < 7 || hour >= 23 ? "night" : hour < 12 ? "morning" : "afternoon";
     const pool = [...(lines[context] || []), ...lines.general, ...(lines[period] || [])];
+    const specific = (lines[context] || []).filter(pair => !recent.includes(pair[0]));
     const available = pool.filter(pair => !recent.includes(pair[0]));
-    const chosen = (available.length ? available : pool)[Math.floor(Math.random() * (available.length || pool.length))];
+    const choices = specific.length ? specific : available.length ? available : pool;
+    const chosen = choices[Math.floor(Math.random() * choices.length)];
     recent.push(chosen[0]); if (recent.length > 16) recent.shift();
     return chosen[site.language === "en" ? 1 : 0];
   }
   site.companionLines = { pick, count: Object.values(lines).reduce((n, group) => n + group.length, 0) };
+  // One remark per intentional entry, not on every mousemove or child-element crossing.
+  const hoverSelector = '#susu-stage,#susu-launch,.sidebar-nav a,.project-card,.compact-project,.note-card,.archive-entry,.winter-preview,.winter-task,.poetry-card,.rail-social a,.rail-social button,.contact-icons a,.contact-icons button,.resume-downloads a,[data-print-resume],.language-switch button,#theme-toggle';
+  const typingSelector = 'textarea,[contenteditable]:not([contenteditable="false"]),input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"])';
+  let hoverTimer;
+  function cancelHover() { clearTimeout(hoverTimer); }
+  function contextFor(target) {
+    const nav = target.dataset.navSection;
+    if (nav) return nav === "home" ? "general" : nav;
+    if (target.matches('.project-card,.compact-project')) return "projects";
+    if (target.matches('.note-card')) return "writing";
+    if (target.matches('.archive-entry')) return "archive";
+    if (target.matches('.winter-preview,.winter-task')) return "winter";
+    if (target.matches('.poetry-card')) return "poetry";
+    if (target.matches('.rail-social a,.rail-social button,.contact-icons a,.contact-icons button')) return "contact";
+    if (target.matches('.resume-downloads a,[data-print-resume]')) return "resume";
+    if (target.id === "theme-toggle") return "theme";
+    if (target.matches('[data-language]')) return "language";
+    return site.page === "home" ? document.querySelector('[data-nav-section][aria-current="location"]')?.dataset.navSection || "general" : site.page;
+  }
+  function requestRemark(target) {
+    cancelHover();
+    hoverTimer = setTimeout(() => {
+      if (!target.isConnected || document.hidden || site.chat?.active || site.chat?.busy || site.mascot?.dragging || site.effects?.transitioning || document.activeElement?.matches(typingSelector)) return;
+      if (!site.mascot?.expanded && target.id !== "susu-launch") return;
+      if (site.mascot.comment(pick(contextFor(target)), { preview: target.id === "susu-launch" })) lastAt = performance.now();
+    }, 120);
+  }
+  document.addEventListener("pointerover", event => {
+    if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
+    const target = event.target.closest?.(hoverSelector);
+    if (target && (!event.relatedTarget || !target.contains(event.relatedTarget))) requestRemark(target);
+  }, { passive: true });
+  document.addEventListener("pointerout", event => {
+    const target = event.target.closest?.(hoverSelector);
+    if (target && (!event.relatedTarget || !target.contains(event.relatedTarget))) cancelHover();
+  }, { passive: true });
+  document.addEventListener("focusin", event => {
+    const target = event.target.closest?.(hoverSelector);
+    if (target?.matches(":focus-visible")) requestRemark(target);
+  });
+  document.addEventListener("focusout", cancelHover);
+  document.addEventListener("pointerdown", cancelHover, { passive: true });
+  document.addEventListener("zimo:navigationstart", cancelHover);
+  document.addEventListener("visibilitychange", cancelHover);
   document.addEventListener("zimo:themechange", () => {
     if (!site.mascot?.expanded || site.chat?.active || site.chat?.busy || performance.now() - lastAt < 18000) return;
     lastAt = performance.now(); site.mascot.comment(pick("theme"));
@@ -97,6 +165,7 @@
     const context = site.page;
     if (context === lastContext) return;
     lastContext = context; lastAt = performance.now();
-    setTimeout(() => { if (!site.chat?.active && !site.chat?.busy) site.mascot.comment(pick(context)); }, 900);
+    const scheduledAt = lastAt;
+    setTimeout(() => { if (lastAt === scheduledAt && site.page === context && !site.chat?.active && !site.chat?.busy) site.mascot.comment(pick(context)); }, 900);
   });
 })();

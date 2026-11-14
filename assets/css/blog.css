@@ -167,6 +167,7 @@ html[lang="en"] #page-content .section-heading h2 { font-family: Georgia,serif; 
   .site-sidebar { display: none !important; }
   #page-content { margin: 0; }
   #page-content .container { width: 100%; max-width: none; }
+  #page-content .resume-shell { padding: 0; }
   .winter-reading-layout { display: block; }
   .winter-index { display: none; }
   .winter-chapter { border: 0; box-shadow: none; break-inside: avoid; }
