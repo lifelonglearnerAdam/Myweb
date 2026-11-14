@@ -12,20 +12,20 @@ async page => {
   await page.emulateMedia({ reducedMotion: "no-preference", media: "screen" });
   for (const lang of ["zh", "en"]) {
     await goto(`archive.html?lang=${lang}`);
-    assert(await page.locator(".archive-entry").count() === 10, `archive indexes all seven projects and three notes in ${lang}`);
+    assert(await page.locator(".archive-entry").count() === 7, `archive indexes the seven public projects in ${lang}`);
     await page.locator("#archive-query").fill("Flutter");
     assert(await page.locator(".archive-entry").count() === 1, `archive searches technical keywords in ${lang}`);
     assert(new URL(page.url()).searchParams.get("q") === "Flutter", `archive search URL can be shared in ${lang}`);
     await page.locator('[data-archive-kind="notes"]').click();
     assert(await page.locator(".archive-empty").count() === 1, `archive has a real empty state in ${lang}`);
     await page.locator("#clear-archive").click();
-    assert(await page.locator(".archive-entry").count() === 10, `clear search resets both query and type in ${lang}`);
+    assert(await page.locator(".archive-entry").count() === 7, `clear search resets both query and type in ${lang}`);
     assert(await page.locator("#archive-query").evaluate(element => element === document.activeElement), `clear search returns keyboard focus in ${lang}`);
     await page.locator('[data-archive-kind="notes"]').click();
-    assert(await page.locator(".archive-entry").count() === 3, `archive notes filter in ${lang}`);
+    assert(await page.locator(".archive-entry").count() === 0, `unpublished notes are absent in ${lang}`);
     await page.reload();
     await page.waitForFunction(() => Boolean(window.Zimo));
-    assert(await page.locator(".archive-entry").count() === 3, `archive filter persists in URL in ${lang}`);
+    assert(await page.locator(".archive-entry").count() === 0, `empty notes filter persists in URL in ${lang}`);
   }
   await goto("archive.html?kind=projects&q=SAT&lang=en");
   assert(await page.locator(".archive-entry").count() === 1 && (await page.locator(".archive-entry h2").textContent()).includes("SAT"), "direct archive URL searches local course-project evidence");
@@ -33,7 +33,9 @@ async page => {
   assert(await page.evaluate(() => !window.archiveInjected), "archive search is not interpreted as HTML");
   await page.locator('[data-language="zh"]').click();
   assert(await page.evaluate(() => !window.archiveInjected), "archive search stays escaped after language re-render");
-  await goto("note.html?id=local-first&lang=en");
+  const fixture = { id: "markdown-test", languages: ["en"], title: { zh: "Markdown test", en: "Markdown test" }, summary: { zh: "Test fixture", en: "Test fixture" }, category: { zh: "Test", en: "Test" }, minutes: 1, date: "", toc: { zh: [1,2,3].map(i => ({ id: `note-section-${i}`, title: `Section ${i}` })), en: [1,2,3].map(i => ({ id: `note-section-${i}`, title: `Section ${i}` })) }, html: { zh: "", en: [1,2,3].map(i => `<h2 id="note-section-${i}">Section ${i}</h2><p>${"Markdown fixture paragraph. ".repeat(35)}</p>`).join("") } };
+  await page.route("**/assets/js/posts.js*", route => route.fulfill({ contentType: "application/javascript", body: `window.PORTFOLIO.notes = ${JSON.stringify([fixture])};` }));
+  await goto("note.html?id=markdown-test&lang=en");
   assert(await page.locator(".note-toc a").count() === 3, "article has a real table of contents");
   await page.locator('.note-toc a[href="#note-section-2"]').click();
   assert(new URL(page.url()).hash === "#note-section-2", "article table of contents targets a real section");
@@ -45,6 +47,7 @@ async page => {
   await page.waitForFunction(() => Boolean(window.Zimo));
   await page.waitForFunction(() => document.getElementById("note-section-2").getBoundingClientRect().top < 250);
   assert(await page.evaluate(() => scrollY > 200), "direct article deep links scroll after local content renders");
+  await page.unroute("**/assets/js/posts.js*");
 
   await page.evaluate(() => {
     localStorage.setItem("zimo.music", "off");
@@ -65,6 +68,7 @@ async page => {
   await page.keyboard.press("Escape");
   assert(await page.locator("#music-volume-panel").isHidden(), "Escape closes the music popover");
   await page.evaluate(() => { window.Zimo.music.audio.currentTime = 42; });
+  await page.waitForFunction(() => !window.Zimo.music.audio.seeking && window.Zimo.music.audio.currentTime >= 42);
   await page.locator("#music-toggle").click();
   assert(await page.evaluate(() => !window.Zimo.music.playing), "music can be paused immediately");
   await goto("project.html?id=docsift&lang=en");
@@ -77,6 +81,7 @@ async page => {
   await page.emulateMedia({ media: "print" });
   assert(await page.locator("#music-player").isHidden(), "music player is excluded from printed documents");
   await page.emulateMedia({ media: "screen" });
+  await page.evaluate(() => localStorage.setItem("zimo.mascot", "closed"));
   await page.setViewportSize({ width: 320, height: 800 });
   await goto("index.html?lang=en");
   const geometry = await page.evaluate(() => {

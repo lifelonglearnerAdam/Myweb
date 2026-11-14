@@ -33,7 +33,7 @@ async page => {
     await mobile.locator('#header-navigation [data-nav-section="archive"]').tap();
     await mobile.waitForFunction(() => window.Zimo.page === "archive" && !window.Zimo.navigation.busy);
     assert(await mobile.evaluate(() => window.Zimo.music.playing), "music continues through touch navigation to the archive");
-    assert(await mobile.locator(".archive-entry").count() === 10, "public archive is usable in a touch-enabled browser");
+    assert(await mobile.locator(".archive-entry").count() === 7, "public archive is usable in a touch-enabled browser");
     await mobile.locator("#music-toggle").tap();
     assert(await mobile.evaluate(() => !window.Zimo.music.playing), "touch users can pause the background music");
     return { passed: checks.length, checks };

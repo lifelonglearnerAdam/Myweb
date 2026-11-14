@@ -44,7 +44,7 @@
     document.getElementById("music-credit-link").href = site.localHref("credits.html#music-credit");
   }
   function savePosition() {
-    if (!Number.isFinite(audio.currentTime)) return;
+    if (!audio.src || audio.readyState === 0 || !Number.isFinite(audio.currentTime)) return;
     lastSavedPosition = audio.currentTime;
     try { sessionStorage.setItem("zimo.music.position", String(audio.currentTime)); } catch (_) { /* Optional. */ }
   }

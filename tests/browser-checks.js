@@ -26,7 +26,7 @@ async page => {
     assert(await page.locator("h1").count() === 1, "one primary heading on the homepage");
     assert(await page.locator(".project-card").count() === 4, "four featured projects");
     assert(await page.locator(".compact-project").count() === 2, "two additional engineering projects");
-    assert(await page.locator(".note-card").count() === 3, "three complete technical notes");
+    assert(await page.locator(".note-card").count() === 0 && await page.locator(".empty-notes").isVisible(), "an honest empty blog instead of generated posts");
     assert(await page.evaluate(() => window.Zimo.effects.enabled), "sakura effects enabled by default");
     await page.mouse.move(50, 200);
     await page.mouse.move(750, 450, { steps: 18 });
@@ -37,7 +37,7 @@ async page => {
     assert(await page.locator(".project-card").count() === 1, "engineering project filter");
     await page.locator('[data-language="en"]').click();
     assert(await page.locator("html").getAttribute("lang") === "en", "English language attribute");
-    assert((await page.locator("h1").textContent()).includes("Build with intention"), "English hero copy");
+    assert((await page.locator("h1").textContent()).includes("Zimo’s blog"), "English blog title");
     assert(await page.locator(".project-card").count() === 1, "filter survives language switch");
     await page.locator('[data-filter="all"]').click();
     assert((await page.locator('.project-body h3').first().textContent()).includes("DocSift"), "localized project rendering");
@@ -51,7 +51,7 @@ async page => {
     assert(await page.locator("html").getAttribute("data-theme") === "dark", "theme persists on reload");
     await page.locator("#theme-toggle").click();
     await page.context().grantPermissions(["clipboard-read", "clipboard-write"], { origin: new URL(base).origin });
-    await page.locator("[data-copy-email]").click();
+    await page.locator("[data-copy-email]").first().click();
     await page.waitForFunction(() => document.getElementById("toast").classList.contains("is-visible"));
     assert(await page.evaluate(() => navigator.clipboard.readText()) === "zimozeng961@gmail.com", "copy email writes the correct address");
 
@@ -105,11 +105,10 @@ async page => {
         assert(await page.locator(".prose li").count() >= 2, `${id} has implementation detail in ${lang}`);
       }
     }
-    for (const id of ["beyond-the-score", "evidence-before-answers", "local-first"]) {
-      for (const lang of ["zh", "en"]) {
-        await goto(`note.html?id=${id}&lang=${lang}`);
-        assert(await page.locator(".prose section").count() === 3, `${id} full article renders in ${lang}`);
-      }
+    for (const lang of ["zh", "en"]) {
+      await goto(`winter.html?lang=${lang}`);
+      assert(await page.locator("[data-winter-task]").count() === 19, `winter guide has real study tasks in ${lang}`);
+      assert(await page.locator("#profile-sidebar").isVisible(), `persistent sidebar is present on the guide in ${lang}`);
     }
     await goto("project.html?id=%3Cscript%3Ealert(1)%3C/script%3E&lang=en");
     assert((await page.locator("h1").textContent()).includes("isn’t here"), "unknown project IDs have a safe fallback");
@@ -125,7 +124,7 @@ async page => {
     assert((await page.locator(".prose").textContent()).includes("CC BY-NC 4.0"), "artwork license is visible");
     for (const lang of ["zh", "en"]) {
       await page.setViewportSize({ width: 320, height: 800 });
-      for (const route of [`project.html?id=docsift&lang=${lang}`, `note.html?id=local-first&lang=${lang}`, `resume.html?lang=${lang}`, `credits.html?lang=${lang}`]) {
+      for (const route of [`project.html?id=docsift&lang=${lang}`, `note.html?id=not-published&lang=${lang}`, `resume.html?lang=${lang}`, `credits.html?lang=${lang}`]) {
         await goto(route);
         assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `detail-page mobile layout: ${route}`);
       }

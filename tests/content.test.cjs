@@ -77,24 +77,33 @@ test("public project links are HTTPS without credentials or local endpoints", ()
       assert.ok(link.kind in data.ui.zh && link.kind in data.ui.en, link.kind);
     }
   }
-  assert.equal(data.projects.find(project => project.id === "sat").links.length, 0, "No invented public link for the local course project");
+  assert.equal(data.projects.find(project => project.id === "sat").links[0].url, "https://github.com/lifelonglearnerAdam/hust-course-notes/tree/main/IIA/SAT-Solver", "The course source link points to the newly published repository");
 });
 
-test("all notes are fully written, bilingual, and linked to real projects", () => {
-  assert.equal(data.notes.length, 3);
-  assert.equal(new Set(data.notes.map(note => note.id)).size, data.notes.length);
-  for (const note of data.notes) {
-    for (const field of ["title", "summary", "category"]) bilingual(note[field], `${note.id}.${field}`);
-    assert.ok(data.projects.some(project => project.id === note.project), note.project);
-    assert.ok(note.sections.length >= 3, note.id);
-    for (const section of note.sections) {
-      bilingual(section.heading, `${note.id}.heading`);
-      for (const lang of ["zh", "en"]) {
-        assert.ok(section.paragraphs[lang].length >= 2);
-        for (const paragraph of section.paragraphs[lang]) assert.ok(paragraph.length > (lang === "zh" ? 30 : 80), `${note.id}.${lang} should not be placeholder content`);
-      }
-    }
+test("the blog does not pass generated placeholder essays off as the owner's posts", () => {
+  vm.runInNewContext(fs.readFileSync(path.join(root, "assets/js/posts.js"), "utf8"), context);
+  assert.ok(Array.isArray(data.notes));
+  assert.ok(data.notes.every(note => note.languages && note.html && !["beyond-the-score", "evidence-before-answers", "local-first"].includes(note.id)), "Only built owner-published Markdown belongs in the article list");
+  assert.ok(!source.includes('id: "beyond-the-score"'));
+  assert.ok(fs.existsSync(path.join(root, "posts/README.md")));
+  assert.ok(fs.existsSync(path.join(root, "posts/_drafts/template.md")));
+});
+
+test("winter study guide is complete, bilingual, and separate from original internal handouts", () => {
+  vm.runInNewContext(fs.readFileSync(path.join(root, "assets/js/winter-content.js"), "utf8"), context);
+  const guide = context.window.WINTER_GUIDE;
+  bilingual(guide.title, "winter.title");
+  assert.equal(guide.tracks.length, 4);
+  assert.equal(guide.common.length + guide.tracks.reduce((sum, track) => sum + track.steps.length, 0), 19);
+  const ids = guide.common.map(item => item.id);
+  for (const track of guide.tracks) {
+    bilingual(track.name, track.id);
+    bilingual(track.summary, track.id);
+    for (const step of track.steps) { ids.push(step.id); bilingual(step.title, step.id); bilingual(step.text, step.id); }
+    for (const link of track.links) assert.ok(link.url.startsWith("https://"));
   }
+  assert.equal(new Set(ids).size, ids.length);
+  assert.ok(!/qq群|组长|报名截止|已开营|qm\\.qq|1059431605|1023906518/.test(JSON.stringify(guide)));
 });
 
 test("research counts, provenance, and team context remain explicit", () => {

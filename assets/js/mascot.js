@@ -193,17 +193,20 @@
     clearTimeout(ambientTimer);
     if (!expanded || document.hidden || reducedMotion.matches) return;
     ambientTimer = setTimeout(() => {
-      if (!drag && !bubbleOpen && !site.chat?.active && !site.effects?.transitioning && performance.now() - lastSpeechAt > 30000) {
+      if (!drag && !bubbleOpen && !site.chat?.active && !site.effects?.transitioning && performance.now() - lastSpeechAt > 20000) {
         const section = document.querySelector('[data-nav-section][aria-current="location"]')?.dataset.navSection;
         const contexts = { projects: "mascotAtProjects", research: "mascotAtResearch", writing: "mascotAtWriting", about: "mascotAtAbout", contact: "mascotAtContact" };
         let key;
         if (contexts[section] && section !== lastAmbientSection) { key = contexts[section]; lastAmbientSection = section; }
         else if ((new Date().getHours() >= 23 || new Date().getHours() < 6) && ambientIndex % 4 === 0) key = "mascotNight";
         else key = `mascotAmbient${ambientIndex % 4 + 1}`;
-        ambientIndex++; showBubble(key, true); play("waiting", true);
+        ambientIndex++;
+        if (site.companionLines) comment(site.companionLines.pick(site.page === "home" ? section : site.page));
+        else showBubble(key, true);
+        play("waiting", true);
       }
       scheduleAmbient();
-    }, 35000 + Math.random() * 18000);
+    }, 22000 + Math.random() * 16000);
   }
   function setExpanded(value, remember = true) {
     expanded = value; mascot.hidden = !value; launcher.hidden = value;
@@ -322,10 +325,17 @@
     positionBubble();
     if (expanded) play(thinking ? "thinking" : "wave", true);
   }
+  function comment(text) {
+    if (!expanded || document.hidden || drag || site.chat?.active || site.chat?.busy) return;
+    say(text);
+    bubbleTimer = setTimeout(() => {
+      if (!site.chat?.active && !bubble.matches(":hover") && !bubble.contains(document.activeElement)) hideBubble();
+    }, 8500);
+  }
   function guide() {
     setExpanded(true); showBubble("mascotGreeting"); play("wave", true);
   }
-  site.mascot = { resetPosition, say, guide, positionBubble, show: () => setExpanded(true), get expanded() { return expanded; }, get dragging() { return Boolean(drag?.moved); }, get position() { return customPosition; } };
+  site.mascot = { resetPosition, say, comment, guide, positionBubble, show: () => setExpanded(true), get expanded() { return expanded; }, get dragging() { return Boolean(drag?.moved); }, get position() { return customPosition; } };
   updateLabels(); setExpanded(expanded, false);
   let greeted = false;
   try { greeted = sessionStorage.getItem("zimo.susu.greeted") === "true"; } catch (_) { /* Optional. */ }

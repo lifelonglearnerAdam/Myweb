@@ -32,8 +32,8 @@ async page => {
     assert(await page.locator(".poetry-verse:not([lang=en])").count() === 0, "poetry stays in English on the Chinese homepage");
     assert(await page.locator(".poetry-reflection").count() === 0, "poems have no Chinese translation or explanatory captions");
     assert((await page.locator(".intro-signature").textContent()).includes("stay young, stay simple, stay hungry, stay foolish"), "personal signature uses the requested wording");
-    assert(await page.locator(".email-row a").getAttribute("href") === "mailto:zimozeng961@gmail.com", "Gmail is the primary public email");
-    assert((await page.locator(".secondary-email").textContent()).includes("2319597720@qq.com"), "QQ remains an alternative contact");
+    assert(await page.locator('#profile-sidebar a[href^="mailto:"]').getAttribute("href") === "mailto:zimozeng961@gmail.com", "Gmail is the primary public email");
+    assert(await page.locator(".rail-social a").count() === 2 && await page.locator(".rail-social button").count() === 1, "contacts are compact GitHub/email/copy icons rather than a large panel");
     const before = await page.locator("#susu-mascot").boundingBox();
     const stage = await page.locator("#susu-stage").boundingBox();
     await page.mouse.move(stage.x + 72, stage.y + 65);
@@ -83,7 +83,7 @@ async page => {
     await page.goForward(); await settled();
     assert(await page.evaluate(() => window.Zimo.page === "project" && window.Zimo.music.playing), "browser Forward also preserves playback");
     await page.locator('#header-navigation [data-nav-section="archive"]').click(); await settled();
-    assert(await page.locator(".archive-entry").count() === 10, "archive counts only public projects and notes");
+    assert(await page.locator(".archive-entry").count() === 7, "archive counts only public projects and notes");
     await page.locator("#archive-query").fill("Flutter");
     await page.locator(".archive-entry").first().click(); await settled();
     assert((await page.locator("h1").textContent()).includes("记账"), "search-result navigation opens the matching public project");
@@ -91,7 +91,7 @@ async page => {
     assert(await page.locator("#archive-query").inputValue() === "Flutter", "Back preserves the archive query in the URL");
     await page.locator('[data-language="en"]').click();
     assert(await page.locator("html").getAttribute("lang") === "en", "language switching works after several soft navigations");
-    await page.locator(".brand").first().click(); await settled();
+    await page.locator(".rail-avatar").click(); await settled();
     assert(await page.locator(".poetry-verse").count() === 5 && await page.locator("#main-content").count() === 1, "home remount has poetry but no duplicate page containers");
     await page.locator("#music-toggle").click();
     assert(await page.evaluate(() => !window.Zimo.music.playing), "continuous player can still be paused");

@@ -1,0 +1,65 @@
+/* Sidebar-first blog, honest empty posts, self-paced guide, and test-only Markdown preview. */
+async page => {
+  const base = new URL(".", page.url()).href;
+  const checks = [], errors = [];
+  const assert = (value, label) => { if (!value) throw new Error(`FAIL: ${label}`); checks.push(label); };
+  const onError = error => errors.push(error.message);
+  page.on("pageerror", onError);
+  const goto = async path => { await page.goto(new URL(path, base).href); await page.waitForFunction(() => Boolean(window.Zimo?.navigation && window.Zimo?.chat)); await page.waitForFunction(() => !window.Zimo.effects.transitioning); };
+  try {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await page.emulateMedia({ reducedMotion: "reduce", colorScheme: "light" });
+    await goto("index.html?lang=zh");
+    assert(await page.locator("#profile-sidebar").count() === 1, "one sidebar, not duplicated navigation panels");
+    assert(await page.locator("#profile-sidebar").isVisible(), "sidebar is visible on desktop");
+    assert(await page.locator(".site-header").evaluate(element => element.getBoundingClientRect().height === 0), "desktop has no competing top navigation bar");
+    assert(await page.locator(".empty-notes").isVisible() && await page.locator(".note-card").count() === 0, "there are no fabricated blog articles");
+    assert(await page.evaluate(() => document.getElementById("writing").getBoundingClientRect().top < document.getElementById("projects").getBoundingClientRect().top), "articles come before the portfolio on the blog homepage");
+    assert(await page.locator(".contact-panel").count() === 0 && await page.locator(".contact-icons").count() === 1, "contact details use small icons rather than a sales-style panel");
+    const course = page.locator('#profile-sidebar [data-nav-section="courses"]');
+    assert(await course.getAttribute("href") === "https://github.com/lifelonglearnerAdam/hust-course-notes", "sidebar links the owner's new course-record repository");
+    assert(await course.getAttribute("target") === "_blank" && (await course.getAttribute("rel")).includes("noopener"), "course repository is a safe external link");
+    await page.evaluate(() => { window.__piano = window.Zimo.music.audio; window.__sidebar = document.getElementById("profile-sidebar"); });
+    await page.locator('#header-navigation [data-nav-section="winter"]').click();
+    await page.waitForFunction(() => window.Zimo.page === "winter" && !window.Zimo.navigation.busy);
+    assert(await page.locator("#profile-sidebar").isVisible(), "winter handbook keeps the same primary sidebar");
+    assert(await page.evaluate(() => window.__piano === window.Zimo.music.audio && window.__sidebar === document.getElementById("profile-sidebar")), "navigation preserves music and the sidebar shell");
+    assert(await page.locator("[data-winter-task]").count() === 19, "four study tracks have nineteen concrete steps including setup");
+    assert(await page.locator(".winter-chapter").count() === 5, "handbook has setup and four readable chapters");
+    assert((await page.locator(".winter-plan-note").textContent()).includes("不是已经开营"), "a plan is not presented as a completed or scheduled camp");
+    await page.locator("#winter-reset").click();
+    await page.locator("[data-winter-task]").first().check();
+    await page.locator("[data-winter-task]").last().check();
+    assert((await page.locator("#winter-progress-count").textContent()).startsWith("2 /"), "learning progress is based on actual checkboxes");
+    await page.reload(); await page.waitForFunction(() => Boolean(window.Zimo));
+    assert(await page.locator("[data-winter-task]:checked").count() === 2, "study progress is remembered locally");
+    await page.locator('[data-language="en"]').click();
+    assert(await page.locator("[data-winter-task]:checked").count() === 2 && (await page.locator("h1").textContent()).includes("Winter"), "language changes preserve guide progress");
+    await page.locator("#winter-reset").click();
+    assert(await page.locator("[data-winter-task]:checked").count() === 0, "guide progress can be cleared");
+    await goto("project.html?id=docsift&lang=en");
+    assert(await page.locator("#profile-sidebar").isVisible(), "project pages do not lose the primary navigation");
+    assert(await page.evaluate(() => window.Zimo.companionLines.count >= 45), "the companion has a varied local remark library");
+    const selected = await page.evaluate(() => Array.from({ length: 16 }, () => window.Zimo.companionLines.pick("winter")));
+    assert(new Set(selected).size === 16, "local remarks avoid immediate repeats");
+    await page.setViewportSize({ width: 390, height: 844 });
+    assert(await page.locator("#profile-sidebar").isHidden(), "phone sidebar starts closed");
+    await page.locator("#nav-toggle").click();
+    assert(await page.locator("#profile-sidebar").isVisible(), "phone menu opens the same navigation as a drawer");
+    await page.keyboard.press("Escape");
+    assert(await page.locator("#profile-sidebar").isHidden(), "Escape closes the phone drawer");
+    const fixture = { id: "markdown-preview", languages: ["zh"], title: { zh: "测试用的文章", en: "测试用的文章" }, summary: { zh: "只在测试浏览器里出现", en: "Only a browser fixture" }, category: { zh: "测试", en: "Test" }, minutes: 1, date: "", toc: { zh: [{ id: "post-heading-1", title: "测试标题" }], en: [{ id: "post-heading-1", title: "测试标题" }] }, html: { zh: '<h2 id="post-heading-1">测试标题</h2><p>Markdown 正文。</p><pre><code>print(&quot;hello&quot;)</code></pre>', en: '<h2 id="post-heading-1">测试标题</h2><p>Markdown 正文。</p><pre><code>print(&quot;hello&quot;)</code></pre>' } };
+    await page.route("**/assets/js/posts.js*", route => route.fulfill({ contentType: "application/javascript", body: `window.PORTFOLIO.notes = ${JSON.stringify([fixture])};` }));
+    await goto("note.html?id=markdown-preview&lang=en");
+    assert(await page.locator(".markdown-body pre code").count() === 1, "published Markdown supports readable code blocks");
+    assert(await page.locator(".note-toc a").count() === 1, "Markdown headings build a real article directory");
+    assert(await page.locator(".document-meta").textContent().then(text => text.includes("Original text")), "missing translations are identified rather than invented");
+    assert(await page.locator("h1").count() === 1, "article body does not add a duplicate primary heading");
+    await page.unroute("**/assets/js/posts.js*");
+    await goto("index.html?lang=zh");
+    assert(await page.locator(".note-card").count() === 0, "test article was never written to or published from the server");
+    assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), "blog shell fits the phone viewport");
+    assert(errors.length === 0, `no browser errors: ${errors.join("; ")}`);
+    return { passed: checks.length, checks, browserErrors: errors };
+  } finally { await page.unroute("**/assets/js/posts.js*"); page.off("pageerror", onError); }
+}

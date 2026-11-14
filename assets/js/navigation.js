@@ -6,7 +6,7 @@
   const directory = new URL(".", location.href).pathname;
   // Static Assets canonicalizes /archive.html to /archive on a cold visit.
   // Accept both forms so Back/Forward also works when the entry URL was canonicalized.
-  const routes = new Set(["", "index", "archive", "project", "note", "resume", "credits", "index.html", "archive.html", "project.html", "note.html", "resume.html", "credits.html"]);
+  const routes = new Set(["", "index", "archive", "project", "note", "resume", "credits", "winter", "index.html", "archive.html", "project.html", "note.html", "resume.html", "credits.html", "winter.html"]);
   const templates = new Map();
   let renderedURL = location.href;
   let controller;

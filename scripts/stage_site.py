@@ -3,6 +3,8 @@
 from pathlib import Path
 import argparse
 import shutil
+import subprocess
+import sys
 from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -22,6 +24,7 @@ out.mkdir(parents=True, exist_ok=True)
 for child in out.iterdir():
     if child.is_dir(): shutil.rmtree(child)
     else: child.unlink()
+subprocess.run([sys.executable, str(ROOT / "scripts/build_posts.py")], check=True)
 files = list(ROOT.glob("*.html")) + [ROOT / ".nojekyll", ROOT / "robots.txt", ROOT / "sitemap.xml"]
 for file in files:
     shutil.copy2(file, out / file.name)

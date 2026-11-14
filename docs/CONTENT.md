@@ -17,7 +17,7 @@
 | AI 新品决策引擎 | https://github.com/lifelonglearnerAdam/miniso-ai-decision-engine | 三人学生团队竞赛项目，展示团队交付；不虚构个人独立完成所有模块、官方企业合作或真实业务收益。 |
 | QuantPilot AI | https://github.com/lifelonglearnerAdam/quantpilot-ai | 研究工作区、安全同步、权限与教学沙盒。在线应用需要飞书登录；不将历史旧的 Pages 演示误作当前正式运行地址。 |
 | 子墨记账 | https://github.com/lifelonglearnerAdam/zimo-jizhang | 以当前 README 的 Flutter / Riverpod / SQLite v2.2 为准，不沿用仓库旧描述中的纯前端版本。 |
-| SAT / 星形数独 | 本地课程设计 README 与 C99 源码，未公开课程原包 | DPLL / CDCL、约束编码、结果核验与限时语义。没有捏造公开仓库入口，也没有把教师数据打包到主页仓库。 |
+| SAT / 星形数独 | https://github.com/lifelonglearnerAdam/hust-course-notes/tree/main/IIA/SAT-Solver | 现在有经过整理的公开源码副本，不含教师题库、原始提交报告或个人标识。 |
 | DecibelMeter | https://github.com/lifelonglearnerAdam/DecibelMeter | Kotlin Android 噪声读数工具，文案保持在公开描述可支持的范围；不虚构专业声学校准能力。 |
 | 手写文档诊断 | https://github.com/lifelonglearnerAdam/monkeyocr-note-defects | 表格与公式专项的个人初审和可视化报告；37 表格 + 25 公式。不是 MonkeyOCRv2 基础模型原创、论文录用或已完成微调提升。 |
 
@@ -35,7 +35,7 @@
 
 ## 手记与文案
 
-3 篇手记为本轮结合项目实现新整理的中英文草稿，不是从旧博客找回的历史文章。没有添加虚构的发布日期。本人在正式申请中使用时，应审阅第一人称表述、技术细节和观点是否与自身理解一致。
+之前三篇由助手整理的手记已移除，不作为本人正式博文展示。正式文章以后来自 `posts/*.md`，只有明确标记 `draft: false` 才发布。不编造发布日期，不自动杜撰英文译稿或个人感受。
 
 ## 不应添加的内容
 
@@ -46,6 +46,10 @@
 - 将测试集缺陷分析写成独立验证的模型提升。
 - 私人生活、个人财务明细、密钥、私有模型权重与服务器地址。
 - 未发表研究的方法、指标、内部代号、实验计划、失败诊断、数据统计和未公开来源。
+
+## 冬日共学
+
+参考本地材料中的通用学习主题，重新写成前端、后端、模型、表达四条自学路线。不复制原文、图表、题库、招生安排或原作者的成果，不包含原机构、群号、姓名、内部链接，也不伪称本人已举办活动。学习勾选只保存在访问者本机。
 
 ## 英文诗与插图
 
