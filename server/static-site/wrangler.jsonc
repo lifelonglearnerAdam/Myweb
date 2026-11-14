@@ -4,6 +4,10 @@
   "main": "worker.mjs",
   "compatibility_date": "2026-01-01",
   "workers_dev": true,
+  "routes": [
+    { "pattern": "zengzimo.cn", "custom_domain": true, "zone_id": "3fc7393e88d0bdcbdd1346ef3b85aa0a" },
+    { "pattern": "www.zengzimo.cn", "custom_domain": true, "zone_id": "3fc7393e88d0bdcbdd1346ef3b85aa0a" }
+  ],
   "assets": {
     "directory": "../../.public-site",
     "binding": "ASSETS",

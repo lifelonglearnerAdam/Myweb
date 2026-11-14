@@ -1,6 +1,6 @@
 {
   "name": "zimo-personal-space",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "private": true,
   "description": "Zimo Zeng’s bilingual personal portfolio. Static HTML, CSS and JavaScript; no build dependencies.",
   "scripts": {

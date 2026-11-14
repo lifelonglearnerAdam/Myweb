@@ -3,10 +3,12 @@
 **文档智能 · AI 应用 · 软件工程**
 Document intelligence. Applied AI. Thoughtful engineering.
 
-- **免费新网址 / Free hosting:** https://me.zimo-personal-space.workers.dev/
+- **个人域名 / Website:** https://zengzimo.cn/
+- **www:** https://www.zengzimo.cn/
+- **English:** https://zengzimo.cn/?lang=en
+- **中英文简历 / Résumé:** https://zengzimo.cn/resume.html
+- **免费备用网址 / Fallback:** https://me.zimo-personal-space.workers.dev/
 - **GitHub Pages 镜像 / Mirror:** https://lifelonglearneradam.github.io/Myweb/
-- **English:** https://lifelonglearneradam.github.io/Myweb/?lang=en
-- **中英文简历 / Résumé:** https://lifelonglearneradam.github.io/Myweb/resume.html
 
 ![Homepage preview](docs/preview-desktop.webp)
 
@@ -44,7 +46,7 @@ A bilingual personal portfolio and small technical blog, rebuilt from a first-ye
 
 ## 技术方案 / Technical approach
 
-**原生 HTML + CSS + JavaScript**，主页无生产依赖或前端框架，可直接部署到 GitHub Pages；Cloudflare Static Assets 另提供免费短网址。只有可选的 AI 聊天使用独立 Cloudflare Worker 后端。
+**原生 HTML + CSS + JavaScript**，主页无生产依赖或前端框架，可直接部署到 GitHub Pages；Cloudflare Static Assets 绑定自有域名并保留免费备用地址。只有可选的 AI 聊天使用独立 Cloudflare Worker 后端。域名注册商仍为阿里云，DNS 使用 Cloudflare Free。
 
 - CSS Grid / Flexbox、CSS 变量、响应式布局、打印样式。
 - Canvas 樱花粒子 + CSS 花树转场。
@@ -141,7 +143,7 @@ git push origin HEAD:master HEAD:main
 
 不要盲目 `git add -A`：目录内可能存在未选择公开的个人图片。不要使用 `--force` 覆盖远端历史。
 
-**免费新网址已上线： https://me.zimo-personal-space.workers.dev/** 。不需要付费域名或社区审核；GitHub 镜像继续保留。部署与域名状态见 [`docs/DOMAIN.md`](docs/DOMAIN.md)。
+**主域名： https://zengzimo.cn/** ，同时绑定 `www.zengzimo.cn`。使用现有免费托管，没有额外购买服务器或备案服务；免费备用地址与 GitHub 镜像继续保留。DNS、HTTPS、来源权限和以后备案的区别见 [`docs/DOMAIN.md`](docs/DOMAIN.md)。
 
 ## Design references
 

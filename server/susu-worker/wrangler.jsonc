@@ -7,7 +7,7 @@
   "observability": { "enabled": false },
   "vars": {
     "MODEL": "gpt-6.1-sol",
-    "ALLOWED_ORIGINS": "https://lifelonglearneradam.github.io,https://me.zimo-personal-space.workers.dev",
+    "ALLOWED_ORIGINS": "https://lifelonglearneradam.github.io,https://me.zimo-personal-space.workers.dev,https://zengzimo.cn,https://www.zengzimo.cn",
     "MAX_DAILY_REQUESTS": "60",
     "MAX_VISITOR_REQUESTS": "20"
   },

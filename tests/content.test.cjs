@@ -175,6 +175,37 @@ test("all poetry excerpts are attributed, English-only and paired with licensed 
   assert.equal(data.poems.find(poem => poem.author === "Robert Frost").lines.length < 90, true);
 });
 
+test("custom-domain deployment rewrites only this site's links and excludes private files", () => {
+  const os = require("node:os");
+  const { execFileSync } = require("node:child_process");
+  const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "zimo-domain-build-"));
+  const output = path.join(temporary, "site");
+  try {
+    execFileSync("python3", [path.join(root, "scripts/stage_site.py"), output], { cwd: root });
+    const html = fs.readFileSync(path.join(output, "index.html"), "utf8");
+    assert.match(html, /rel="canonical" href="https:\/\/zengzimo\.cn\/"/);
+    const content = fs.readFileSync(path.join(output, "assets/js/content.js"), "utf8");
+    assert.ok(content.includes("https://lifelonglearneradam.github.io/docsift/"), "Other project links are not rewritten");
+    assert.ok(fs.readFileSync(path.join(output, "sitemap.xml"), "utf8").includes("https://zengzimo.cn/project.html?id=docsift"));
+    assert.ok(fs.readFileSync(path.join(output, "robots.txt"), "utf8").includes("https://zengzimo.cn/sitemap.xml"));
+    assert.ok(fs.readFileSync(path.join(output, "404.html"), "utf8").includes('<base href="/">'));
+    assert.ok(fs.readFileSync(path.join(output, "assets/js/app.js"), "utf8").includes("https://zengzimo.cn/"));
+    for (const privatePath of [".git", "image", "server", ".env", ".dev.vars", "tests"]) assert.ok(!fs.existsSync(path.join(output, privatePath)), privatePath);
+    assert.ok(fs.readFileSync(path.join(root, "index.html"), "utf8").includes('href="https://lifelonglearneradam.github.io/Myweb/"'), "Building does not overwrite the GitHub mirror source");
+  } finally { fs.rmSync(temporary, { recursive: true, force: true }); }
+});
+
+test("custom domain and free fallback all use their own same-origin chat API", () => {
+  const js = fs.readFileSync(path.join(root, "assets/js/companion-chat.js"), "utf8");
+  assert.ok(js.includes('const PUBLIC_SITE = "https://zengzimo.cn"'));
+  assert.ok(js.includes('"https://www.zengzimo.cn"') && js.includes('"https://me.zimo-personal-space.workers.dev"'));
+  assert.ok(js.includes('HOSTED_ORIGINS.has(location.origin) ? "/api/chat"'));
+  const config = JSON.parse(fs.readFileSync(path.join(root, "server/static-site/wrangler.jsonc"), "utf8"));
+  assert.deepEqual(config.routes.map(route => route.pattern).sort(), ["www.zengzimo.cn", "zengzimo.cn"]);
+  assert.ok(config.routes.every(route => route.custom_domain));
+  assert.equal(config.workers_dev, true, "The old free hostname remains available");
+});
+
 test("old URLs are redirects and do not retain obsolete personal content", () => {
   for (const name of ["about", "hobby", "photo", "myessay", "contact"]) {
     for (const prefix of ["", "web/"]) {

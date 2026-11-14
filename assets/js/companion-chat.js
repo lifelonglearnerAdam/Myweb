@@ -4,10 +4,11 @@
   const site = window.Zimo;
   const bubble = document.getElementById("susu-bubble");
   if (!site?.mascot || !bubble || site.chat) return;
-  const PUBLIC_SITE = "https://me.zimo-personal-space.workers.dev";
-  // On the free hostname, requests are same-origin and use a Cloudflare service binding.
-  // The GitHub mirror uses the same website API, not the separate public proxy hostname.
-  const ENDPOINT = location.origin === PUBLIC_SITE ? "/api/chat" : `${PUBLIC_SITE}/api/chat`;
+  const PUBLIC_SITE = "https://zengzimo.cn";
+  const HOSTED_ORIGINS = new Set([PUBLIC_SITE, "https://www.zengzimo.cn", "https://me.zimo-personal-space.workers.dev"]);
+  // Both custom hostnames and the free fallback keep chat on their own origin.
+  // The GitHub mirror uses the custom website API, never a separate proxy hostname.
+  const ENDPOINT = HOSTED_ORIGINS.has(location.origin) ? "/api/chat" : `${PUBLIC_SITE}/api/chat`;
   const CONTEXT_MESSAGES = 32;
   const DISPLAY_MESSAGES = 34;
   let history = [], messages = [], busy = false, composing = false, cooldownUntil = 0;

@@ -1,36 +1,62 @@
-# 免费网址与发布
+# 自有域名与发布
 
-## 已上线的地址
+## 访问地址
 
-- **免费新网址：https://me.zimo-personal-space.workers.dev/**
+- **主域名：https://zengzimo.cn/**
+- **www：https://www.zengzimo.cn/**
+- 免费备用地址：https://me.zimo-personal-space.workers.dev/
 - GitHub Pages 镜像：https://lifelonglearneradam.github.io/Myweb/
 
-两者均属于本人账户下的免费托管地址，没有购买独立域名或开通付费 Cloudflare 服务。新地址由 Cloudflare Workers Static Assets 直接提供页面，不需要社区域名审核。苏苏的聊天代理是独立 Worker，前端没有 API 密钥。
+域名在阿里云／万网注册，网站继续使用 Cloudflare 免费 Workers Static Assets 托管。没有购买服务器、付费 Cloudflare 套餐或备案服务。域名注册、实名、DNS、HTTPS 与 ICP 备案是不同事项；本文不代表已取得 ICP 备案。
+
+## DNS 与域名绑定
+
+- 注册商：阿里云计算有限公司（万网），注册商不变，没有域名转移。
+- 域名实名通过后，注册局状态为 `ok`，原先的 `clientHold` 已解除。
+- DNS 服务器已更换为 Cloudflare 为这个域名分配的：
+  - `ara.ns.cloudflare.com`
+  - `sean.ns.cloudflare.com`
+- 更换前已检查阿里云解析列表为空，没有覆盖既有网站、邮箱或验证记录。
+- `zengzimo.cn` 与 `www.zengzimo.cn` 都绑定至已有 `me` Worker，HTTPS 由 Cloudflare 管理。
+- 源码中的 `server/static-site/wrangler.jsonc` 保留两个 Custom Domain 路由和 `workers_dev: true`，后续部署不会丢失绑定，免费备用网址也继续可用。
+- DNS 缓存和证书签发可能有同步时间；绑定成功不等于保证所有国内运营商线路都稳定，仍需在实际网络上测试。
+
+以后要更换 DNS 服务商，先导出并核对所有记录，包括新增的邮箱 MX、TXT、验证或其他子域名，再操作，不要只复制网站记录。
 
 ## 发布到 Cloudflare
 
-静态托管与聊天分开部署，避免将后端代码、密钥或本地图片放进公共静态资源。
+```bash
+python3 scripts/stage_site.py .public-site
+wrangler deploy --config server/static-site/wrangler.jsonc
+```
 
-1. `python3 scripts/stage_site.py .public-site`
-2. `wrangler deploy --config server/static-site/wrangler.jsonc`，仅上传准备好的 `.public-site`，Worker 名称为 `me`。
-3. 账户的已注册 Workers 子域名为 `zimo-personal-space`，因此完整地址是 `me.zimo-personal-space.workers.dev`。
-4. 构建脚本只复制公开站点文件，并把本站绝对链接、站点地图与 404 base 调整到新主机名根目录。
-5. GitHub 的 `main` / `master` 同步推送；Pages 仍从 `master` 发布。
+构建脚本默认将 canonical、Open Graph、站点地图、简历站点地址和 404 base 调整到 `https://zengzimo.cn/`，不修改其他项目的外链，也不覆盖 GitHub 镜像的源文件。
 
-不应直接把整个工作目录作为 Static Assets 上传，也不要把 `image/` 中的个人照片、`.git/`、测试日志、Cloudflare 配置凭证或 `.dev.vars` 发布出去。
+如需要独立构建其他主机，可显式指定：
 
-## 苏苏聊天的独立后端
+```bash
+python3 scripts/stage_site.py /tmp/zimo-site-test --site-url https://me.zimo-personal-space.workers.dev
+```
 
-- 网页聊天入口：**https://me.zimo-personal-space.workers.dev/api/chat**。
-- 主站通过内部 Service Binding 转发到苏苏 Worker，浏览器不再额外请求独立代理子域名；GitHub 镜像也使用这个入口。
-- 后端 Worker：https://zimo-susu-chat.zimo-personal-space.workers.dev（供维护，不是前端直连地址）。
-- `server/susu-worker/` 保存**不含密钥**的后端源码与公开配置。
-- API 地址、API Key 与限频盐值只存在 Cloudflare Secret 中。
-- 来源白名单包括上述 Cloudflare 站点和 GitHub Pages。
-- 目前全站每日最多 60 次模型请求；Cloudflare 托管免费不代表上游模型调用免费。
+不直接把整个工作目录作为 Static Assets 上传。构建只复制公开页面、资源与旧链接入口，不上传 `image/` 原图、`.git/`、后端源码、测试、`.dev.vars` 或账号配置。
+
+## 苏苏聊天
+
+- 主站入口：`https://zengzimo.cn/api/chat`；www 与备用站也各自使用自己的 `/api/chat`。
+- 通过 Cloudflare 内部 `SUSU_CHAT` Service Binding 转发到后端，不要求浏览器连接另外的公共代理子域名。
+- GitHub 镜像向自有域名的 `/api/chat` 发起允许的跨域请求。
+- CORS 来源白名单包含自有域名、www、免费备用站与 GitHub。密钥与上游地址仍然只在后端 Secret，不放进网页或 Git。
+- 部署新的静态站前，先更新并部署 `server/susu-worker/wrangler.jsonc` 中的来源权限。
+- 同源调用、上下文、指引切换、限频与费用边界见 `server/susu-worker/README.md`。
+
+## 关于以后备案
+
+目前是 Cloudflare 的非中国内地免费托管，自有 `.cn` 域名并不自动要求购买境内服务器，也不代表已经备案。
+
+如果以后决定接入中国内地服务器、CDN 或相应境内托管，需通过实际接入商按真实资源与个人资料办理备案；是否需要购买资源，应以最终平台的备案资格要求为准，不为了“先拿备案号”购买不用的服务器。实名认证、短信和人脸核验由本人在官方平台完成。
+
+备案通过不等于公开 AI 聊天等所有功能自然满足全部要求；迁到境内时需另外核验相关服务与合规要求。
 
 ## 之前考虑的社区域名
 
-`zimo.is-a.dev` **没有申请、没有获批**。该社区明确限制使用 AI 代建申请 PR，因此没有尝试以“有人旁观”为理由绕过规则。现在已有无需人工审核的免费托管网址，不影响网站使用。
-
-独立注册域名仍然可以以后绑定，但购买、实名与续费需要本人另行决定；本轮没有产生域名购买行为。
+`zimo.is-a.dev` 没有申请、没有获批；没有绕过该社区对 AI 代建 PR 的限制。现在使用本人已购买的域名，不依赖社区审核。

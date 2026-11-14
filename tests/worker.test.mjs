@@ -46,6 +46,17 @@ test("wrong origins and content types are rejected before model calls", async ()
   assert.equal(preflight.headers.get("Access-Control-Allow-Origin"), origin);
 });
 
+test("custom-domain and www origins pass preflight without opening chat to unrelated sites", async () => {
+  const env = { ALLOWED_ORIGINS: "https://lifelonglearneradam.github.io,https://me.zimo-personal-space.workers.dev,https://zengzimo.cn,https://www.zengzimo.cn" };
+  for (const origin of ["https://zengzimo.cn", "https://www.zengzimo.cn", "https://me.zimo-personal-space.workers.dev"]) {
+    const response = await worker.fetch(new Request("https://susu.internal/chat", { method: "OPTIONS", headers: { Origin: origin } }), env);
+    assert.equal(response.status, 204);
+    assert.equal(response.headers.get("Access-Control-Allow-Origin"), origin);
+  }
+  const invalid = await worker.fetch(new Request("https://susu.internal/chat", { method: "OPTIONS", headers: { Origin: "https://zengzimo.cn.unrelated.example" } }), env);
+  assert.equal(invalid.status, 403);
+});
+
 test("sixteen conversation turns survive validation without private context or system roles", () => {
   const turns = Array.from({ length: 20 }, (_, i) => [{ role: "user", content: `message ${i}` }, { role: "assistant", content: `reply ${i}` }]).flat();
   const value = chatInput({ message: "remember my nickname", history: turns });
