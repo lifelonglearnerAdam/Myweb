@@ -26,7 +26,7 @@ async page => {
     assert(await page.locator("h1").count() === 1, "one primary heading on the homepage");
     assert(await page.locator(".project-card").count() === 4, "four featured projects");
     assert(await page.locator(".compact-project").count() === 2, "two additional engineering projects");
-    assert(await page.locator(".note-card").count() === 0 && await page.locator(".empty-notes").isVisible(), "an honest empty blog instead of generated posts");
+    assert(await page.locator(".note-card").count() === await page.evaluate(() => window.PORTFOLIO.notes.length) && (await page.locator(".note-card").first().getAttribute("href")).includes("tor-onion-field-notes"), "the blog starts with the explicitly published Tor visual essay, not fabricated placeholder posts");
     assert(await page.evaluate(() => window.Zimo.effects.enabled), "sakura effects enabled by default");
     await page.mouse.move(50, 200);
     await page.mouse.move(750, 450, { steps: 18 });

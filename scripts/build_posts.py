@@ -140,9 +140,15 @@ def read_post(path):
         date.fromisoformat(published)
     if text.startswith("# " + title + "\n"):
         text = text.split("\n", 1)[1].lstrip()
+    layout = metadata.get("layout", "article")
+    if layout not in ("article", "visual-story"):
+        raise ValueError(f"{path.name}: layout must be article or visual-story")
+    cover = metadata.get("cover", "")
+    if cover and (not re.fullmatch(r"assets/images/[a-zA-Z0-9_./-]+\.(?:webp|png|jpe?g|avif|svg)", cover) or ".." in cover.split("/")):
+        raise ValueError(f"{path.name}: cover must be a local image under assets/images/")
     body, toc = markdown(text)
     summary = metadata.get("summary") or re.sub(r"[`*#>\[\]]", "", text.split("\n\n")[0]).strip()[:150]
-    return {"id": identifier, "language": language, "title": title, "summary": summary, "category": metadata.get("category", "随记" if language == "zh" else "Notes"), "date": published, "html": body, "toc": toc, "minutes": max(1, round(len(text) / (650 if language == "zh" else 1200)))}
+    return {"id": identifier, "language": language, "title": title, "summary": summary, "category": metadata.get("category", "随记" if language == "zh" else "Notes"), "date": published, "html": body, "toc": toc, "layout": layout, "cover": cover, "minutes": max(1, round(len(text) / (650 if language == "zh" else 1200)))}
 
 
 def build(source):
@@ -160,7 +166,7 @@ def build(source):
     posts = []
     for identifier, versions in grouped.items():
         original = versions.get("zh") or versions["en"]
-        post = {"id": identifier, "languages": list(versions), "minutes": original["minutes"], "date": original["date"]}
+        post = {"id": identifier, "languages": list(versions), "minutes": original["minutes"], "date": original["date"], "layout": original["layout"], "cover": original["cover"]}
         for field in ("title", "summary", "category", "html", "toc"):
             post[field] = {lang: versions.get(lang, original)[field] for lang in ("zh", "en")}
         posts.append(post)

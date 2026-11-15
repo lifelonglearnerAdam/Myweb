@@ -6,7 +6,7 @@
 - GitHub Pages 镜像：https://lifelonglearneradam.github.io/Myweb/
 - 备用网址：https://me.zimo-personal-space.workers.dev/
 
-从大一实践课的网页改起。现在先把博客的架子搭好：文章、归档、冬日共学、项目和关于我。正式文章还没写，不拿生成内容或虚构日期填满首页。
+从大一实践课的网页改起。现在有文章、归档、冬日共学、项目和关于我。第一篇正式文章是 [Tor 网络可视化实测](https://zengzimo.cn/note.html?id=tor-onion-field-notes)：基于真实验收记录，明确标注 AI 辅助、原创生成插画、截图与未解决问题，不用虚构日期或结果填满首页。
 
 ![桌面预览](docs/preview-desktop.webp)
 
@@ -56,6 +56,9 @@ wrangler dev --local --config server/static-site/wrangler.jsonc --port 4175
 ```text
 posts/                        Markdown 文章与不发布的草稿模板
 assets/js/posts.js            文章构建结果，勿手工编辑
+assets/js/visual-story.js     可选分镜阅读、手动播放控制与图片放大
+assets/css/visual-story.css   仅在图解文章中按需加载
+assets/images/posts/tor/     Tor 文章的原创插画、SVG 与脱敏证据拼图
 assets/js/content.js          个人信息、项目与界面文案
 assets/js/winter-content.js   自己重写的开放式学习路线
 assets/js/app.js              页面和全站侧栏
@@ -100,6 +103,7 @@ playwright-cli open http://127.0.0.1:4173/
 playwright-cli run-code --filename=tests/hover-checks.js
 playwright-cli run-code --filename=tests/resume-checks.js
 playwright-cli run-code --filename=tests/blog-checks.js
+playwright-cli run-code --filename=tests/visual-story-checks.js
 playwright-cli run-code --filename=tests/browser-checks.js
 playwright-cli run-code --filename=tests/experience-checks.js
 playwright-cli run-code --filename=tests/guide-mode-checks.js

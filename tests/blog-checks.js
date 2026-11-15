@@ -1,4 +1,4 @@
-/* Sidebar-first blog, honest empty posts, self-paced guide, and test-only Markdown preview. */
+/* Sidebar-first blog, explicit published posts, self-paced guide, and test-only Markdown preview. */
 async page => {
   const base = new URL(".", page.url()).href;
   const checks = [], errors = [];
@@ -13,7 +13,8 @@ async page => {
     assert(await page.locator("#profile-sidebar").count() === 1, "one sidebar, not duplicated navigation panels");
     assert(await page.locator("#profile-sidebar").isVisible(), "sidebar is visible on desktop");
     assert(await page.locator(".site-header").evaluate(element => element.getBoundingClientRect().height === 0), "desktop has no competing top navigation bar");
-    assert(await page.locator(".empty-notes").isVisible() && await page.locator(".note-card").count() === 0, "there are no fabricated blog articles");
+    assert(await page.locator(".note-card").count() === await page.evaluate(() => window.PORTFOLIO.notes.length), "the homepage lists only explicitly published Markdown articles");
+    assert((await page.locator(".note-card").first().getAttribute("href")).includes("tor-onion-field-notes"), "the commissioned Tor essay is the first article");
     assert(await page.evaluate(() => document.getElementById("writing").getBoundingClientRect().top < document.getElementById("projects").getBoundingClientRect().top), "articles come before the portfolio on the blog homepage");
     assert(await page.locator(".contact-panel").count() === 0 && await page.locator(".contact-icons").count() === 1, "contact details use small icons rather than a sales-style panel");
     const course = page.locator('#profile-sidebar [data-nav-section="courses"]');
@@ -58,7 +59,7 @@ async page => {
     assert(await page.locator("h1").count() === 1, "article body does not add a duplicate primary heading");
     await page.unroute("**/assets/js/posts.js*");
     await goto("index.html?lang=zh");
-    assert(await page.locator(".note-card").count() === 0, "test article was never written to or published from the server");
+    assert(await page.locator('.note-card[href*="markdown-preview"]').count() === 0 && await page.locator(".note-card").count() === await page.evaluate(() => window.PORTFOLIO.notes.length), "the browser fixture was never published to the server");
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), "blog shell fits the phone viewport");
     assert(errors.length === 0, `no browser errors: ${errors.join("; ")}`);
     return { passed: checks.length, checks, browserErrors: errors };

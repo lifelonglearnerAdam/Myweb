@@ -43,6 +43,24 @@ class PostsTest(unittest.TestCase):
         self.assertIn('alt="Picture"', rendered)
         self.assertIn('rel="noopener noreferrer"', module.inline("[docs](https://example.com)"))
 
+    def test_visual_story_is_explicit_and_cover_is_local(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory)
+            file = source / "visual.md"
+            metadata = "---\ntitle: Visual notes\nslug: visual\ndraft: false\nlayout: visual-story\ncover: assets/images/posts/tor/cover.webp\n---\n# A frame\n\n![Diagram](assets/images/posts/tor/web-layers.svg)\n\nEvidence, not a promise."
+            file.write_text(metadata, encoding="utf-8")
+            post = module.build(source)[0]
+            self.assertEqual(post["layout"], "visual-story")
+            self.assertEqual(post["cover"], "assets/images/posts/tor/cover.webp")
+            self.assertIn('<h2 id="post-heading-1"', post["html"]["zh"])
+            for unsafe in ["https://tracker.example/a.webp", "assets/images/../../private.png", "javascript:alert", "assets/images/test.svg?x=1"]:
+                file.write_text(metadata.replace("assets/images/posts/tor/cover.webp", unsafe), encoding="utf-8")
+                with self.assertRaises(ValueError):
+                    module.build(source)
+            file.write_text(metadata.replace("layout: visual-story", "layout: raw-html"), encoding="utf-8")
+            with self.assertRaises(ValueError):
+                module.build(source)
+
     def test_invalid_publication_metadata_fails_loudly(self):
         with tempfile.TemporaryDirectory() as directory:
             source = Path(directory)

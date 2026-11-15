@@ -12,20 +12,20 @@ async page => {
   await page.emulateMedia({ reducedMotion: "no-preference", media: "screen" });
   for (const lang of ["zh", "en"]) {
     await goto(`archive.html?lang=${lang}`);
-    assert(await page.locator(".archive-entry").count() === 7, `archive indexes the seven public projects in ${lang}`);
+    assert(await page.locator(".archive-entry").count() === await page.evaluate(() => window.PORTFOLIO.projects.length + window.PORTFOLIO.notes.length), `archive indexes every public project and published article in ${lang}`);
     await page.locator("#archive-query").fill("Flutter");
     assert(await page.locator(".archive-entry").count() === 1, `archive searches technical keywords in ${lang}`);
     assert(new URL(page.url()).searchParams.get("q") === "Flutter", `archive search URL can be shared in ${lang}`);
     await page.locator('[data-archive-kind="notes"]').click();
     assert(await page.locator(".archive-empty").count() === 1, `archive has a real empty state in ${lang}`);
     await page.locator("#clear-archive").click();
-    assert(await page.locator(".archive-entry").count() === 7, `clear search resets both query and type in ${lang}`);
+    assert(await page.locator(".archive-entry").count() === await page.evaluate(() => window.PORTFOLIO.projects.length + window.PORTFOLIO.notes.length), `clear search resets both query and type in ${lang}`);
     assert(await page.locator("#archive-query").evaluate(element => element === document.activeElement), `clear search returns keyboard focus in ${lang}`);
     await page.locator('[data-archive-kind="notes"]').click();
-    assert(await page.locator(".archive-entry").count() === 0, `unpublished notes are absent in ${lang}`);
+    assert(await page.locator(".archive-entry").count() === await page.evaluate(() => window.PORTFOLIO.notes.length), `notes filter contains only explicitly published articles in ${lang}`);
     await page.reload();
     await page.waitForFunction(() => Boolean(window.Zimo));
-    assert(await page.locator(".archive-entry").count() === 0, `empty notes filter persists in URL in ${lang}`);
+    assert(await page.locator(".archive-entry").count() === await page.evaluate(() => window.PORTFOLIO.notes.length), `published notes filter persists in URL in ${lang}`);
   }
   await goto("archive.html?kind=projects&q=SAT&lang=en");
   assert(await page.locator(".archive-entry").count() === 1 && (await page.locator(".archive-entry h2").textContent()).includes("SAT"), "direct archive URL searches local course-project evidence");

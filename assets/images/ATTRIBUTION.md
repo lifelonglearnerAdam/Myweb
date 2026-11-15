@@ -10,6 +10,16 @@
 - `social-preview.png`: original social preview based on the site’s visual identity.
 - `docsift.webp`, `miniso.webp`: resized screenshots of the owner’s public project demos.
 
+## Tor visual field notes · 2026-11-15
+
+Files are limited to `posts/tor/`:
+
+- `cover.webp`, `rendezvous-art.webp`, `gate-art.webp`: original concept art generated with the owner's configured `gpt-image-2.6` image model, compressed to WebP. These are visual metaphors, not accurate network topologies or evidence of a successful connection. No personal photographs, IPs or proxy settings were provided to the image model.
+- `web-layers.svg`, `onion-routing.svg`, `onion-rendezvous.svg`, `clash-chain.svg`, `observed-times.svg`, `two-search-boxes.svg`, `privacy-boundaries.svg`: original explanatory/data figures; source in `scripts/build_tor_figures.py`. Approximate diagrams and single-run observations, not a physical map, anonymity proof or performance benchmark.
+- `five-sites-evidence.webp`: a limited, resized montage of actual Tor Browser viewport captures made during the 2026-11-14 acceptance session. Sites: Riseup ([riseup.net](https://riseup.net/)), Tor Metrics ([metrics.torproject.org](https://metrics.torproject.org/)), Ahmia ([ahmia.fi](https://ahmia.fi/)), Tor Project ([torproject.org](https://www.torproject.org/)), SecureDrop ([securedrop.org](https://securedrop.org/)). Website content, branding and page designs remain the respective owners' property. Shown for contextual technical commentary, not claimed as original illustration, relicensed, or endorsed by those projects. The montage excludes browser chrome, personal account information and connection endpoints.
+
+The article credits its AI-assisted drafting and automated test provenance, documents failed and unresolved checks, and links to official technical explanations. Original files, raw logs, credentials and local configuration are not published. Image prompts are conceptual only and are preserved locally, not embedded in the page.
+
 ## Poetry photography · external sources
 
 These are landscape photographs, not hand-drawn or newly generated illustrations. All are cropped and resized to 900 × 540 and compressed to WebP; derivative files retain their respective licenses. Attribution is shown on the cards and in `credits.html#poetry-credit`.

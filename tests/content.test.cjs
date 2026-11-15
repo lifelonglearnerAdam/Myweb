@@ -21,7 +21,12 @@ function bilingual(value, location) {
 
 test("every script has valid JavaScript syntax", () => {
   for (const file of fs.readdirSync(path.join(root, "assets/js"))) {
-    if (file.endsWith(".js")) assert.doesNotThrow(() => new vm.Script(fs.readFileSync(path.join(root, "assets/js", file), "utf8")), file);
+    if (!file.endsWith(".js")) continue;
+    const script = fs.readFileSync(path.join(root, "assets/js", file), "utf8");
+    if (/^export\s/m.test(script)) {
+      const { execFileSync } = require("node:child_process");
+      assert.doesNotThrow(() => execFileSync(process.execPath, ["--input-type=module", "--check"], { input: script }), file);
+    } else assert.doesNotThrow(() => new vm.Script(script), file);
   }
 });
 
@@ -102,6 +107,32 @@ test("the blog does not pass generated placeholder essays off as the owner's pos
   assert.ok(!source.includes('id: "beyond-the-score"'));
   assert.ok(fs.existsSync(path.join(root, "posts/README.md")));
   assert.ok(fs.existsSync(path.join(root, "posts/_drafts/template.md")));
+});
+
+test("the first visual essay separates generated artwork, real evidence and unresolved behavior", () => {
+  vm.runInNewContext(fs.readFileSync(path.join(root, "assets/js/posts.js"), "utf8"), context);
+  const note = data.notes[0];
+  assert.equal(note.id, "tor-onion-field-notes");
+  assert.equal(note.layout, "visual-story");
+  assert.equal(note.date, "2026-11-15");
+  assert.equal(note.languages.join(","), "zh", "Missing translations remain labelled as original text");
+  const source = fs.readFileSync(path.join(root, "posts/tor-onion-field-notes.md"), "utf8");
+  for (const term of ["AI 辅助", "2026-11-14", "45 秒", "未完全验收", "服务描述符", "统计基准", "gpt-image-2.6"]) assert.ok(source.includes(term), term);
+  assert.doesNotMatch(source, /\/home\/|127\.0\.0\.1|192\.168\.|7897|17997|Mieru|AnyTLS/);
+  const assets = [];
+  for (const match of source.matchAll(/!\[[^\]]+\]\(([^)]+)\)/g)) {
+    assert.match(match[1], /^assets\/images\/posts\/tor\//);
+    assert.ok(fs.existsSync(path.join(root, match[1])), match[1]);
+    assets.push(match[1]);
+  }
+  assert.ok(assets.length >= 10);
+  assets.push(note.cover);
+  assert.ok(assets.reduce((sum, file) => sum + fs.statSync(path.join(root, file)).size, 0) < 800000, "The visual essay keeps a small image payload");
+  for (const file of assets.filter(file => file.endsWith(".svg"))) {
+    const svg = fs.readFileSync(path.join(root, file), "utf8");
+    assert.match(svg, /<title/); assert.match(svg, /<desc/);
+    assert.doesNotMatch(svg, /<script|<foreignObject|https?:\/\/(?!www\.w3\.org\/2000\/svg)/);
+  }
 });
 
 test("winter study guide is complete, bilingual, and separate from original internal handouts", () => {
