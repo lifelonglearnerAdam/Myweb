@@ -111,13 +111,13 @@ test("the blog does not pass generated placeholder essays off as the owner's pos
 
 test("the first visual essay separates generated artwork, real evidence and unresolved behavior", () => {
   vm.runInNewContext(fs.readFileSync(path.join(root, "assets/js/posts.js"), "utf8"), context);
-  const note = data.notes[0];
-  assert.equal(note.id, "tor-onion-field-notes");
+  const note = data.notes.find(note => note.id === "tor-onion-field-notes");
+  assert.ok(note, "The original Tor essay remains published as newer articles are added");
   assert.equal(note.layout, "visual-story");
   assert.equal(note.date, "2026-11-15");
   assert.equal(note.languages.join(","), "zh", "Missing translations remain labelled as original text");
   const source = fs.readFileSync(path.join(root, "posts/tor-onion-field-notes.md"), "utf8");
-  for (const term of ["AI 辅助", "2026-11-14", "45 秒", "未完全验收", "服务描述符", "统计基准", "gpt-image-2.6"]) assert.ok(source.includes(term), term);
+  for (const term of ["AI 辅助", "2026-11-14", "2026-11-17", "此次修订没有重跑 Tor 测试", "45 秒", "未完全验收", "服务描述符", "统计基准", "gpt-image-2.6", "https://jvns.ca/blog/2022/12/08/a-debugging-manifesto/"]) assert.ok(source.includes(term), term);
   assert.doesNotMatch(source, /\/home\/|127\.0\.0\.1|192\.168\.|7897|17997|Mieru|AnyTLS/);
   const assets = [];
   for (const match of source.matchAll(/!\[[^\]]+\]\(([^)]+)\)/g)) {
@@ -133,6 +133,23 @@ test("the first visual essay separates generated artwork, real evidence and unre
     assert.match(svg, /<title/); assert.match(svg, /<desc/);
     assert.doesNotMatch(svg, /<script|<foreignObject|https?:\/\/(?!www\.w3\.org\/2000\/svg)/);
   }
+});
+
+test("the Windows-to-Linux article preserves workflow boundaries, sources and original language", () => {
+  vm.runInNewContext(fs.readFileSync(path.join(root, "assets/js/posts.js"), "utf8"), context);
+  const note = data.notes.find(note => note.id === "windows-to-linux-terminal-workflow");
+  assert.ok(note, "The commissioned migration article is published");
+  assert.equal(note.date, "2026-11-17");
+  assert.equal(note.layout, "article");
+  assert.equal(note.languages.join(","), "zh");
+  assert.equal(note.title.zh, note.title.en, "The English UI does not invent a translated article");
+  assert.match(note.title.zh, /从 Windows 到 Linux/);
+  assert.ok(note.toc.zh.length >= 8, "The workflow article builds a navigable directory");
+  assert.match(note.html.zh, /<pre><code class="language-bash">/);
+  const source = fs.readFileSync(path.join(root, "posts/windows-to-linux-terminal-workflow.md"), "utf8");
+  for (const term of ["LibreOffice", "Neovim", "pi", "tmux", "Ptyxis", "26 页", "修复副本", "不是装上 Linux", "AI 辅助", "没有做重启验收", "不是模型"]) assert.ok(source.includes(term), term);
+  for (const url of ["https://jvns.ca/blog/2025/01/11/getting-a-modern-terminal-setup/", "https://drewdevault.com/blog/How-new-Linux-users-succeed/", "https://karthinks.com/software/more-less-emacs/"]) assert.ok(source.includes(url), url);
+  assert.doesNotMatch(source, /\/home\/|\/run\/media\/|U\d{8,}|sk-[a-zA-Z0-9_-]{16,}|原始会话下载/);
 });
 
 test("winter study guide is complete, bilingual, and separate from original internal handouts", () => {

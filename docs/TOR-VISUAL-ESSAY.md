@@ -6,6 +6,8 @@ Public URL: https://zengzimo.cn/note.html?id=tor-onion-field-notes
 
 The owner requested a picture-led, film-like account of the Tor session as the first article. The Markdown source is `posts/tor-onion-field-notes.md`, published explicitly with `draft: false`, dated 2026-11-15. The underlying configuration and actual-browser observations were recorded on 2026-11-14. This is an AI-assisted engineering/learning record, not novel protocol research or a population-level benchmark.
 
+On 2026-11-17, the owner also requested revising this article with reference to personal technical blogs. The title and narrative now begin with the concrete routing, failure-path and search-box questions rather than reading like a protocol overview. The same slug, original publication date, nine scenes, ten body visuals and evidence remain. The final section records the revision date explicitly: no Tor observation was rerun for this editorial change. Julia Evans's [A debugging manifesto](https://jvns.ca/blog/2022/12/08/a-debugging-manifesto/) was actually read and is linked as further reading, not as evidence of this test. The companion Linux article's editorial note documents the other blog references.
+
 Do not turn the documented results into an absolute anonymity claim:
 
 - Five distinct onion service homepages rendered real page content with HTTP 200 in the installed Tor Browser: Riseup, Tor Metrics, Ahmia, Tor Project and SecureDrop.
@@ -79,4 +81,4 @@ wrangler deploy --config server/static-site/wrangler.jsonc
 
 The browser storyboard checks cover the actual first article, all local images, manual playback and its actual 20-second screen-step timer, pause on user interaction, chapter state, lightbox/focus/detail mode, theme/language changes, 390px geometry and cleanup on navigation/Back. Existing tests now count explicitly published articles rather than assuming the blog is permanently empty. Draft exclusion and browser-only fixture tests remain in place.
 
-The repository uses `main` as its default branch and `master` for its Pages mirror; synchronize without force-overwriting unrelated history. Only allowlisted public output is deployed to the Worker, not source/test logs or private material. Verify the first homepage card and the full article again on the actual custom domain after deployment.
+The repository uses `main` as its default branch and `master` for its Pages mirror; synchronize without force-overwriting unrelated history. Only allowlisted public output is deployed to the Worker, not source/test logs or private material. Verify the homepage card by its stable article slug and the full article again on the actual custom domain after deployment; later dated articles may appear before this original post.

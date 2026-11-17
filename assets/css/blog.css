@@ -78,6 +78,7 @@ body { --rail-width: 236px; --outer: max(24px,calc((100vw - 1480px)/2 + 24px)); 
 .contact-icons svg { width: 18px; height: 18px; }
 #site-footer { width: auto; max-width: none; margin-left: calc(var(--outer) + var(--rail-width) + 54px); margin-right: calc(var(--outer) + 28px); padding-bottom: 82px; }
 #page-content .document-shell,#page-content .archive-shell,#page-content .resume-shell { padding-top: 34px; }
+.note-reading-layout > * { min-width: 0; }
 .markdown-body h2,.markdown-body h3,.markdown-body h4 { scroll-margin-top: 25px; }
 .markdown-body h2 { margin: 31px 0 13px; }
 .markdown-body h3 { margin: 25px 0 11px; font-size: 18px; }

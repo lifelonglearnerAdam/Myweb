@@ -14,7 +14,8 @@ async page => {
     assert(await page.locator("#profile-sidebar").isVisible(), "sidebar is visible on desktop");
     assert(await page.locator(".site-header").evaluate(element => element.getBoundingClientRect().height === 0), "desktop has no competing top navigation bar");
     assert(await page.locator(".note-card").count() === await page.evaluate(() => window.PORTFOLIO.notes.length), "the homepage lists only explicitly published Markdown articles");
-    assert((await page.locator(".note-card").first().getAttribute("href")).includes("tor-onion-field-notes"), "the commissioned Tor essay is the first article");
+    assert((await page.locator(".note-card").first().getAttribute("href")).includes(await page.evaluate(() => window.PORTFOLIO.notes[0].id)), "the homepage follows the generated newest-first article order");
+    assert(await page.locator('.note-card[href*="tor-onion-field-notes"]').count() === 1, "the original Tor essay remains available alongside newer posts");
     assert(await page.evaluate(() => document.getElementById("writing").getBoundingClientRect().top < document.getElementById("projects").getBoundingClientRect().top), "articles come before the portfolio on the blog homepage");
     assert(await page.locator(".contact-panel").count() === 0 && await page.locator(".contact-icons").count() === 1, "contact details use small icons rather than a sales-style panel");
     const course = page.locator('#profile-sidebar [data-nav-section="courses"]');

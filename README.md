@@ -8,6 +8,8 @@
 
 从大一实践课的网页改起。现在有文章、归档、冬日共学、项目和关于我。第一篇正式文章是 [Tor 网络可视化实测](https://zengzimo.cn/note.html?id=tor-onion-field-notes)：基于真实验收记录，明确标注 AI 辅助、原创生成插画、截图与未解决问题，不用虚构日期或结果填满首页。
 
+[从 Windows 到 Linux：把日常工作搬进终端](https://zengzimo.cn/note.html?id=windows-to-linux-terminal-workflow) 记录 LibreOffice 文档兼容、Neovim 开发、终端工具协作与 pi 接入，区分终端入口和图形界面，也保留功能验收的边界。内容依据与参考博客见 [docs/LINUX-WORKFLOW-POST.md](docs/LINUX-WORKFLOW-POST.md)。
+
 ![桌面预览](docs/preview-desktop.webp)
 
 ## 以后怎么写文章
@@ -103,6 +105,7 @@ playwright-cli open http://127.0.0.1:4173/
 playwright-cli run-code --filename=tests/hover-checks.js
 playwright-cli run-code --filename=tests/resume-checks.js
 playwright-cli run-code --filename=tests/blog-checks.js
+playwright-cli run-code --filename=tests/linux-workflow-checks.js
 playwright-cli run-code --filename=tests/visual-story-checks.js
 playwright-cli run-code --filename=tests/browser-checks.js
 playwright-cli run-code --filename=tests/experience-checks.js
