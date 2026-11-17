@@ -1,5 +1,9 @@
 # Visual assets & attribution
 
+## Design reference and download source
+
+The owner credits **HUST Sukuna** and [sukuna.moe](https://sukuna.moe/) as the design reference for this website and the place where the owner downloaded shared resources. This acknowledgement does not replace individual asset creators or licenses below. It does not imply endorsement or transfer of ownership. Personal thanks to nkns and Xinhan Wang are on the site's [Thanks & credits](../../credits.html) page.
+
 ## Original site assets
 
 - `wishing-tree-scene.webp`: scene generated with `gpt-image-2.6` through the owner-configured image provider, then compressed to WebP. A pink wishing tree, reflective lake, and pale lavender mountains, inspired by the wishing-tree motif in *Fox Spirit Matchmaker*. Not an official frame or extracted game/anime asset. The earlier SVG drafts have been removed.

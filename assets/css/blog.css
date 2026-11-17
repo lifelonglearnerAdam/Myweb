@@ -100,6 +100,17 @@ body { --rail-width: 236px; --outer: max(24px,calc((100vw - 1480px)/2 + 24px)); 
 .markdown-body img { width: auto; max-width: 100%; margin: 22px auto; border-radius: 10px; }
 .markdown-body blockquote { margin: 20px 0; padding: 3px 0 3px 18px; border-left: 3px solid var(--purple); color: var(--muted); }
 .article-neighbor { display: block; padding: 20px 25px; margin-top: 13px; font-size: 13px; }
+.thanks-content { margin-top: 28px; }
+.thanks-content .thanks-list { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; padding: 0; margin-block: 18px 0; list-style: none; }
+.thanks-content .thanks-list > li { min-width: 0; padding: 20px; margin: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-soft); }
+.thanks-content .thanks-list > li::before { display: none; }
+.thanks-list h3 { margin: 10px 0 12px; font-size: 17px; line-height: 1.6; overflow-wrap: anywhere; }
+.thanks-list h3 .text-link { font: inherit; gap: 8px; }
+.thanks-list .thanks-role { font: 10px/1.8 var(--mono); color: var(--muted); }
+.thanks-list p:last-child { font-size: 13px; line-height: 1.9; }
+.thanks-page section { scroll-margin-top: 85px; }
+@media (max-width:1100px) { .thanks-content .thanks-list { grid-template-columns: 1fr; } }
+@media (max-width:580px) { .thanks-page.document-header { padding: 27px 24px; } }
 .note-reading-layout:has(> .note-article:first-child) { grid-template-columns: 1fr; }
 .winter-intro { padding: 34px 37px; }
 .winter-intro h1 { font: 500 36px/1.5 var(--serif); margin-top: 12px; }

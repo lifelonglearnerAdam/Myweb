@@ -91,7 +91,7 @@ server/susu-worker/           独立 AI 后端；凭证只在 Secret
 - 苏苏**没有冒充官方原声**，也没有克隆配音演员。复核参考站后，找到了 Shizuku 模型自带的 MP3，但那不是苏苏的声音；苏苏原声仍未加入。具体出处见 [docs/VOICE.md](docs/VOICE.md)。
 - 樱花背景和头像沿用已生成的素材；诗卡是有署名和许可的外部摄影，英文诗只摘名家原文。
 
-素材、音乐与隐私说明：[credits.html](https://zengzimo.cn/credits.html)、[图片署名](assets/images/ATTRIBUTION.md)、[音乐署名](assets/audio/ATTRIBUTION.md)。
+[致谢 / Thanks & credits](https://zengzimo.cn/credits.html) 可从侧栏和页脚进入：感谢 Sukuna 学长的网站设计与资源分享、nkns 的 Neovim 启发、王心瀚 Xinhan Wang 学长在 pi / ChatGPT 使用上的引导，也列出社区工具、图片与音乐作者及许可。[图片署名](assets/images/ATTRIBUTION.md) · [音乐署名](assets/audio/ATTRIBUTION.md)。
 
 ## 检查与发布
 
@@ -107,6 +107,7 @@ playwright-cli run-code --filename=tests/resume-checks.js
 playwright-cli run-code --filename=tests/blog-checks.js
 playwright-cli run-code --filename=tests/linux-workflow-checks.js
 playwright-cli run-code --filename=tests/language-checks.js
+playwright-cli run-code --filename=tests/thanks-checks.js
 playwright-cli run-code --filename=tests/visual-story-checks.js
 playwright-cli run-code --filename=tests/browser-checks.js
 playwright-cli run-code --filename=tests/experience-checks.js
@@ -122,4 +123,4 @@ GitHub 默认分支为 `main`，Pages 从 `master` 发布，两者同步。只�
 
 域名和备案的区别见 [docs/DOMAIN.md](docs/DOMAIN.md)。外部下载资料只存在本地课程目录，不随网站或个人代码仓库上传。
 
-设计参考：[Suwa shrine](https://sukunahust.moe/) 的博客结构。参考的是阅读与导航方式，不复制学长的文章、个人经历或下载资料到本站冒充原创。
+网站主要按 HUST [Sukuna 学长的博客](https://sukuna.moe/) 设计，资源也由本人从那里下载。具体素材仍分别保留原作者和许可，不将学长的文章、经历或分享资源冒充原创。

@@ -67,6 +67,37 @@ test("résumé coursework contains only reviewed numeric results at least 85, wi
   }
 });
 
+test("thanks preserve the owner's named mentors and individual community credits", () => {
+  const thanks = data.acknowledgements;
+  bilingual(thanks.intro, "thanks intro");
+  assert.equal(thanks.people.length, 3);
+  assert.equal(new Set(thanks.people.map(person => person.id)).size, 3);
+  for (const person of thanks.people) {
+    bilingual(person.name, `${person.id} name`);
+    bilingual(person.affiliation, `${person.id} role`);
+    bilingual(person.text, `${person.id} thanks`);
+  }
+  const sukuna = thanks.people.find(person => person.id === "sukuna");
+  assert.equal(sukuna.url, "https://sukuna.moe/");
+  assert.match(sukuna.affiliation.en, /HUST/);
+  assert.match(sukuna.text.zh, /下载/);
+  const nkns = thanks.people.find(person => person.id === "nkns");
+  assert.match(nkns.text.zh, /Neovim/);
+  assert.equal(nkns.url, undefined, "Do not guess a personal website");
+  const xinhan = thanks.people.find(person => person.id === "xinhan-wang");
+  assert.match(xinhan.name.zh, /王心瀚.*Xinhan Wang/);
+  assert.match(xinhan.text.zh, /pi.*ChatGPT/);
+  assert.equal(xinhan.url, undefined, "Do not guess a personal website");
+  for (const item of thanks.community) {
+    assert.ok(item.author.trim());
+    assert.ok(item.url.startsWith("https://"));
+    bilingual(item.text, `${item.name} credit`);
+  }
+  const app = fs.readFileSync(path.join(root, "assets/js/app.js"), "utf8");
+  for (const term of ["people-credit", "design-credit", "community-credit", "mascot-credit", "poetry-credit", "music-credit", "legeling", "Lee Galloway", "CC BY-NC 4.0", "CC BY-SA 3.0"]) assert.ok(app.includes(term), term);
+  assert.ok(!app.includes("https://sukunahust.moe"), "The public design link uses the owner's current URL");
+});
+
 test("project IDs are unique, safe, and complete in both languages", () => {
   const ids = data.projects.map(project => project.id);
   assert.equal(new Set(ids).size, ids.length);
