@@ -9,7 +9,7 @@
   };
   const requestedLanguage = new URLSearchParams(location.search).get("lang");
   const savedLanguage = storage.get("language");
-  let language = ["zh", "en"].includes(requestedLanguage) ? requestedLanguage : ["zh", "en"].includes(savedLanguage) ? savedLanguage : "zh";
+  let language = ["zh", "en"].includes(requestedLanguage) ? requestedLanguage : ["zh", "en"].includes(savedLanguage) ? savedLanguage : "en";
   let activeFilter = "all";
   let menuOpen = false;
   let sectionObserver;
@@ -171,7 +171,7 @@
   function renderNotes() {
     const root = document.getElementById("notes-list");
     if (!root) return;
-    root.innerHTML = data.notes.length ? data.notes.map(note => `<a class="note-card panel${note.cover ? " note-card-visual" : ""}" href="${localHref(`note.html?id=${note.id}`)}">${note.cover ? `<div class="note-card-cover"><img src="${escapeHTML(note.cover)}" width="1200" height="800" alt="" loading="lazy" decoding="async"><span>VISUAL FIELD NOTES ↗</span></div>` : ""}<div class="note-content"><div class="note-meta"><span>${escapeHTML(localize(note.category))}</span><span>${note.minutes} ${t("minutes")}</span>${note.date ? `<time datetime="${note.date}">${note.date}</time>` : ""}</div><h3>${escapeHTML(localize(note.title))}</h3><p>${escapeHTML(localize(note.summary))}</p></div><span class="note-arrow" aria-hidden="true">↗</span></a>`).join("") : `<div class="empty-notes panel"><span class="eyebrow">NOTES</span><h3>${t("noNotesTitle")}</h3><p>${t("noNotesText")}</p><a class="text-link" href="${localHref("winter.html")}">${t("winterRead")} ↗</a></div>`;
+    root.innerHTML = data.notes.length ? data.notes.map(note => `<a class="note-card panel${note.cover ? " note-card-visual" : ""}" href="${localHref(`note.html?id=${note.id}`)}">${note.cover ? `<div class="note-card-cover"><img src="${escapeHTML(note.cover)}" width="1200" height="800" alt="" loading="lazy" decoding="async"></div>` : ""}<div class="note-content"><div class="note-meta"><span>${escapeHTML(localize(note.category))}</span><span>${note.minutes} ${t("minutes")}</span>${note.date ? `<time datetime="${note.date}">${note.date}</time>` : ""}</div><h3>${escapeHTML(localize(note.title))}</h3><p>${escapeHTML(localize(note.summary))}</p></div><span class="note-arrow" aria-hidden="true">↗</span></a>`).join("") : `<div class="empty-notes panel"><span class="eyebrow">NOTES</span><h3>${t("noNotesTitle")}</h3><p>${t("noNotesText")}</p><a class="text-link" href="${localHref("winter.html")}">${t("winterRead")} ↗</a></div>`;
   }
   function renderPoetry() {
     document.querySelectorAll("#main-content > .poetry-card").forEach(element => element.remove());
@@ -277,13 +277,23 @@
     const index = data.notes.indexOf(note);
     const neighbors = [data.notes[index - 1], data.notes[index + 1]].filter(Boolean);
     root.innerHTML = `<a class="breadcrumb" href="${localHref("archive.html?kind=notes")}">← ${t("allNotes")}</a><article><header class="document-header panel"><p class="eyebrow">${escapeHTML(localize(note.category))}</p><h1>${escapeHTML(localize(note.title))}</h1><p class="document-lede">${escapeHTML(localize(note.summary))}</p><div class="document-meta"><span>${escapeHTML(localize(data.profile.name))}</span><span>${note.minutes} ${t("minutes")}</span>${note.date ? `<time datetime="${note.date}">${note.date}</time>` : ""}${!note.languages.includes(language) ? `<span>${t("originalLanguage")}</span>` : ""}</div></header><div class="note-reading-layout">${toc.length ? `<aside class="note-toc panel" aria-label="${t("noteToc")}"><h2>${t("noteToc")}</h2><nav>${toc.map(item => `<a href="#${item.id}" data-no-scene>${escapeHTML(item.title)}</a>`).join("")}</nav></aside>` : ""}<div class="note-article panel"><div class="prose markdown-body">${localize(note.html)}</div></div></div></article><div class="document-bottom panel"><a class="text-link" href="${localHref("archive.html?kind=notes")}">← ${t("allNotes")}</a><button class="button button-plain" type="button" data-copy-link>${icon("copy")}<span>${t("copyLink")}</span></button></div>${neighbors.map(item => `<a class="article-neighbor panel" href="${localHref(`note.html?id=${item.id}`)}">${escapeHTML(localize(item.title))} ↗</a>`).join("")}`;
+    if (note.cover && note.layout !== "visual-story") root.querySelector(".document-header").insertAdjacentHTML("afterend", `<figure class="document-cover note-cover"><img src="${escapeHTML(note.cover)}" width="1536" height="1024" alt="${language === "zh" ? "Image2.6 工作台示意图，非真实截图" : "Image2.6 workbench illustration, not a screenshot"}" fetchpriority="high" decoding="async"></figure>`);
+    if (note.layout !== "visual-story") root.querySelectorAll(".note-cover img, .markdown-body img").forEach(image => {
+      const link = document.createElement("a");
+      link.href = image.getAttribute("src");
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.setAttribute("aria-label", language === "zh" ? "查看完整插图" : "Open full illustration");
+      image.before(link);
+      link.append(image);
+    });
     if (note.layout === "visual-story") {
       const article = root.querySelector("article");
       article.classList.add("visual-article");
       const header = article.querySelector(".document-header");
       header.classList.add("story-hero");
       if (note.cover) header.insertAdjacentHTML("afterbegin", `<img class="story-hero-art" src="${escapeHTML(note.cover)}" width="1536" height="1024" alt="" fetchpriority="high" decoding="async">`);
-      import("./visual-story.js?v=1.0").then(module => {
+      import("./visual-story.js?v=1.1").then(module => {
         if (article.isConnected) storyCleanup = module.mount(article, { language, site: window.Zimo });
       }).catch(() => { /* The complete Markdown remains readable without the enhancement. */ });
     }

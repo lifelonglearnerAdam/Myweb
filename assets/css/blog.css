@@ -79,6 +79,13 @@ body { --rail-width: 236px; --outer: max(24px,calc((100vw - 1480px)/2 + 24px)); 
 #site-footer { width: auto; max-width: none; margin-left: calc(var(--outer) + var(--rail-width) + 54px); margin-right: calc(var(--outer) + 28px); padding-bottom: 82px; }
 #page-content .document-shell,#page-content .archive-shell,#page-content .resume-shell { padding-top: 34px; }
 .note-reading-layout > * { min-width: 0; }
+.note-cover { margin: 20px 0 0; background: #fcf3e7; }
+.note-cover img { max-height: 420px; object-fit: contain; }
+.note-cover a,.markdown-body a:has(> img) { display: block; position: relative; cursor: zoom-in; }
+.note-cover a::after,.markdown-body a:has(> img)::after { content: "↗"; position: absolute; right: 12px; bottom: 12px; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: rgb(25 26 35 / 75%); color: white; font-size: 13px; }
+.note-article .markdown-body > p:has(img) { margin-block: 25px 17px; }
+.note-article .markdown-body > p img { display: block; width: 100%; margin: 0; }
+.note-article .markdown-body hr { border: 0; border-top: 1px solid var(--line); margin-block: 30px 18px; }
 .markdown-body h2,.markdown-body h3,.markdown-body h4 { scroll-margin-top: 25px; }
 .markdown-body h2 { margin: 31px 0 13px; }
 .markdown-body h3 { margin: 25px 0 11px; font-size: 18px; }

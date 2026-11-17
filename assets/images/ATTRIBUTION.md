@@ -20,6 +20,20 @@ Files are limited to `posts/tor/`:
 
 The article credits its AI-assisted drafting and automated test provenance, documents failed and unresolved checks, and links to official technical explanations. Original files, raw logs, credentials and local configuration are not published. Image prompts are conceptual only and are preserved locally, not embedded in the page.
 
+## Short illustrated posts · 2026-11-17
+
+Generated with **`gpt-image-2.6` through the owner's CCSWITCH provider**:
+
+- `posts/linux/linux-cover-art.webp`: the Neovim / build / pi workbench under tmux. A drawn interface, not a real terminal capture or build result.
+- `posts/linux/office-art.webp`: content reading versus page layout. The actual Neovim setup reads DOCX content; the illustration must not be taken to claim PPTX support or pixel-identical Office compatibility.
+- `posts/linux/workflow-art.webp`: find, edit, build, test and review, with pi as an assistant. A process illustration, not test evidence.
+- `posts/linux/preview-art.webp`: inline images in Kitty versus an external viewer in the documented Ptyxis environment. Drawn windows, not screenshots.
+- `posts/tor/route-cover-art.webp`: the single-route / no-fallback idea. A metaphor, not an exact Tor topology or node count. It replaces the previous Tor cover in the current post; older generated assets remain in the repository's visual archive.
+
+Only conceptual prompts were sent. No private files, screenshots, code, credentials or connection settings were supplied. Five successful images were inspected and compressed to local WebP derivatives; together they are under 410 KB. One failed cover request was retried explicitly. Raw PNGs and per-image model/prompt provenance remain outside the repository.
+
+Both articles now use short prose and selected images; the original Tor capture is still marked as real evidence. Omitted diagrams remain available in the source repository, not loaded just to decorate the page.
+
 ## Poetry photography · external sources
 
 These are landscape photographs, not hand-drawn or newly generated illustrations. All are cropped and resized to 900 × 540 and compressed to WebP; derivative files retain their respective licenses. Attribution is shown on the cards and in `credits.html#poetry-credit`.

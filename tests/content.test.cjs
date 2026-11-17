@@ -117,7 +117,9 @@ test("the first visual essay separates generated artwork, real evidence and unre
   assert.equal(note.date, "2026-11-15");
   assert.equal(note.languages.join(","), "zh", "Missing translations remain labelled as original text");
   const source = fs.readFileSync(path.join(root, "posts/tor-onion-field-notes.md"), "utf8");
-  for (const term of ["AI 辅助", "2026-11-14", "2026-11-17", "此次修订没有重跑 Tor 测试", "45 秒", "未完全验收", "服务描述符", "统计基准", "gpt-image-2.6", "https://jvns.ca/blog/2022/12/08/a-debugging-manifesto/"]) assert.ok(source.includes(term), term);
+  for (const term of ["AI 辅助", "2026-11-14", "2026-11-17", "没重跑网络测试", "45 秒", "未完全验收", "服务描述符", "统计基准", "Image2.6", "真实截图"]) assert.ok(source.includes(term), term);
+  const prose = source.split("---").slice(2).join("---").replace(/!\[[^\]]*\]\([^)]+\)|https?:\/\/[^\s)]+/g, "");
+  assert.ok(prose.length < 1500, "The revised Tor post stays short and lets its diagrams carry the explanation");
   assert.doesNotMatch(source, /\/home\/|127\.0\.0\.1|192\.168\.|7897|17997|Mieru|AnyTLS/);
   const assets = [];
   for (const match of source.matchAll(/!\[[^\]]+\]\(([^)]+)\)/g)) {
@@ -125,7 +127,7 @@ test("the first visual essay separates generated artwork, real evidence and unre
     assert.ok(fs.existsSync(path.join(root, match[1])), match[1]);
     assets.push(match[1]);
   }
-  assert.ok(assets.length >= 10);
+  assert.equal(assets.length, 6, "The short Tor post keeps six relevant visuals instead of an introductory textbook");
   assets.push(note.cover);
   assert.ok(assets.reduce((sum, file) => sum + fs.statSync(path.join(root, file)).size, 0) < 800000, "The visual essay keeps a small image payload");
   for (const file of assets.filter(file => file.endsWith(".svg"))) {
@@ -143,12 +145,19 @@ test("the Windows-to-Linux article preserves workflow boundaries, sources and or
   assert.equal(note.layout, "article");
   assert.equal(note.languages.join(","), "zh");
   assert.equal(note.title.zh, note.title.en, "The English UI does not invent a translated article");
-  assert.match(note.title.zh, /从 Windows 到 Linux/);
-  assert.ok(note.toc.zh.length >= 8, "The workflow article builds a navigable directory");
+  assert.match(note.title.zh, /从 Windows 搬到 Linux/);
+  assert.equal(note.toc.zh.length, 5, "The short workflow post has five compact sections");
   assert.match(note.html.zh, /<pre><code class="language-bash">/);
   const source = fs.readFileSync(path.join(root, "posts/windows-to-linux-terminal-workflow.md"), "utf8");
-  for (const term of ["LibreOffice", "Neovim", "pi", "tmux", "Ptyxis", "26 页", "修复副本", "不是装上 Linux", "AI 辅助", "没有做重启验收", "不是模型"]) assert.ok(source.includes(term), term);
-  for (const url of ["https://jvns.ca/blog/2025/01/11/getting-a-modern-terminal-setup/", "https://drewdevault.com/blog/How-new-Linux-users-succeed/", "https://karthinks.com/software/more-less-emacs/"]) assert.ok(source.includes(url), url);
+  for (const term of ["LibreOffice", "Neovim", "pi", "tmux", "Ptyxis", "26 页", "原件没动", "AI 辅助", "Image2.6", "不是 Linux 自带命令"]) assert.ok(source.includes(term), term);
+  for (const url of ["https://jvns.ca/blog/2025/01/11/getting-a-modern-terminal-setup/", "https://drewdevault.com/blog/My-weird-branchless-git-workflow/", "https://karthinks.com/software/more-less-emacs/"]) assert.ok(source.includes(url), url);
+  const images = [...source.matchAll(/!\[[^\]]+\]\(([^)]+)\)/g)].map(match => match[1]);
+  assert.equal(images.length, 3);
+  images.push(note.cover);
+  for (const file of images) assert.ok(fs.existsSync(path.join(root, file)), file);
+  assert.ok(images.reduce((sum, file) => sum + fs.statSync(path.join(root, file)).size, 0) < 650000, "The four Image2.6 illustrations stay lightweight");
+  const prose = source.split("---").slice(2).join("---").replace(/!\[[^\]]*\]\([^)]+\)|https?:\/\/[^\s)]+/g, "");
+  assert.ok(prose.length < 1500, "The revised Linux post stays short rather than turning back into a report");
   assert.doesNotMatch(source, /\/home\/|\/run\/media\/|U\d{8,}|sk-[a-zA-Z0-9_-]{16,}|原始会话下载/);
 });
 

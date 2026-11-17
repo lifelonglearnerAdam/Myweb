@@ -26,14 +26,20 @@ async page => {
     await card.click();
     await page.waitForURL(`**/note.html?id=${id}*`);
     await page.waitForFunction(() => window.Zimo.page === "note" && !window.Zimo.navigation.busy);
-    assert(await page.locator("h1").count() === 1 && (await page.locator("h1").textContent()).includes("从 Windows 到 Linux"), "the real post renders with the correct direction and one primary heading");
+    assert(await page.locator("h1").count() === 1 && (await page.locator("h1").textContent()).includes("从 Windows 搬到 Linux"), "the real post renders with the correct direction and one primary heading");
     assert(await page.locator(".document-meta time").getAttribute("datetime") === "2026-11-17", "the article displays its actual writing date");
     assert(await page.locator("#profile-sidebar").isVisible(), "the article retains desktop navigation");
-    assert(await page.locator(".markdown-body pre code.language-bash").count() >= 4, "the article renders its terminal examples as code blocks");
+    assert(await page.locator(".markdown-body pre code.language-bash").count() === 1, "the short post keeps one useful command block");
+    assert(await page.locator(".note-cover img").count() === 1 && await page.locator(".markdown-body img").count() === 3, "the post uses one Image2.6 cover and three explanatory illustrations");
+    for (const image of await page.locator(".note-cover img, .markdown-body img").all()) {
+      await image.scrollIntoViewIfNeeded();
+      await image.evaluate(image => image.decode());
+      assert(await image.evaluate(image => image.complete && image.naturalWidth > 0), "each new illustration decodes successfully");
+    }
     const contents = await page.locator(".markdown-body").textContent();
     for (const term of ["LibreOffice", "Neovim", "tmux", "pi", "Ptyxis", "26 页", "AI 辅助"]) assert(contents.includes(term), `the published body contains ${term}`);
     const targets = await page.locator(".note-toc a").evaluateAll(links => links.map(link => link.hash.slice(1)));
-    assert(targets.length >= 8, "the real headings generate an article directory");
+    assert(targets.length === 5, "the short article has five navigable sections");
     assert(await page.evaluate(ids => ids.every(id => document.getElementById(id)), targets), "every directory link points to a real heading");
     await page.locator(".note-toc a").nth(1).click();
     assert(new URL(page.url()).hash.slice(1) === targets[1], "the article directory navigates to its section");
@@ -44,7 +50,7 @@ async page => {
     }
     await goto(`note.html?id=${id}&lang=en`);
     assert((await page.locator(".document-meta").textContent()).includes("Original text"), "the English UI identifies the Chinese original instead of fabricating a translation");
-    assert((await page.locator("h1").textContent()).includes("从 Windows 到 Linux"), "the original article title survives a language change");
+    assert((await page.locator("h1").textContent()).includes("从 Windows 搬到 Linux"), "the original article title survives a language change");
     for (const width of [320, 390, 768, 1024, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       for (const lang of ["zh", "en"]) {

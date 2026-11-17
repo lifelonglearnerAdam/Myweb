@@ -24,9 +24,9 @@ async page => {
     await ready();
     assert(await page.evaluate(() => window.__essayPiano === window.Zimo.music?.audio), "in-site navigation to the essay keeps the existing music instance");
     assert(await page.locator("h1").count() === 1, "one article-level h1, not one per frame");
-    assert(await page.locator(".story-scene").count() === 9 && await page.locator(".story-frame").count() === 10, "nine frames retain all ten body visuals and the source credits");
+    assert(await page.locator(".story-scene").count() === 6 && await page.locator(".story-frame").count() === 6, "the short post has six sections and six relevant body visuals");
     assert(await page.locator(".story-hero-art").count() === 1, "IMAGE2.6 cover remains separate from technical diagrams");
-    assert(await page.locator(".story-frame-art").count() === 2, "both body concept artworks are explicitly identified");
+    assert(await page.locator(".story-frame-art").count() === 1, "the retained gate artwork is identified separately from actual evidence");
     assert(!await page.evaluate(() => window.Zimo.story.playing), "auto advance never starts on its own");
     assert((await page.locator(".story-copy").allTextContents()).join(" ").includes("未完全验收"), "the unresolved Ahmia behavior remains visible, not silently removed");
     await page.screenshot({ path: ".playwright-cli/tor-essay-desktop.png" });
@@ -39,7 +39,7 @@ async page => {
     }
     await page.locator(".story-picker").selectOption("1");
     await page.waitForFunction(() => window.Zimo.story.current === 1);
-    assert((await page.locator(".story-counter").textContent()).includes("02 / 09"), "chapter selection updates the current-scene counter");
+    assert((await page.locator(".story-counter").textContent()).includes("02 / 06"), "chapter selection updates the current-scene counter");
     const imageButton = page.locator(".story-scene").nth(1).locator(".story-zoom").first();
     await imageButton.click();
     assert(await page.locator(".story-lightbox").isVisible(), "diagram opens in an accessible local modal");
@@ -63,7 +63,7 @@ async page => {
     assert((await page.locator(".story-play").getAttribute("aria-label")) === "Auto read", "story controls follow the UI language");
     assert(await page.locator(".story-controls").count() === 1, "language changes do not duplicate controls or timers");
     await page.locator("#theme-toggle").click();
-    await page.locator(".story-picker").selectOption("5");
+    await page.locator(".story-picker").selectOption("2");
     await page.screenshot({ path: ".playwright-cli/tor-essay-dark-evidence.png" });
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), "desktop dark layout has no horizontal overflow");
     await page.setViewportSize({ width: 390, height: 844 });

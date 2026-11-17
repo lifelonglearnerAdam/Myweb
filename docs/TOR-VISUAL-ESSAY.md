@@ -8,6 +8,10 @@ The owner requested a picture-led, film-like account of the Tor session as the f
 
 On 2026-11-17, the owner also requested revising this article with reference to personal technical blogs. The title and narrative now begin with the concrete routing, failure-path and search-box questions rather than reading like a protocol overview. The same slug, original publication date, nine scenes, ten body visuals and evidence remain. The final section records the revision date explicitly: no Tor observation was rerun for this editorial change. Julia Evans's [A debugging manifesto](https://jvns.ca/blog/2022/12/08/a-debugging-manifesto/) was actually read and is linked as further reading, not as evidence of this test. The companion Linux article's editorial note documents the other blog references.
 
+The owner subsequently rejected that long revision and asked for much shorter, picture-led writing. The current post is **《Tor 配好以后》**: six sections, six body visuals and about one thousand Chinese prose characters. Its new `route-cover-art.webp` was actually generated with the CCSWITCH `gpt-image-2.6` provider. The old nine-section inventory below is historical: unused assets remain in the repository but are not loaded by the short post. The gate metaphor, route diagram, browser montage, timing chart, search-box diagram and boundaries chart are retained. The hero no longer uses a giant cinematic text overlay or film-style reading hint; manual reading controls and accessible image enlargement remain.
+
+No Tor network test was rerun for this rewrite. Failed searches, first-load timeouts, cache distinctions and the original publication date remain unchanged. The original detailed protocol references and provenance remain here so they do not take over the short public article.
+
 Do not turn the documented results into an absolute anonymity claim:
 
 - Five distinct onion service homepages rendered real page content with HTTP 200 in the installed Tor Browser: Riseup, Tor Metrics, Ahmia, Tor Project and SecureDrop.
@@ -46,7 +50,7 @@ The optional derivative steps require Pillow. They select only the known artwork
 
 ## Storyboard behavior
 
-`layout: visual-story` is an opt-in Markdown presentation. A heading starts each scene, standalone images become zoomable figures, and short prose remains ordinary document content. The nine scenes include a final sources/methods frame. The Markdown HTML exists before enhancement; failure to import the optional module leaves it readable.
+`layout: visual-story` is an opt-in Markdown presentation. A heading starts each scene, standalone images become zoomable figures, and short prose remains ordinary document content. The current six scenes include a final short sources/methods section. The Markdown HTML exists before enhancement; failure to import the optional module leaves it readable.
 
 The article alone imports `assets/js/visual-story.js` and its scoped CSS. It provides:
 

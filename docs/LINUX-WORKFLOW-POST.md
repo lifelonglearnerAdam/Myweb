@@ -5,6 +5,12 @@
 - 整理日期：2026-11-17。此日期不是系统安装日期。
 - 本人明确确认迁移方向为 Windows → Linux，并要求参考其他技术作者的博客、发表至本人网站。正文标注 AI 辅助，不创建未经本人提供的英文译稿。
 
+## 当前短图文版
+
+本人反馈上一版冗长、报告腔重，明确要求大幅删字并调用 CCSWITCH 的 Image2.6。当前版本只保留五小节、一个命令块和三个正文示意图，另有一张工作台封面；正文约一千中文字符，详细依据留在本文件而不是堆回正文。四张图均由实际 `gpt-image-2.6` 请求生成，不是程序画图冒充模型结果，也不是真实截图。
+
+网站首次访问默认英文；明确的 `?lang=zh` 或已主动保存的语言偏好仍有效。文章原文保持中文，英文界面标注 Original text，不在此变更中伪造英文译稿。
+
 ## 本地记录支持的事实
 
 - 当前工作环境为 Ubuntu 26.04；终端工作台使用 Neovim / LazyVim、tmux、Yazi、lazygit、fzf、ripgrep、fd、zoxide 等。Bash 中的别名、函数与自定义 `work` 脚本可支持正文描述；它们不是 Linux 标准命令。
@@ -22,6 +28,7 @@
 
 - Julia Evans，2025-01-11：[What's involved in getting a “modern” terminal setup?](https://jvns.ca/blog/2025/01/11/getting-a-modern-terminal-setup/)。参考按 Shell、终端与应用拆解需求和配置关联的方式，不沿用作者的个人配置、年限或感受。
 - Drew DeVault，2021-12-05：[How new Linux users can increase their odds of success](https://drewdevault.com/blog/How-new-Linux-users-succeed/)。参考迁移预期与学习新工作方式的讨论；不将其中对其他平台的具体评价作为技术事实转载。
+- Drew DeVault，2020-04-06：[My unorthodox, branchless git workflow](https://drewdevault.com/blog/My-weird-branchless-git-workflow/)。追加实际阅读，参考用具体动作直接介绍个人习惯的写法，不照搬作者的 Git 分支策略。
 - Karthinks，2022-06-27：[more < less < emacs](https://karthinks.com/software/more-less-emacs/)。参考从一个小摩擦写到具体修改与边界的组织方式；没有复制 Emacs 代码或冒充本人使用 Emacs。
 
 不转载这些作者的全文、插图或个人经历；公开文章附原文链接，明确其不是本机迁移事实的依据。

@@ -4,13 +4,13 @@ export function mount(article, { language, site }) {
   const words = zh ? {
     frames: "分镜", play: "自动阅读", pause: "暂停阅读", previous: "上一镜", next: "下一镜",
     chapters: "跳到章节", close: "关闭大图", zoom: "放大图像", original: "原文与来源",
-    hint: "向下滚动，像看一部没有声音的短片。", pace: "自动阅读滚动间隔", seconds: "秒 / 屏",
+    hint: "", pace: "自动阅读滚动间隔", seconds: "秒 / 屏",
     art: "IMAGE2.6 概念插画 · 非网络拓扑或实验截图", diagram: "原理图解 · 不按物理距离绘制",
     evidence: "实际浏览器截图 · 仅作本次观察记录", references: "片尾 / 来源与方法", detail: "放大细节", fit: "适应屏幕"
   } : {
     frames: "SCENES", play: "Auto read", pause: "Pause", previous: "Previous scene", next: "Next scene",
     chapters: "Go to a chapter", close: "Close image", zoom: "Enlarge image", original: "Text & sources",
-    hint: "Scroll through a quiet, illustrated field film.", pace: "Automatic reading interval", seconds: "sec / screen",
+    hint: "", pace: "Automatic reading interval", seconds: "sec / screen",
     art: "IMAGE2.6 concept art · not topology or experimental evidence", diagram: "Explanatory diagram · not physical distances",
     evidence: "Actual browser capture · one observation, not an uptime promise", references: "CREDITS / SOURCES & METHOD", detail: "Zoom details", fit: "Fit to screen"
   };
@@ -29,7 +29,7 @@ export function mount(article, { language, site }) {
     const css = document.createElement("link");
     css.id = "visual-story-css";
     css.rel = "stylesheet";
-    css.href = new URL("../css/visual-story.css?v=1.0", import.meta.url).href;
+    css.href = new URL("../css/visual-story.css?v=1.1", import.meta.url).href;
     document.head.append(css);
   }
   const source = article.querySelector(".markdown-body");
@@ -144,10 +144,12 @@ export function mount(article, { language, site }) {
   progress.setAttribute("aria-label", words.frames);
   controls.append(count, picker, previous, play, pace, next, progress);
   layout.before(controls);
-  const hint = document.createElement("p");
-  hint.className = "story-scroll-hint";
-  hint.textContent = words.hint;
-  article.querySelector(".story-hero")?.append(hint);
+  if (words.hint) {
+    const hint = document.createElement("p");
+    hint.className = "story-scroll-hint";
+    hint.textContent = words.hint;
+    article.querySelector(".story-hero")?.append(hint);
+  }
 
   const dialog = document.createElement("dialog");
   dialog.className = "story-lightbox";
