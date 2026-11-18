@@ -29,7 +29,7 @@ async page => {
     assert(await page.locator("h1").count() === 1 && (await page.locator("h1").textContent()).includes("从 Windows 搬到 Linux"), "the real post renders with the correct direction and one primary heading");
     assert(await page.locator(".document-meta time").getAttribute("datetime") === "2026-11-17", "the article displays its actual writing date");
     assert(await page.locator("#profile-sidebar").isVisible(), "the article retains desktop navigation");
-    assert(await page.locator(".markdown-body pre code.language-bash").count() === 1, "the short post keeps one useful command block");
+    assert(await page.locator(".markdown-body pre code.language-bash").count() === 3, "readers get a PDF export command and both steps of a runnable local exercise");
     assert(await page.locator(".note-cover img").count() === 1 && await page.locator(".markdown-body img").count() === 3, "the post uses one Image2.6 cover and three explanatory illustrations");
     for (const image of await page.locator(".note-cover img, .markdown-body img").all()) {
       await image.scrollIntoViewIfNeeded();
@@ -37,7 +37,7 @@ async page => {
       assert(await image.evaluate(image => image.complete && image.naturalWidth > 0), "each new illustration decodes successfully");
     }
     const contents = await page.locator(".markdown-body").textContent();
-    for (const term of ["LibreOffice", "Neovim", "tmux", "pi", "Ptyxis", "26 页", "AI 辅助"]) assert(contents.includes(term), `the published body contains ${term}`);
+    for (const term of ["LibreOffice", "Neovim", "tmux", "pi", "Ptyxis", "26 页", "AI 辅助", "pdfinfo", "check=1", "check=0"]) assert(contents.includes(term), `the published body contains ${term}`);
     const targets = await page.locator(".note-toc a").evaluateAll(links => links.map(link => link.hash.slice(1)));
     assert(targets.length === 5, "the short article has five navigable sections");
     assert(await page.evaluate(ids => ids.every(id => document.getElementById(id)), targets), "every directory link points to a real heading");

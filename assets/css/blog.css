@@ -93,15 +93,16 @@ body { --rail-width: 236px; --outer: max(24px,calc((100vw - 1480px)/2 + 24px)); 
 .markdown-body ul,.markdown-body ol { padding-left: 22px; list-style: revert; margin-block: 15px; }
 .markdown-body li { padding-left: 0; }
 .markdown-body li::before { display: none; }
-.markdown-body pre { overflow-x: auto; padding: 18px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-soft); margin-block: 20px; font: 12px/1.8 var(--mono); }
+.markdown-body pre,.story-copy pre { overflow-x: auto; padding: 18px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-soft); margin-block: 20px; font: 12px/1.8 var(--mono); }
 .markdown-body code { font-family: var(--mono); }
+.story-copy pre > code { padding: 0; background: none; font: inherit; }
 .markdown-body p code { padding: 2px 5px; background: var(--lilac); border-radius: 4px; font-size: .88em; }
 .markdown-body a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 .markdown-body img { width: auto; max-width: 100%; margin: 22px auto; border-radius: 10px; }
 .markdown-body blockquote { margin: 20px 0; padding: 3px 0 3px 18px; border-left: 3px solid var(--purple); color: var(--muted); }
 .article-neighbor { display: block; padding: 20px 25px; margin-top: 13px; font-size: 13px; }
 .thanks-content { margin-top: 28px; }
-.thanks-content .thanks-list { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; padding: 0; margin-block: 18px 0; list-style: none; }
+.thanks-content .thanks-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; padding: 0; margin-block: 18px 0; list-style: none; }
 .thanks-content .thanks-list > li { min-width: 0; padding: 20px; margin: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-soft); }
 .thanks-content .thanks-list > li::before { display: none; }
 .thanks-list h3 { margin: 10px 0 12px; font-size: 17px; line-height: 1.6; overflow-wrap: anywhere; }
@@ -109,7 +110,7 @@ body { --rail-width: 236px; --outer: max(24px,calc((100vw - 1480px)/2 + 24px)); 
 .thanks-list .thanks-role { font: 10px/1.8 var(--mono); color: var(--muted); }
 .thanks-list p:last-child { font-size: 13px; line-height: 1.9; }
 .thanks-page section { scroll-margin-top: 85px; }
-@media (max-width:1100px) { .thanks-content .thanks-list { grid-template-columns: 1fr; } }
+@media (max-width:640px) { .thanks-content .thanks-list { grid-template-columns: 1fr; } }
 @media (max-width:580px) { .thanks-page.document-header { padding: 27px 24px; } }
 .note-reading-layout:has(> .note-article:first-child) { grid-template-columns: 1fr; }
 .winter-intro { padding: 34px 37px; }

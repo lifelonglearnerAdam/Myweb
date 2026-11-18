@@ -19,6 +19,12 @@ function bilingual(value, location) {
   }
 }
 
+function proseLength(source) {
+  return source.split("---").slice(2).join("---")
+    .replace(/^```[^\n]*\n[\s\S]*?^```[ \t]*$/gm, "")
+    .replace(/!\[[^\]]*\]\([^)]+\)|https?:\/\/[^\s)]+/g, "").length;
+}
+
 test("every script has valid JavaScript syntax", () => {
   for (const file of fs.readdirSync(path.join(root, "assets/js"))) {
     if (!file.endsWith(".js")) continue;
@@ -70,8 +76,7 @@ test("résumé coursework contains only reviewed numeric results at least 85, wi
 test("thanks preserve the owner's named mentors and individual community credits", () => {
   const thanks = data.acknowledgements;
   bilingual(thanks.intro, "thanks intro");
-  assert.equal(thanks.people.length, 3);
-  assert.equal(new Set(thanks.people.map(person => person.id)).size, 3);
+  assert.equal(new Set(thanks.people.map(person => person.id)).size, thanks.people.length);
   for (const person of thanks.people) {
     bilingual(person.name, `${person.id} name`);
     bilingual(person.affiliation, `${person.id} role`);
@@ -88,6 +93,11 @@ test("thanks preserve the owner's named mentors and individual community credits
   assert.match(xinhan.name.zh, /王心瀚.*Xinhan Wang/);
   assert.match(xinhan.text.zh, /pi.*ChatGPT/);
   assert.equal(xinhan.url, undefined, "Do not guess a personal website");
+  const dongliang = thanks.people.find(person => person.id === "dongliang-luo");
+  assert.match(dongliang.name.zh, /罗东亮.*Dongliang Luo/);
+  assert.match(dongliang.text.zh, /介绍.*刘禹良.*Yuliang Liu.*最早.*稳定.*VPN/);
+  assert.match(dongliang.text.en, /Yuliang Liu.*first reliable VPN/);
+  assert.doesNotMatch(JSON.stringify(dongliang), /https?:\/\/|\b\d{1,3}(\.\d{1,3}){3}\b/, "Do not publish private endpoints or invent a personal URL");
   for (const item of thanks.community) {
     assert.ok(item.author.trim());
     assert.ok(item.url.startsWith("https://"));
@@ -148,10 +158,11 @@ test("the first visual essay separates generated artwork, real evidence and unre
   assert.equal(note.date, "2026-11-15");
   assert.equal(note.languages.join(","), "zh", "Missing translations remain labelled as original text");
   const source = fs.readFileSync(path.join(root, "posts/tor-onion-field-notes.md"), "utf8");
-  for (const term of ["AI 辅助", "2026-11-14", "2026-11-17", "没重跑网络测试", "45 秒", "未完全验收", "服务描述符", "统计基准", "Image2.6", "真实截图"]) assert.ok(source.includes(term), term);
-  const prose = source.split("---").slice(2).join("---").replace(/!\[[^\]]*\]\([^)]+\)|https?:\/\/[^\s)]+/g, "");
-  assert.ok(prose.length < 1500, "The revised Tor post stays short and lets its diagrams carry the explanation");
-  assert.doesNotMatch(source, /\/home\/|127\.0\.0\.1|192\.168\.|7897|17997|Mieru|AnyTLS/);
+  for (const term of ["AI 辅助", "2026-11-14", "18 日补本机对照", "没重跑 Tor 网络测试", "45 秒", "未完全验收", "服务描述符", "统计基准", "Image2.6", "真实截图", "https://check.torproject.org/", "--noproxy ''", "exit=7"]) assert.ok(source.includes(term), term);
+  assert.ok(proseLength(source) < 1500, "The Tor post stays short while giving readers testable examples");
+  // Allow only the harmless loopback endpoints in the standalone reader exercise.
+  const publicText = source.replace(/^```bash\n[\s\S]*?^```$/gm, code => code.replace(/--bind 127\.0\.0\.1|http:\/\/127\.0\.0\.1:1808[01]\b/g, "loopback sample"));
+  assert.doesNotMatch(publicText, /\/home\/|127\.0\.0\.1|192\.168\.|7897|17997|Mieru|AnyTLS/);
   const assets = [];
   for (const match of source.matchAll(/!\[[^\]]+\]\(([^)]+)\)/g)) {
     assert.match(match[1], /^assets\/images\/posts\/tor\//);
@@ -180,15 +191,14 @@ test("the Windows-to-Linux article preserves workflow boundaries, sources and or
   assert.equal(note.toc.zh.length, 5, "The short workflow post has five compact sections");
   assert.match(note.html.zh, /<pre><code class="language-bash">/);
   const source = fs.readFileSync(path.join(root, "posts/windows-to-linux-terminal-workflow.md"), "utf8");
-  for (const term of ["LibreOffice", "Neovim", "pi", "tmux", "Ptyxis", "26 页", "原件没动", "AI 辅助", "Image2.6", "不是 Linux 自带命令"]) assert.ok(source.includes(term), term);
+  for (const term of ["LibreOffice", "Neovim", "pi", "tmux", "Ptyxis", "26 页", "原件没动", "AI 辅助", "Image2.6", "不是 Linux 自带命令", "pdfinfo", "git init -q", "grep -x Linux", "check=1", "check=0"]) assert.ok(source.includes(term), term);
   for (const url of ["https://jvns.ca/blog/2025/01/11/getting-a-modern-terminal-setup/", "https://drewdevault.com/blog/My-weird-branchless-git-workflow/", "https://karthinks.com/software/more-less-emacs/"]) assert.ok(source.includes(url), url);
   const images = [...source.matchAll(/!\[[^\]]+\]\(([^)]+)\)/g)].map(match => match[1]);
   assert.equal(images.length, 3);
   images.push(note.cover);
   for (const file of images) assert.ok(fs.existsSync(path.join(root, file)), file);
   assert.ok(images.reduce((sum, file) => sum + fs.statSync(path.join(root, file)).size, 0) < 650000, "The four Image2.6 illustrations stay lightweight");
-  const prose = source.split("---").slice(2).join("---").replace(/!\[[^\]]*\]\([^)]+\)|https?:\/\/[^\s)]+/g, "");
-  assert.ok(prose.length < 1500, "The revised Linux post stays short rather than turning back into a report");
+  assert.ok(proseLength(source) < 1500, "The Linux post stays short while keeping directly usable examples");
   assert.doesNotMatch(source, /\/home\/|\/run\/media\/|U\d{8,}|sk-[a-zA-Z0-9_-]{16,}|原始会话下载/);
 });
 

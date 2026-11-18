@@ -19,7 +19,16 @@ LibreOffice 接住 DOCX 和 PPTX，Neovim 里的 DOCX 插件用来快速读正�
 
 上次一份 PPTX 死活打不开，其他文件却正常。最后查到内部索引的兼容问题，规范后，副本的 26 页都能读了。原件没动。
 
-能打开，不代表分页、字体和动画都一样。要交的文件，还是打开看一遍。
+要交 PDF 时，可以在 `report.docx` 所在目录跑这几行。需要 LibreOffice 和 `pdfinfo`（Ubuntu 的 `poppler-utils` 包）：
+
+```bash
+out=$(mktemp -d)
+libreoffice -env:UserInstallation="file://$out/profile" \
+  --headless --convert-to pdf --outdir "$out" report.docx
+test -s "$out/report.pdf" && pdfinfo "$out/report.pdf"
+```
+
+临时目录不会混进旧 PDF。看到页数，说明这次确实导出了文件；用 `xdg-open "$out/report.pdf"` 再看分页和字体。
 
 # 一个目录，几个窗格
 
@@ -27,23 +36,29 @@ LibreOffice 接住 DOCX 和 PPTX，Neovim 里的 DOCX 插件用来快速读正�
 
 Neovim 写，另一个窗格编译，pi 放旁边。tmux 管会话，Yazi 找文件，lazygit 看改动。没必要把每件事都塞成编辑器插件。
 
-CMake 项目里，编辑完就回到这几步：
+不用先找一个 CMake 工程。有 `git`、`cc`（Ubuntu 可装 `build-essential`）和 `nvim`，就能从空目录跑一遍：
 
 ```bash
-cmake -S . -B build -G Ninja \
-  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-cmake --build build
-ctest --test-dir build --output-on-failure
-git diff
+dir=$(mktemp -d) && cd "$dir" && git init -q &&
+  printf '%s\n' '#include <stdio.h>' \
+    'int main(void) { puts("Windows"); }' > hello.c &&
+  git add hello.c
 ```
 
-这是已有 CMake 项目的用法，依赖和测试要先配好。补全再聪明，最后也得让编译器和测试说话。
+`git add` 先存一份对照，不用提交。下面这段先跑一次：能编译，但 `check=1`，因为输出不是 `Linux`。
+
+```bash
+cc -Wall -Wextra hello.c -o hello &&
+  ./hello | grep -x Linux
+echo "check=$?"
+git diff -- hello.c
+```
+
+运行 `nvim hello.c`。按 `Esc`，输入 `:%s/Windows/Linux/` 回车，再输入 `:wq` 回车。重跑同一段：这次打印 `Linux` 和 `check=0`，diff 只有一行被替换。编译通过和程序做对，是两件事。
 
 # pi 就坐在旁边
 
-在项目目录运行 `pi`。读报错、查代码、看差异，省掉来回复制粘贴。
-
-学新东西时，我会让它先解释，别急着改。改完看 diff，再跑测试。接的是模型服务，别把密钥和私有材料顺手喂进去。
+也可以在改代码前，在练习目录运行已配置好的 `pi`。问它：「只读 `hello.c`，解释为什么编译成功，检查却返回 1；先别改文件。」看完解释，自己改、跑、看 diff。别把私有材料顺手喂进去。
 
 # 看图这件小事
 
@@ -53,13 +68,9 @@ Kitty 能内嵌图片，Ptyxis 这套环境不行。后来让 Neovim 直接叫�
 
 我想要的是顺手，不是为了“全终端”三个字跟一张 PNG 较劲。
 
-# 记在这里
+# 接回工作台
 
-- tmux 能接回会话，不替你保存文件，也不保证重启后任务还在。
-- Neovim 不在保存时自动格式化；需要时手动来。
-- `work`、`v`、`y` 是我自己的脚本、别名或函数，不是 Linux 自带命令。
-
-配置还会改。这篇先记现在能用的部分。
+`tmux new-session -A -s desk` 创建或接回会话。按 `Ctrl-b`，松开再按 `d` 断开，程序继续运行；这不等于跨重启保存。我的 `work`、`v`、`y` 是自定义入口，不是 Linux 自带命令。
 
 ---
 

@@ -29,6 +29,7 @@ async page => {
     assert(await page.locator(".story-frame-art").count() === 1, "the retained gate artwork is identified separately from actual evidence");
     assert(!await page.evaluate(() => window.Zimo.story.playing), "auto advance never starts on its own");
     assert((await page.locator(".story-copy").allTextContents()).join(" ").includes("未完全验收"), "the unresolved Ahmia behavior remains visible, not silently removed");
+    assert(await page.locator(".story-copy pre code.language-bash").count() === 2 && (await page.locator(".story-copy").allTextContents()).join(" ").includes("exit=7"), "the loopback exercise and expected failure survive storyboard enhancement");
     await page.screenshot({ path: ".playwright-cli/tor-essay-desktop.png" });
     for (const scene of await page.locator(".story-scene").all()) {
       await scene.scrollIntoViewIfNeeded();
@@ -69,6 +70,9 @@ async page => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.locator(".story-picker").selectOption("0");
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), "the 390px phone layout fits without cropping the article");
+    await page.setViewportSize({ width: 320, height: 800 });
+    assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1) && await page.locator(".story-copy pre").evaluateAll(blocks => blocks.every(block => block.getBoundingClientRect().right <= innerWidth + 1)), "long shell examples scroll within their blocks on 320px phones");
+    await page.setViewportSize({ width: 390, height: 844 });
     await page.screenshot({ path: ".playwright-cli/tor-essay-mobile.png" });
     const phoneImage = page.locator(".story-scene").first().locator(".story-zoom");
     await phoneImage.click();

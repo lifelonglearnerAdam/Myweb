@@ -35,6 +35,10 @@ window.PORTFOLIO = {
       {
         id: "xinhan-wang", name: { zh: "王心瀚 · Xinhan Wang 学长", en: "Xinhan Wang · 王心瀚" }, affiliation: { zh: "pi & ChatGPT", en: "pi & ChatGPT" },
         text: { zh: "我使用 pi 和 ChatGPT 的引路人。", en: "He guided me into using pi and ChatGPT." }
+      },
+      {
+        id: "dongliang-luo", name: { zh: "罗东亮 · Dongliang Luo", en: "Dongliang Luo · 罗东亮" }, affiliation: { zh: "实验室 · 网络支持", en: "Lab introduction & network access" },
+        text: { zh: "他介绍我进入刘禹良（Yuliang Liu）实验室，也最早给我提供了稳定的 VPN 通道。", en: "He introduced me to the lab of Yuliang Liu (刘禹良) and helped me join it. He also provided my first reliable VPN connection." }
       }
     ],
     community: [

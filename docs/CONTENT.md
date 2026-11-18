@@ -45,9 +45,9 @@
 
 ## 致谢与资源来源
 
-本人明确要求公开致谢：HUST Sukuna 学长（网站按照 `https://sukuna.moe/` 设计，资源也从该站下载）、nkns（启发本人接触 Neovim）、王心瀚 Xinhan Wang 学长（pi 与 ChatGPT 的引路人）。仅 Sukuna 的链接由本人提供；不猜测另外两人的主页、账号或联系方式。当前网络未能打开 Sukuna 站点，链接按本人指定更新，不伪称已在线复核。
+本人明确要求公开致谢：HUST Sukuna 学长（网站按照 `https://sukuna.moe/` 设计，资源也从该站下载）、nkns（启发本人接触 Neovim）、王心瀚 Xinhan Wang 学长（pi 与 ChatGPT 的引路人）、罗东亮 Dongliang Luo（介绍本人进入刘禹良 Yuliang Liu 实验室，并最早提供稳定的 VPN 通道）。不公开 VPN 地址、配置或实验室内部资料，不把引荐写成正式职务或背书。仅 Sukuna 的链接由本人提供；不猜测其他人的主页、账号或联系方式。当前网络未能打开 Sukuna 站点，链接按本人指定更新，不伪称已在线复核。
 
-`credits.html` 从原有素材说明页扩展为侧栏可见的“致谢 / Thanks & credits”，保留所有素材作者、许可、隐私说明与旧锚点。Sukuna 是设计与下载来源的致谢，不因此覆盖 legeling、摄影作者、音乐演奏者及其他具体资源的作者权利。不声称三位学长为本站背书。
+`credits.html` 从原有素材说明页扩展为侧栏可见的“致谢 / Thanks & credits”，保留所有素材作者、许可、隐私说明与旧锚点。Sukuna 是设计与下载来源的致谢，不因此覆盖 legeling、摄影作者、音乐演奏者及其他具体资源的作者权利。不声称致谢对象为本站背书。
 
 ## 不应添加的内容
 

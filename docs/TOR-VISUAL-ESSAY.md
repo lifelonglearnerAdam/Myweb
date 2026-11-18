@@ -10,7 +10,7 @@ On 2026-11-17, the owner also requested revising this article with reference to 
 
 The owner subsequently rejected that long revision and asked for much shorter, picture-led writing. The current post is **《Tor 配好以后》**: six sections, six body visuals and about one thousand Chinese prose characters. Its new `route-cover-art.webp` was actually generated with the CCSWITCH `gpt-image-2.6` provider. The old nine-section inventory below is historical: unused assets remain in the repository but are not loaded by the short post. The gate metaphor, route diagram, browser montage, timing chart, search-box diagram and boundaries chart are retained. The hero no longer uses a giant cinematic text overlay or film-style reading hint; manual reading controls and accessible image enlargement remain.
 
-No Tor network test was rerun for this rewrite. Failed searches, first-load timeouts, cache distinctions and the original publication date remain unchanged. The original detailed protocol references and provenance remain here so they do not take over the short public article.
+No Tor network test was rerun for this rewrite. A separate reader exercise was run with Python and curl on loopback only: direct HTTP returned 200; explicitly requiring an unused local proxy returned curl exit 7 even with NO_PROXY set for loopback. This illustrates why a successful page load does not establish the required path, not that Tor or its isolation was retested. Failed searches, first-load timeouts, cache distinctions and the original publication date remain unchanged. The original detailed protocol references and provenance remain here so they do not take over the short public article.
 
 Do not turn the documented results into an absolute anonymity claim:
 
