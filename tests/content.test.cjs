@@ -98,6 +98,11 @@ test("thanks preserve the owner's named mentors and individual community credits
   assert.match(dongliang.text.zh, /介绍.*刘禹良.*Yuliang Liu.*最早.*稳定.*VPN/);
   assert.match(dongliang.text.en, /Yuliang Liu.*first reliable VPN/);
   assert.doesNotMatch(JSON.stringify(dongliang), /https?:\/\/|\b\d{1,3}(\.\d{1,3}){3}\b/, "Do not publish private endpoints or invent a personal URL");
+  const yinmin = thanks.people.find(person => person.id === "yinmin-zhong");
+  assert.match(yinmin.name.zh, /钟寅敏.*Yinmin Zhong/);
+  assert.match(yinmin.affiliation.zh, /北京大学/);
+  assert.match(yinmin.text.zh, /开源项目《CS 自学指南》.*启发/);
+  assert.equal(yinmin.url, "https://csdiy.wiki/");
   for (const item of thanks.community) {
     assert.ok(item.author.trim());
     assert.ok(item.url.startsWith("https://"));

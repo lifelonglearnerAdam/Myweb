@@ -24,7 +24,7 @@ async page => {
       await goto(`credits.html?lang=${lang}`);
       assert(await page.locator("h1").count() === 1, `one primary heading in ${lang}`);
       assert(await page.locator('[data-nav-section="thanks"]').getAttribute("aria-current") === "location", `Thanks is the active navigation item in ${lang}`);
-      for (const id of ["sukuna", "nkns", "xinhan-wang", "dongliang-luo"]) assert(await page.locator(`[data-thanks-person="${id}"]`).count() === 1, `${id} is credited once in ${lang}`);
+      for (const id of ["sukuna", "nkns", "xinhan-wang", "dongliang-luo", "yinmin-zhong"]) assert(await page.locator(`#people-credit [data-thanks-person="${id}"]`).count() === 1, `${id} is credited once in ${lang}`);
       const sukuna = page.locator('[data-thanks-person="sukuna"]');
       const link = sukuna.locator('a[href="https://sukuna.moe/"]');
       assert(await link.count() === 1 && await link.getAttribute("target") === "_blank" && (await link.getAttribute("rel")).includes("noopener"), `Sukuna has the exact supplied safe link in ${lang}`);
@@ -34,7 +34,11 @@ async page => {
       assert(["王心瀚", "Xinhan Wang", "pi", "ChatGPT"].every(term => xinhan.includes(term)), `Xinhan Wang's name and guidance are credited in ${lang}`);
       const dongliang = await page.locator('[data-thanks-person="dongliang-luo"]').textContent();
       assert(["罗东亮", "Dongliang Luo", "刘禹良", "Yuliang Liu", "VPN"].every(term => dongliang.includes(term)), `Dongliang Luo’s lab introduction and early VPN support are credited in ${lang}`);
-      assert(await page.locator('[data-thanks-person]:not([data-thanks-person="sukuna"]) a').count() === 0, `no personal URLs are invented in ${lang}`);
+      const yinmin = page.locator('#people-credit [data-thanks-person="yinmin-zhong"]');
+      const credit = await yinmin.innerText();
+      assert(await yinmin.isVisible() && ["钟寅敏", "Yinmin Zhong", lang === "zh" ? "北京大学" : "Peking University", lang === "zh" ? "开源项目《CS 自学指南》" : "open-source guide, CS DIY"].every(term => credit.includes(term)), `Yinmin Zhong and his guide are visible in People in ${lang}`);
+      assert(await yinmin.getByRole("link").getAttribute("href") === "https://csdiy.wiki/", `Yinmin Zhong links to the supplied project in ${lang}`);
+      assert(await page.locator('[data-thanks-person]:not([data-thanks-person="sukuna"]):not([data-thanks-person="yinmin-zhong"]) a').count() === 0, `no personal URLs are invented in ${lang}`);
       for (const section of ["people-credit", "design-credit", "community-credit", "mascot-credit", "poetry-credit", "music-credit"]) assert(await page.locator(`#${section}`).count() === 1, `${section} remains addressable in ${lang}`);
       const body = await page.locator(".thanks-page").textContent();
       for (const term of ["Neovim contributors", "folke", "Mario Zechner", "legeling", "Lee Galloway", "CC BY-NC 4.0", "CC BY-SA 3.0"]) assert(body.includes(term), `${term} credit survives in ${lang}`);

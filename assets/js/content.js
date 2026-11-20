@@ -39,6 +39,11 @@ window.PORTFOLIO = {
       {
         id: "dongliang-luo", name: { zh: "罗东亮 · Dongliang Luo", en: "Dongliang Luo · 罗东亮" }, affiliation: { zh: "实验室 · 网络支持", en: "Lab introduction & network access" },
         text: { zh: "他介绍我进入刘禹良（Yuliang Liu）实验室，也最早给我提供了稳定的 VPN 通道。", en: "He introduced me to the lab of Yuliang Liu (刘禹良) and helped me join it. He also provided my first reliable VPN connection." }
+      },
+      {
+        id: "yinmin-zhong", name: { zh: "钟寅敏（Yinmin Zhong）", en: "Yinmin Zhong · 钟寅敏" }, affiliation: { zh: "北京大学 · csdiy.wiki", en: "Peking University · csdiy.wiki" },
+        text: { zh: "自学计算机科学时，我从他的开源项目《CS 自学指南》中得到了很多启发。", en: "His open-source guide, CS DIY, has shaped how I study computer science on my own." },
+        url: "https://csdiy.wiki/"
       }
     ],
     community: [
