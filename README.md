@@ -91,7 +91,7 @@ server/susu-worker/           独立 AI 后端；凭证只在 Secret
 - 苏苏**没有冒充官方原声**，也没有克隆配音演员。复核参考站后，找到了 Shizuku 模型自带的 MP3，但那不是苏苏的声音；苏苏原声仍未加入。具体出处见 [docs/VOICE.md](docs/VOICE.md)。
 - 樱花背景和头像沿用已生成的素材；诗卡是有署名和许可的外部摄影，英文诗只摘名家原文。
 
-[致谢 / Thanks & credits](https://zengzimo.cn/credits.html) 可从侧栏和页脚进入：感谢 Sukuna 学长的网站设计与资源分享、nkns 的 Neovim 启发、王心瀚 Xinhan Wang 学长在 pi / ChatGPT 使用上的引导，以及罗东亮 Dongliang Luo 在实验室引荐与早期网络接入上的帮助。也感谢北京大学的钟寅敏（Yinmin Zhong），他的开源项目[《CS 自学指南》](https://csdiy.wiki/)给了我很多启发。下方也列出社区工具、图片与音乐作者及许可。[图片署名](assets/images/ATTRIBUTION.md) · [音乐署名](assets/audio/ATTRIBUTION.md)。
+[致谢 / Thanks & credits](https://zengzimo.cn/credits.html) 可从侧栏和页脚进入：感谢 Sukuna 学长的网站设计与资源分享、nkns 的 Neovim 启发、王心瀚 Xinhan Wang 学长在 pi / ChatGPT 使用上的引导，以及罗东亮 Dongliang Luo 在实验室引荐与早期网络接入上的帮助。也感谢北京大学的钟寅敏（Yinmin Zhong），他的开源项目[《CS 自学指南》](https://csdiy.wiki/)给了我很多启发。[自学资源致谢](https://zengzimo.cn/credits?lang=zh#study-credit) 也列出了 [1037.wiki](https://1037.wiki/) 和分享课程资料的同学。下方也列出社区工具、图片与音乐作者及许可。[图片署名](assets/images/ATTRIBUTION.md) · [音乐署名](assets/audio/ATTRIBUTION.md)。
 
 ## 检查与发布
 
@@ -121,6 +121,6 @@ wrangler deploy --config server/static-site/wrangler.jsonc
 
 GitHub 默认分支为 `main`，Pages 从 `master` 发布，两者同步。只暂存确认要公开的文件，别直接把目录里的个人图片或资料包 `git add -A`。原始 `css/`、`js/` 不再被新版引用，保留以免覆盖之前的本地改动。
 
-域名和备案的区别见 [docs/DOMAIN.md](docs/DOMAIN.md)。外部下载资料只存在本地课程目录，不随网站或个人代码仓库上传。
+站点地图与 Google、Bing、百度的主动提交方法见 [docs/SEARCH.md](docs/SEARCH.md)。域名和备案的区别见 [docs/DOMAIN.md](docs/DOMAIN.md)。外部下载资料只存在本地课程目录，不随网站或个人代码仓库上传。
 
 网站主要按 HUST [Sukuna 学长的博客](https://sukuna.moe/) 设计，资源也由本人从那里下载。具体素材仍分别保留原作者和许可，不将学长的文章、经历或分享资源冒充原创。

@@ -46,6 +46,10 @@ window.PORTFOLIO = {
         url: "https://csdiy.wiki/"
       }
     ],
+    studyResources: [
+      { name: { zh: "CS 自学指南", en: "CS DIY" }, url: "https://csdiy.wiki/", text: { zh: "钟寅敏的计算机自学指南。", en: "Yinmin Zhong’s guide to studying computer science independently." } },
+      { name: "1037.wiki", url: "https://1037.wiki/", text: { zh: "感谢华中科技大学冰岩作坊搭建这个平台，也谢谢在上面分享课程笔记和复习资料的同学。", en: "Thanks to Bingyan Studio at HUST for building this platform, and to the students who share their course notes and study materials there." } }
+    ],
     community: [
       { name: "Neovim", author: "Neovim contributors", url: "https://github.com/neovim/neovim", text: { zh: "编辑器与社区文档。", en: "The editor and its community documentation." } },
       { name: "LazyVim", author: "folke & contributors", url: "https://github.com/LazyVim/LazyVim", text: { zh: "我的 Neovim 配置起点。", en: "The starting point for my Neovim setup." } },

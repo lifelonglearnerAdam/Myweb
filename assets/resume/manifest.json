@@ -1,19 +1,19 @@
 {
   "sourceHashes": {
-    "resume.html": "0e1d76c681ff9927c08fa5b07e644966bbb8778cf1084a1b35d36e478909340e",
-    "assets/js/content.js": "98c23419a0bab769e627b2ed87fb8103161de44509d3f2312cab477a95c8de93",
-    "assets/js/app.js": "9f0a8b2e9a40fea25bcba62f197a69e57b62b57fa48b68e04e8eda8d760746de",
+    "resume.html": "529169c40cbfc7779a36d14b3eef20fea592e9fb1b9cf3f1d39f8064a6623603",
+    "assets/js/content.js": "a05252e640d872f6bb53b62db6eadee342fbf85f3b08de44f97fd7049950ea86",
+    "assets/js/app.js": "d5e6ad87768e04e143312976cce46dc368cd35c574324678f6a1071ad9843558",
     "assets/css/site.css": "7350fa724208fdf9a61e18b6567d75f0a06928a5f0d28d49a92b047676037f22",
     "assets/css/blog.css": "ba506cc58b531481693d1c7a0445b951686f2236851703391d77824d77d7e0b7",
     "assets/js/theme-init.js": "687091ed4742b0becfc30748812b413ebbf07d84b8e105a1c280e5823223eb3d"
   },
   "files": {
     "Zimo-Zeng-Resume-zh.pdf": {
-      "sha256": "f6ff7da7b5294b4ddb625a7faaa8173c31d99496ba13897ac02f53e1f178bcb9",
+      "sha256": "b26045e878698353e8cad1c39ab9119ba11de23aab9d114af69df81a98172dc8",
       "bytes": 410562
     },
     "Zimo-Zeng-Resume-en.pdf": {
-      "sha256": "4d689fc58e001d0971228e601d7045f444866af9b4260b73b825d6e5511188cb",
+      "sha256": "14fa9e9bbd407571a3616ea1e2668755f474193b86017556f8d83e36547f6ca2",
       "bytes": 69569
     }
   }

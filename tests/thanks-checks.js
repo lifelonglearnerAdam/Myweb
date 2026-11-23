@@ -40,6 +40,9 @@ async page => {
       assert(await yinmin.getByRole("link").getAttribute("href") === "https://csdiy.wiki/", `Yinmin Zhong links to the supplied project in ${lang}`);
       assert(await page.locator('[data-thanks-person]:not([data-thanks-person="sukuna"]):not([data-thanks-person="yinmin-zhong"]) a').count() === 0, `no personal URLs are invented in ${lang}`);
       for (const section of ["people-credit", "design-credit", "community-credit", "mascot-credit", "poetry-credit", "music-credit"]) assert(await page.locator(`#${section}`).count() === 1, `${section} remains addressable in ${lang}`);
+      const study = page.locator("#study-credit");
+      assert(await study.getByRole("heading", { name: lang === "zh" ? "自学资源" : "Self-study resources" }).isVisible(), `self-study resources are visible in ${lang}`);
+      for (const url of ["https://csdiy.wiki/", "https://1037.wiki/"]) assert(await study.locator(`a[href="${url}"]`).count() === 1, `${url} is credited in ${lang}`);
       const body = await page.locator(".thanks-page").textContent();
       for (const term of ["Neovim contributors", "folke", "Mario Zechner", "legeling", "Lee Galloway", "CC BY-NC 4.0", "CC BY-SA 3.0"]) assert(body.includes(term), `${term} credit survives in ${lang}`);
       assert(await page.locator('#site-footer a[href*="credits.html"]').count() === 1, `the footer still links to credits in ${lang}`);

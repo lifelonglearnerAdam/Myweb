@@ -2,6 +2,7 @@
 """Stage an allowlisted static site, never .git, local photos, configs, or backend secrets."""
 from pathlib import Path
 import argparse
+import re
 import shutil
 import subprocess
 import sys
@@ -26,7 +27,7 @@ for child in out.iterdir():
     if child.is_dir(): shutil.rmtree(child)
     else: child.unlink()
 subprocess.run([sys.executable, str(ROOT / "scripts/build_posts.py")], check=True)
-files = list(ROOT.glob("*.html")) + [ROOT / ".nojekyll", ROOT / "robots.txt", ROOT / "sitemap.xml"]
+files = list(ROOT.glob("*.html")) + [ROOT / ".nojekyll", ROOT / "robots.txt", ROOT / "sitemap.xml", ROOT / "indexnow-key.txt"]
 for file in files:
     shutil.copy2(file, out / file.name)
 for directory in ("assets", "web"):
@@ -36,6 +37,9 @@ for directory in ("assets", "web"):
 for p in out.rglob("*"):
     if p.is_file() and p.suffix in {".html", ".js", ".xml", ".txt"}:
         text = p.read_text(encoding="utf-8")
+        # Cloudflare serves these pages without .html; the suffixed URLs return a 307.
+        text = re.sub(r'https://lifelonglearneradam\.github\.io/Myweb/(archive|winter|resume|credits|project|note)\.html(?=[?"<#])',
+                      lambda match: site_url + match[1], text)
         text = text.replace("https://lifelonglearneradam.github.io/Myweb/", site_url)
         text = text.replace("lifelonglearneradam.github.io/Myweb/", site.hostname + "/")
         if p.name == "404.html": text = text.replace('<base href="/Myweb/">', '<base href="/">')

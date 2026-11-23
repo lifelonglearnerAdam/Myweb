@@ -174,6 +174,15 @@ def build(source):
     return posts
 
 
+def render_sitemap(posts):
+    urls = ["", "archive.html", "winter.html", "resume.html", "credits.html"]
+    urls += ["project.html?id=" + slug for slug in ("docsift", "miniso", "quantpilot", "ledger", "sat", "decibel", "monkeyocr")]
+    urls += ["note.html?id=" + post["id"] for post in posts]
+    base = "https://lifelonglearneradam.github.io/Myweb/"
+    entries = [f"  <url><loc>{html.escape(base + url)}</loc></url>" for url in urls]
+    return '\n'.join(['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">', *entries, '</urlset>', ''])
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", default=str(ROOT / "posts"))
@@ -185,18 +194,16 @@ def main():
         payload = json.dumps(posts, ensure_ascii=False, indent=2).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
         generated = "/* Generated from owner-published posts/*.md. Drafts are never included. */\nwindow.PORTFOLIO.notes = " + payload + ";\n"
         output = Path(args.output)
-        if args.check:
-            if not output.exists() or output.read_text(encoding="utf-8") != generated:
-                raise ValueError("Article data is stale; run npm run build.")
-        else:
-            output.parent.mkdir(parents=True, exist_ok=True)
-            output.write_text(generated, encoding="utf-8")
-            if output.resolve() == (ROOT / "assets/js/posts.js").resolve():
-                urls = ["", "archive.html", "winter.html", "resume.html", "credits.html"]
-                urls += ["project.html?id=" + value for value in ("docsift", "miniso", "quantpilot", "ledger", "sat", "decibel", "monkeyocr")]
-                urls += ["note.html?id=" + post["id"] for post in posts]
-                sitemap = '<?xml version="1.0" encoding="UTF-8"?>\\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\\n' + "".join('  <url><loc>https://lifelonglearneradam.github.io/Myweb/' + html.escape(url) + '</loc></url>\\n' for url in urls) + '</urlset>\\n'
-                (ROOT / "sitemap.xml").write_text(sitemap.replace('\\n', '\n'), encoding="utf-8")
+        files = {output: generated}
+        if output.resolve() == (ROOT / "assets/js/posts.js").resolve():
+            files[ROOT / "sitemap.xml"] = render_sitemap(posts)
+        for path, content in files.items():
+            if args.check:
+                if not path.exists() or path.read_text(encoding="utf-8") != content:
+                    raise ValueError(f"{path.name} is stale; run npm run build.")
+            else:
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(content, encoding="utf-8")
         print(f"{'Checked' if args.check else 'Built'} {len(posts)} published Markdown posts; drafts excluded.")
     except (ValueError, OSError) as error:
         print(error, file=sys.stderr)

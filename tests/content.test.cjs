@@ -313,8 +313,14 @@ test("custom-domain deployment rewrites only this site's links and excludes priv
     assert.match(html, /rel="canonical" href="https:\/\/zengzimo\.cn\/"/);
     const content = fs.readFileSync(path.join(output, "assets/js/content.js"), "utf8");
     assert.ok(content.includes("https://lifelonglearneradam.github.io/docsift/"), "Other project links are not rewritten");
-    assert.ok(fs.readFileSync(path.join(output, "sitemap.xml"), "utf8").includes("https://zengzimo.cn/project.html?id=docsift"));
-    assert.ok(fs.readFileSync(path.join(output, "robots.txt"), "utf8").includes("https://zengzimo.cn/sitemap.xml"));
+    const sitemap = fs.readFileSync(path.join(output, "sitemap.xml"), "utf8");
+    const locations = Array.from(sitemap.matchAll(/<loc>([^<]+)<\/loc>/g), match => match[1]);
+    const expected = ["", "archive", "winter", "resume", "credits", ...data.projects.map(p => `project?id=${p.id}`), ...data.notes.map(n => `note?id=${n.id}`)];
+    assert.deepEqual(locations.sort(), expected.map(route => `https://zengzimo.cn/${route}`).sort());
+    const robots = fs.readFileSync(path.join(output, "robots.txt"), "utf8");
+    assert.ok(robots.includes("Disallow: /api/") && robots.includes("Sitemap: https://zengzimo.cn/sitemap.xml"));
+    assert.match(fs.readFileSync(path.join(output, "indexnow-key.txt"), "utf8").trim(), /^[a-f0-9]{32}$/);
+    assert.ok(fs.readFileSync(path.join(output, "note.html"), "utf8").includes('name="detail-canonical-base" content="https://zengzimo.cn/note"'));
     assert.ok(fs.readFileSync(path.join(output, "404.html"), "utf8").includes('<base href="/">'));
     assert.ok(fs.readFileSync(path.join(output, "assets/js/app.js"), "utf8").includes("https://zengzimo.cn/"));
     for (const privatePath of [".git", "image", "server", ".env", ".dev.vars", "tests"]) assert.ok(!fs.existsSync(path.join(output, privatePath)), privatePath);
